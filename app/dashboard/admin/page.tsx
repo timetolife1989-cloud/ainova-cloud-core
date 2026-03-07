@@ -33,6 +33,12 @@ const ADMIN_MENU = [
     icon: 'FileText',
     href: '/dashboard/admin/audit-log',
   },
+  {
+    title: 'SAP Import',
+    description: 'Excel fájlok importálása: visszajelentés, normaidők, munkaterv',
+    icon: 'Upload',
+    href: '/dashboard/admin/sap-import',
+  },
 ] as const;
 
 export default function AdminPage() {
