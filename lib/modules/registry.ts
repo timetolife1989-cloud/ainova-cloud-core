@@ -140,3 +140,17 @@ export async function getActiveModuleIds(): Promise<string[]> {
     return [];
   }
 }
+
+// =====================================================
+// LAC modul regisztráció
+// =====================================================
+
+registerModule({
+  id: 'lac-napi-perces',
+  name: 'Napi Perces',
+  description: 'LAC gyártási teljesítmény — napi/heti/havi kimutatás',
+  icon: 'BarChart2',
+  href: '/dashboard/napi-perces',
+  color: 'bg-blue-500',
+  dependsOn: [],
+});
