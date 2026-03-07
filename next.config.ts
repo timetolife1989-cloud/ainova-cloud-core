@@ -1,6 +1,8 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Standalone output bundles server.js + node_modules for Docker
+  output: 'standalone',
   experimental: {
     serverActions: {
       bodySizeLimit: '50mb',

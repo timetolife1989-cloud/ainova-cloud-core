@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "docker:build": "docker build -t ainova-cloud-core:latest .",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f app",
+    "docker:dev:db": "docker-compose -f docker-compose.dev.yml up -d db"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.18",

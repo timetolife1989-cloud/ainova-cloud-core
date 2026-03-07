@@ -1,0 +1,74 @@
+# ============================================================
+# Ainova Cloud Core — Production docker-compose
+#
+# Usage:
+#   1. Copy .env.example to .env and fill in SA_PASSWORD
+#   2. docker-compose up -d
+#   3. docker-compose exec app npx tsx scripts/run-migration.ts database/core/001_core_users.sql
+#      (repeat for 002–005)
+#   4. Open http://localhost:3000  →  admin / Admin1234!
+#
+# To stop:  docker-compose down
+# To wipe:  docker-compose down -v   (removes DB data volume)
+# ============================================================
+
+services:
+
+  # ---- Microsoft SQL Server 2022 ----
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ainova-db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${SA_PASSWORD:-AinovaSecret1!}"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"${SA_PASSWORD:-AinovaSecret1!}\" -Q 'SELECT 1' -C -b -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  # ---- Ainova Cloud Core (Next.js) ----
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ainova-app
+    environment:
+      NODE_ENV: production
+      DB_ADAPTER: mssql
+      DB_SERVER: db
+      DB_DATABASE: "${DB_DATABASE:-AinovaCore}"
+      DB_USER: sa
+      DB_PASSWORD: "${SA_PASSWORD:-AinovaSecret1!}"
+      DB_PORT: "1433"
+      DB_CONNECTION_TIMEOUT: "30000"
+      DB_REQUEST_TIMEOUT: "30000"
+      DB_POOL_MIN: "2"
+      DB_POOL_MAX: "10"
+      AUTH_ADAPTER: session
+      SESSION_SECRET: "${SESSION_SECRET:-change-me-minimum-32-characters-long}"
+      UPLOAD_DIR: /ainova-uploads
+      FE_LOGIN_RATE_LIMIT: "true"
+      FE_LOGIN_AUDIT: "true"
+      NEXT_PUBLIC_APP_NAME: "${NEXT_PUBLIC_APP_NAME:-Ainova Cloud Core}"
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    volumes:
+      - uploads:/ainova-uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  mssql-data:
+    driver: local
+  uploads:
+    driver: local

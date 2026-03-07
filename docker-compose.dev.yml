@@ -1,0 +1,67 @@
+# ============================================================
+# Ainova Cloud Core — Development docker-compose
+#
+# Mounts source code for hot-reload. DB only — app runs on host.
+#
+# Usage (DB only, app on host):
+#   docker-compose -f docker-compose.dev.yml up -d db
+#   npm run dev
+#
+# Usage (full stack in Docker with hot-reload):
+#   docker-compose -f docker-compose.dev.yml up
+# ============================================================
+
+services:
+
+  # ---- Microsoft SQL Server 2022 (dev) ----
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ainova-db-dev
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${SA_PASSWORD:-AinovaSecret1!}"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data-dev:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"${SA_PASSWORD:-AinovaSecret1!}\" -Q 'SELECT 1' -C -b -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---- App (dev mode with hot-reload) ----
+  app-dev:
+    image: node:22-slim
+    container_name: ainova-app-dev
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    environment:
+      NODE_ENV: development
+      DB_ADAPTER: mssql
+      DB_SERVER: db
+      DB_DATABASE: "${DB_DATABASE:-AinovaCore}"
+      DB_USER: sa
+      DB_PASSWORD: "${SA_PASSWORD:-AinovaSecret1!}"
+      DB_PORT: "1433"
+      AUTH_ADAPTER: session
+      SESSION_SECRET: "${SESSION_SECRET:-dev-secret-32-characters-minimum}"
+      UPLOAD_DIR: /ainova-uploads
+      NEXT_PUBLIC_APP_NAME: "${NEXT_PUBLIC_APP_NAME:-Ainova Cloud Core (Dev)}"
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - uploads-dev:/ainova-uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mssql-data-dev:
+    driver: local
+  uploads-dev:
+    driver: local
