@@ -1,9 +1,10 @@
 /**
- * Core migration runner
- * Usage: npx tsx scripts/run-migration.ts <prefix>
- * Examples:
- *   npx tsx scripts/run-migration.ts 001
- *   npx tsx scripts/run-migration.ts 001_core_users
+ * Migration runner
+ * Usage:
+ *   npx tsx scripts/run-migration.ts 001              -- prefix, keres database/core/-ban
+ *   npx tsx scripts/run-migration.ts all:core         -- összes core migráció
+ *   npx tsx scripts/run-migration.ts all:lac          -- összes lac migráció
+ *   npx tsx scripts/run-migration.ts database/lac/001_lac_sap_visszajelentes.sql  -- konkrét fájl
  */
 import sql from 'mssql';
 import * as dotenv from 'dotenv';
@@ -27,82 +28,101 @@ const cfg: sql.config = {
   requestTimeout:    120000,
 };
 
-async function main(): Promise<void> {
-  const prefix = process.argv[2];
-  if (!prefix) {
-    console.error('Usage: npx tsx scripts/run-migration.ts <prefix>');
-    console.error('Example: npx tsx scripts/run-migration.ts 001');
-    process.exit(1);
-  }
+async function runFile(pool: sql.ConnectionPool, filePath: string): Promise<void> {
+  console.log(`\n▶ ${path.basename(filePath)}`);
+  console.log('─'.repeat(55));
 
-  const migDir = path.join(process.cwd(), 'database', 'core');
-  if (!fs.existsSync(migDir)) {
-    console.error(`Migration directory not found: ${migDir}`);
-    process.exit(1);
-  }
-
-  const files = fs
-    .readdirSync(migDir)
-    .filter(f => f.startsWith(prefix) && f.endsWith('.sql'))
-    .sort();
-
-  if (files.length === 0) {
-    console.error(`No SQL files matching "${prefix}*.sql" in ${migDir}`);
-    process.exit(1);
-  }
-
-  const file = files[0];
-  console.log(`\n▶ Running migration: ${file}`);
-  console.log('─'.repeat(50));
-
-  const sqlText = fs.readFileSync(path.join(migDir, file), 'utf8');
-
-  // Split on GO statement (case-insensitive, whole line)
+  const sqlText = fs.readFileSync(filePath, 'utf8');
   const batches = sqlText
     .split(/^\s*GO\s*$/im)
-    .map(b => b.trim())
-    .filter(b => {
+    .map((b: string) => b.trim())
+    .filter((b: string) => {
       if (!b) return false;
-      // Skip comment-only batches
       return !b.split('\n').every(
-        line => line.trim() === '' || line.trim().startsWith('--')
+        (line: string) => line.trim() === '' || line.trim().startsWith('--')
       );
     });
 
-  const pool = await sql.connect(cfg);
-  let batchIndex = 0;
-
+  let idx = 0;
   for (const batch of batches) {
-    batchIndex++;
+    idx++;
     try {
-      const result = await pool.request().query(batch);
-
-      // If batch returned rows (e.g. SELECT COUNT(*)), print them
-      if (result.recordset && result.recordset.length > 0) {
-        const row = result.recordset[0];
-        const summary = Object.entries(row)
-          .map(([k, v]) => `${k}: ${v}`)
-          .join(', ');
-        console.log(`  ✅ Batch ${batchIndex}: ${summary}`);
+      const res = await pool.request().query(batch);
+      if (res.recordset && res.recordset.length > 0) {
+        const row = res.recordset[0];
+        const summary = Object.entries(row).map(([k, v]) => `${k}: ${v}`).join(', ');
+        console.log(`  ✅ Batch ${idx}: ${summary}`);
       } else {
-        const affected = Array.isArray(result.rowsAffected)
-          ? result.rowsAffected.reduce((a, b) => a + b, 0)
-          : (result.rowsAffected ?? 0);
-        const firstLine = batch.split('\n').find(l => l.trim() && !l.trim().startsWith('--')) ?? '';
-        console.log(`  ✅ Batch ${batchIndex}: ${firstLine.slice(0, 60)}… (${affected} rows affected)`);
+        const affected = Array.isArray(res.rowsAffected)
+          ? (res.rowsAffected as number[]).reduce((a, b) => a + b, 0)
+          : (res.rowsAffected ?? 0);
+        const firstLine = batch.split('\n').find((l: string) => l.trim() && !l.trim().startsWith('--')) ?? '';
+        console.log(`  ✅ Batch ${idx}: ${firstLine.slice(0, 60)}… (${affected} rows)`);
       }
     } catch (e: unknown) {
       const err = e as Error & { number?: number };
-      console.error(`  ❌ Batch ${batchIndex} FAILED: ${err.message}`);
+      console.error(`  ❌ Batch ${idx} FAILED: ${err.message}`);
       if (err.number) console.error(`     SQL Error #${err.number}`);
-      console.error(`     SQL: ${batch.slice(0, 200)}`);
-      await pool.close();
+      console.error(`     SQL kezdete: ${batch.slice(0, 200)}`);
+      throw err;
+    }
+  }
+}
+
+async function main(): Promise<void> {
+  const arg = process.argv[2];
+  if (!arg) {
+    console.error('Használat: npx tsx scripts/run-migration.ts <prefix|all:core|all:lac|fájl.sql>');
+    console.error('Példák:');
+    console.error('  npx tsx scripts/run-migration.ts 001');
+    console.error('  npx tsx scripts/run-migration.ts all:core');
+    console.error('  npx tsx scripts/run-migration.ts all:lac');
+    console.error('  npx tsx scripts/run-migration.ts database/lac/001_lac_sap_visszajelentes.sql');
+    process.exit(1);
+  }
+
+  let files: string[] = [];
+
+  if (arg === 'all:core' || arg === 'all:lac') {
+    const folder = arg === 'all:core' ? 'core' : 'lac';
+    const dir = path.join(process.cwd(), 'database', folder);
+    files = fs.readdirSync(dir)
+      .filter((f: string) => f.endsWith('.sql'))
+      .sort()
+      .map((f: string) => path.join(dir, f));
+    console.log(`\n🗂  ${files.length} migráció a database/${folder}/ könyvtárban`);
+  } else if (arg.endsWith('.sql')) {
+    const full = path.isAbsolute(arg) ? arg : path.join(process.cwd(), arg);
+    if (!fs.existsSync(full)) {
+      console.error(`Fájl nem található: ${full}`);
       process.exit(1);
     }
+    files = [full];
+  } else {
+    // prefix — keres database/core/-ban
+    const dir = path.join(process.cwd(), 'database', 'core');
+    const found = fs.readdirSync(dir)
+      .filter((f: string) => f.startsWith(arg) && f.endsWith('.sql'))
+      .sort();
+    if (found.length === 0) {
+      console.error(`Nem találtam "${arg}*.sql" fájlt a database/core/ könyvtárban`);
+      process.exit(1);
+    }
+    files = [path.join(dir, found[0])];
+  }
+
+  const pool = await sql.connect(cfg);
+  try {
+    for (const f of files) {
+      await runFile(pool, f);
+    }
+  } catch {
+    await pool.close();
+    process.exit(1);
   }
 
   await pool.close();
-  console.log('\n✅ Migration complete!\n');
+  console.log('\n✅ Minden migráció kész!\n');
 }
 
 main().catch((e: unknown) => {
