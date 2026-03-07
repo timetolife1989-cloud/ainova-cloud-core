@@ -1,0 +1,129 @@
+'use client';
+
+import { useState } from 'react';
+import * as LucideIcons from 'lucide-react';
+import type { ModuleDefinition } from '@/lib/modules/registry';
+
+interface ModuleToggleCardProps {
+  module: ModuleDefinition;
+  isActive: boolean;
+  activeIds: string[];
+  allModules: ModuleDefinition[];
+  onToggle: (moduleId: string, enable: boolean) => Promise<void>;
+}
+
+export function ModuleToggleCard({
+  module,
+  isActive,
+  activeIds,
+  allModules,
+  onToggle,
+}: ModuleToggleCardProps) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const Icon = (LucideIcons[module.icon as keyof typeof LucideIcons] ?? LucideIcons.Package) as React.ComponentType<{ className?: string }>;
+
+  // Check if this toggle is currently blocked (pre-flight, same logic as server)
+  const missingDeps = (module.dependsOn ?? []).filter(dep => !activeIds.includes(dep));
+  const dependents  = allModules.filter(
+    m => activeIds.includes(m.id) && m.dependsOn?.includes(module.id)
+  );
+
+  const canEnable  = !isActive && missingDeps.length === 0;
+  const canDisable = isActive  && dependents.length === 0;
+  const isBlocked  = isActive ? !canDisable : !canEnable;
+
+  const blockReason = isActive && dependents.length > 0
+    ? `Aktív függő modulok: ${dependents.map(m => m.name).join(', ')}`
+    : !isActive && missingDeps.length > 0
+      ? `Szükséges modulok: ${missingDeps.map(id => allModules.find(m => m.id === id)?.name ?? id).join(', ')}`
+      : null;
+
+  const handleToggle = async () => {
+    if (isBlocked || loading) return;
+    setLoading(true);
+    setError(null);
+    try {
+      await onToggle(module.id, !isActive);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Hiba történt');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className={`rounded-xl border p-5 transition-all ${
+      isActive
+        ? 'bg-gray-900 border-indigo-700'
+        : 'bg-gray-950 border-gray-800'
+    }`}>
+      <div className="flex items-start justify-between gap-4">
+        {/* Left: icon + info */}
+        <div className="flex items-start gap-3 min-w-0">
+          <div className={`p-2 rounded-lg flex-shrink-0 ${
+            isActive ? 'bg-indigo-900/50' : 'bg-gray-800'
+          }`}>
+            <Icon className={`w-5 h-5 ${isActive ? 'text-indigo-400' : 'text-gray-500'}`} />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-sm text-gray-100">{module.name}</span>
+              {module.version && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-700 text-gray-400">
+                  v{module.version}
+                </span>
+              )}
+              {isActive && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-900 text-indigo-300">
+                  Aktív
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-0.5">{module.description}</p>
+
+            {/* Dependencies info */}
+            {(module.dependsOn ?? []).length > 0 && (
+              <p className="text-[10px] text-gray-600 mt-1">
+                Igényli: {(module.dependsOn ?? [])
+                  .map(id => allModules.find(m => m.id === id)?.name ?? id)
+                  .join(', ')}
+              </p>
+            )}
+
+            {/* Block reason */}
+            {blockReason && (
+              <p className="text-[10px] text-yellow-600 mt-1">{blockReason}</p>
+            )}
+
+            {/* Error */}
+            {error && (
+              <p className="text-[10px] text-red-400 mt-1">{error}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Right: toggle switch */}
+        <button
+          onClick={() => void handleToggle()}
+          disabled={isBlocked || loading}
+          title={blockReason ?? (isActive ? 'Kikapcsolás' : 'Bekapcsolás')}
+          className={`relative flex-shrink-0 w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${
+            loading
+              ? 'opacity-50 cursor-wait'
+              : isBlocked
+                ? 'opacity-30 cursor-not-allowed'
+                : 'cursor-pointer'
+          } ${isActive ? 'bg-indigo-600' : 'bg-gray-700'}`}
+          aria-checked={isActive}
+          role="switch"
+        >
+          <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+            isActive ? 'translate-x-5' : 'translate-x-0'
+          }`} />
+        </button>
+      </div>
+    </div>
+  );
+}
