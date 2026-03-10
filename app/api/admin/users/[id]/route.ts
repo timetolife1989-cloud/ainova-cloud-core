@@ -1,5 +1,6 @@
 import { type NextRequest } from 'next/server';
-import { checkSession, checkCsrf } from '@/lib/api-utils';
+import { checkCsrf } from '@/lib/api-utils';
+import { checkAuth } from '@/lib/rbac/middleware';
 import { getAuth } from '@/lib/auth';
 import { UpdateUserSchema } from '@/lib/validators/user';
 
@@ -9,11 +10,8 @@ interface RouteContext {
 
 // GET /api/admin/users/[id]
 export async function GET(request: NextRequest, context: RouteContext) {
-  const session = await checkSession(request);
-  if (!session.valid) return session.response;
-  if (session.role !== 'admin' && session.role !== 'manager') {
-    return Response.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  const auth = await checkAuth(request, 'users.view');
+  if (!auth.valid) return auth.response;
 
   const { id } = await context.params;
   const userId = parseInt(id, 10);
@@ -31,11 +29,8 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
 // PUT /api/admin/users/[id]
 export async function PUT(request: NextRequest, context: RouteContext) {
-  const session = await checkSession(request);
-  if (!session.valid) return session.response;
-  if (session.role !== 'admin') {
-    return Response.json({ error: 'Csak admin módosíthat felhasználót' }, { status: 403 });
-  }
+  const auth = await checkAuth(request, 'users.manage');
+  if (!auth.valid) return auth.response;
 
   const csrf = checkCsrf(request);
   if (!csrf.valid) return csrf.response;
@@ -71,11 +66,8 @@ export async function PUT(request: NextRequest, context: RouteContext) {
 
 // DELETE /api/admin/users/[id]  — soft delete (deactivate)
 export async function DELETE(request: NextRequest, context: RouteContext) {
-  const session = await checkSession(request);
-  if (!session.valid) return session.response;
-  if (session.role !== 'admin') {
-    return Response.json({ error: 'Csak admin deaktiválhat felhasználót' }, { status: 403 });
-  }
+  const auth = await checkAuth(request, 'users.manage');
+  if (!auth.valid) return auth.response;
 
   const csrf = checkCsrf(request);
   if (!csrf.valid) return csrf.response;
@@ -87,7 +79,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
   }
 
   // Prevent self-deactivation
-  if (userId === session.userId) {
+  if (userId === auth.userId) {
     return Response.json({ error: 'Saját magadat nem deaktiválhatod' }, { status: 400 });
   }
 

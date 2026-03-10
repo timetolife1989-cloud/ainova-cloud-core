@@ -1,0 +1,317 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
+import { ClipboardCheck, Plus, X, Check, AlertTriangle, Clock, CheckCircle, Circle, AlertCircle } from 'lucide-react';
+
+interface TrackingItem {
+  id: number;
+  referenceCode: string | null;
+  title: string;
+  description: string | null;
+  status: string;
+  priority: string;
+  assignedTo: string | null;
+  quantity: number | null;
+  dueDate: string | null;
+  createdAt: string;
+}
+
+const PRIORITIES = [
+  { value: 'low', label: 'Alacsony', color: 'text-gray-400' },
+  { value: 'normal', label: 'Normál', color: 'text-blue-400' },
+  { value: 'high', label: 'Magas', color: 'text-orange-400' },
+  { value: 'urgent', label: 'Sürgős', color: 'text-red-400' },
+];
+
+const DEFAULT_STATUSES = ['Nyitott', 'Folyamatban', 'Kész', 'Lezárt'];
+
+function getStatusIcon(status: string) {
+  switch (status) {
+    case 'Nyitott': return <Circle className="w-4 h-4 text-gray-400" />;
+    case 'Folyamatban': return <Clock className="w-4 h-4 text-blue-400" />;
+    case 'Kész': return <CheckCircle className="w-4 h-4 text-green-400" />;
+    case 'Lezárt': return <Check className="w-4 h-4 text-gray-500" />;
+    default: return <Circle className="w-4 h-4 text-gray-400" />;
+  }
+}
+
+export default function TrackingDashboardPage() {
+  const [items, setItems] = useState<TrackingItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string>('');
+
+  // Form state
+  const [formRef, setFormRef] = useState('');
+  const [formTitle, setFormTitle] = useState('');
+  const [formDesc, setFormDesc] = useState('');
+  const [formPriority, setFormPriority] = useState('normal');
+  const [formAssigned, setFormAssigned] = useState('');
+  const [formDueDate, setFormDueDate] = useState('');
+
+  const fetchData = useCallback(async () => {
+    try {
+      let url = '/api/modules/tracking/data';
+      if (filterStatus) url += `?status=${encodeURIComponent(filterStatus)}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const json = await res.json() as { items: TrackingItem[] };
+        setItems(json.items);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [filterStatus]);
+
+  useEffect(() => {
+    void fetchData();
+  }, [fetchData]);
+
+  const getCsrfToken = () => {
+    return document.cookie.split('; ').find(c => c.startsWith('csrf-token='))?.split('=')[1] ?? '';
+  };
+
+  const handleSave = async () => {
+    if (!formTitle.trim()) {
+      setError('Cím megadása kötelező');
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/modules/tracking/data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': getCsrfToken(),
+        },
+        body: JSON.stringify({
+          referenceCode: formRef || undefined,
+          title: formTitle,
+          description: formDesc || undefined,
+          priority: formPriority,
+          assignedTo: formAssigned || undefined,
+          dueDate: formDueDate || undefined,
+        }),
+      });
+
+      const body = await res.json() as { ok?: boolean; error?: string };
+      if (!res.ok) throw new Error(body.error ?? 'Hiba');
+
+      setModalOpen(false);
+      resetForm();
+      await fetchData();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Hiba történt');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleStatusChange = async (item: TrackingItem, newStatus: string) => {
+    try {
+      await fetch(`/api/modules/tracking/data/${item.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': getCsrfToken(),
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      await fetchData();
+    } catch {
+      // ignore
+    }
+  };
+
+  const resetForm = () => {
+    setFormRef('');
+    setFormTitle('');
+    setFormDesc('');
+    setFormPriority('normal');
+    setFormAssigned('');
+    setFormDueDate('');
+  };
+
+  // Summary
+  const openCount = items.filter(i => i.status === 'Nyitott').length;
+  const inProgressCount = items.filter(i => i.status === 'Folyamatban').length;
+  const doneCount = items.filter(i => i.status === 'Kész' || i.status === 'Lezárt').length;
+  const overdueCount = items.filter(i => i.dueDate && new Date(i.dueDate) < new Date() && i.status !== 'Kész' && i.status !== 'Lezárt').length;
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <DashboardSectionHeader title="Felkövetés" subtitle="Feladat és rendelés követés" />
+        <div className="animate-pulse space-y-4 mt-6">
+          <div className="grid grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-20 bg-gray-800 rounded-xl" />)}
+          </div>
+          <div className="h-64 bg-gray-800 rounded-xl" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex items-center justify-between mb-6">
+        <DashboardSectionHeader title="Felkövetés" subtitle="Feladat és rendelés követés" />
+        <button
+          onClick={() => setModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium"
+        >
+          <Plus className="w-4 h-4" /> Új feladat
+        </button>
+      </div>
+
+      {/* Summary cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-700" onClick={() => setFilterStatus('Nyitott')}>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gray-800 rounded-lg"><Circle className="w-5 h-5 text-gray-400" /></div>
+            <div>
+              <p className="text-xs text-gray-500">Nyitott</p>
+              <p className="text-2xl font-bold text-white">{openCount}</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-700" onClick={() => setFilterStatus('Folyamatban')}>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-900/30 rounded-lg"><Clock className="w-5 h-5 text-blue-400" /></div>
+            <div>
+              <p className="text-xs text-gray-500">Folyamatban</p>
+              <p className="text-2xl font-bold text-white">{inProgressCount}</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-700" onClick={() => setFilterStatus('')}>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-900/30 rounded-lg"><CheckCircle className="w-5 h-5 text-green-400" /></div>
+            <div>
+              <p className="text-xs text-gray-500">Kész</p>
+              <p className="text-2xl font-bold text-white">{doneCount}</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-red-900/30 rounded-lg"><AlertCircle className="w-5 h-5 text-red-400" /></div>
+            <div>
+              <p className="text-xs text-gray-500">Késedelmes</p>
+              <p className="text-2xl font-bold text-white">{overdueCount}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter */}
+      <div className="flex gap-2 mb-4">
+        <button onClick={() => setFilterStatus('')} className={`px-3 py-1.5 text-xs rounded-lg border ${!filterStatus ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-gray-900 border-gray-700 text-gray-400'}`}>Összes</button>
+        {DEFAULT_STATUSES.map(s => (
+          <button key={s} onClick={() => setFilterStatus(s)} className={`px-3 py-1.5 text-xs rounded-lg border ${filterStatus === s ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-gray-900 border-gray-700 text-gray-400'}`}>{s}</button>
+        ))}
+      </div>
+
+      {/* Items list */}
+      <div className="space-y-2">
+        {items.map(item => (
+          <div key={item.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {getStatusIcon(item.status)}
+              <div>
+                <div className="flex items-center gap-2">
+                  {item.referenceCode && <span className="text-xs text-gray-500 font-mono">{item.referenceCode}</span>}
+                  <h3 className="text-white font-medium">{item.title}</h3>
+                  <span className={`text-xs ${PRIORITIES.find(p => p.value === item.priority)?.color ?? 'text-gray-400'}`}>
+                    {PRIORITIES.find(p => p.value === item.priority)?.label}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500">
+                  {item.assignedTo && <span>Felelős: {item.assignedTo} • </span>}
+                  {item.dueDate && <span>Határidő: {item.dueDate}</span>}
+                </p>
+              </div>
+            </div>
+            <select
+              value={item.status}
+              onChange={e => handleStatusChange(item, e.target.value)}
+              className="bg-gray-800 border border-gray-700 rounded-lg px-2 py-1 text-sm text-gray-300"
+            >
+              {DEFAULT_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+        ))}
+        {items.length === 0 && (
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
+            <ClipboardCheck className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+            <p className="text-gray-400">Nincs feladat</p>
+          </div>
+        )}
+      </div>
+
+      {/* Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-white">Új feladat</h3>
+              <button onClick={() => setModalOpen(false)} className="p-1 hover:bg-gray-800 rounded">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Hivatkozási szám</label>
+                <input type="text" value={formRef} onChange={e => setFormRef(e.target.value)} placeholder="pl. ORD-001" className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Cím *</label>
+                <input type="text" value={formTitle} onChange={e => setFormTitle(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Leírás</label>
+                <textarea value={formDesc} onChange={e => setFormDesc(e.target.value)} rows={2} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Prioritás</label>
+                  <select value={formPriority} onChange={e => setFormPriority(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100">
+                    {PRIORITIES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Felelős</label>
+                  <input type="text" value={formAssigned} onChange={e => setFormAssigned(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Határidő</label>
+                <input type="date" value={formDueDate} onChange={e => setFormDueDate(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" />
+              </div>
+            </div>
+
+            {error && (
+              <div className="mt-4 p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-300 text-sm flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" /> {error}
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button onClick={() => setModalOpen(false)} className="px-4 py-2 text-gray-400 hover:text-gray-300 text-sm">Mégse</button>
+              <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium disabled:opacity-50">
+                <Check className="w-4 h-4" />{saving ? 'Mentés...' : 'Mentés'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

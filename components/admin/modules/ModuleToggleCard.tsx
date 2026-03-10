@@ -10,6 +10,7 @@ interface ModuleToggleCardProps {
   activeIds: string[];
   allModules: ModuleDefinition[];
   onToggle: (moduleId: string, enable: boolean) => Promise<void>;
+  licensedModules?: string[];
 }
 
 export function ModuleToggleCard({
@@ -18,6 +19,7 @@ export function ModuleToggleCard({
   activeIds,
   allModules,
   onToggle,
+  licensedModules,
 }: ModuleToggleCardProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,15 +32,21 @@ export function ModuleToggleCard({
     m => activeIds.includes(m.id) && m.dependsOn?.includes(module.id)
   );
 
-  const canEnable  = !isActive && missingDeps.length === 0;
+  const isLicenseLocked = licensedModules
+    ? !licensedModules.includes('*') && !licensedModules.includes(module.id)
+    : false;
+
+  const canEnable  = !isActive && missingDeps.length === 0 && !isLicenseLocked;
   const canDisable = isActive  && dependents.length === 0;
   const isBlocked  = isActive ? !canDisable : !canEnable;
 
-  const blockReason = isActive && dependents.length > 0
-    ? `Aktív függő modulok: ${dependents.map(m => m.name).join(', ')}`
-    : !isActive && missingDeps.length > 0
-      ? `Szükséges modulok: ${missingDeps.map(id => allModules.find(m => m.id === id)?.name ?? id).join(', ')}`
-      : null;
+  const blockReason = isLicenseLocked
+    ? 'Licenc szükséges'
+    : isActive && dependents.length > 0
+      ? `Aktív függő modulok: ${dependents.map(m => m.name).join(', ')}`
+      : !isActive && missingDeps.length > 0
+        ? `Szükséges modulok: ${missingDeps.map(id => allModules.find(m => m.id === id)?.name ?? id).join(', ')}`
+        : null;
 
   const handleToggle = async () => {
     if (isBlocked || loading) return;
@@ -78,6 +86,11 @@ export function ModuleToggleCard({
               {isActive && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-900 text-indigo-300">
                   Aktív
+                </span>
+              )}
+              {isLicenseLocked && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-900/50 text-red-400 flex items-center gap-1">
+                  <LucideIcons.Lock className="w-3 h-3" /> Licenc szükséges
                 </span>
               )}
             </div>

@@ -66,13 +66,13 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
 
       if (!res.ok) {
         const data = await res.json() as { error?: string };
-        showToast(setSettingsToast, { type: 'error', message: data.error ?? 'Mentés sikertelen' });
+        showToast(setSettingsToast, { type: 'error', message: data.error ?? 'Save failed' });
         return;
       }
 
-      showToast(setSettingsToast, { type: 'success', message: 'Beállítások mentve' });
+      showToast(setSettingsToast, { type: 'success', message: 'Settings saved' });
     } catch {
-      showToast(setSettingsToast, { type: 'error', message: 'Hálózati hiba' });
+      showToast(setSettingsToast, { type: 'error', message: 'Network error' });
     }
   };
 
@@ -95,14 +95,14 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
       const data = await res.json() as { ok?: boolean; path?: string; error?: string };
 
       if (!res.ok || !data.ok) {
-        showToast(setLogoToast, { type: 'error', message: data.error ?? 'Feltöltés sikertelen' });
+        showToast(setLogoToast, { type: 'error', message: data.error ?? 'Upload failed' });
         return;
       }
 
       setLogoPath(data.path ?? '');
-      showToast(setLogoToast, { type: 'success', message: 'Logó feltöltve' });
+      showToast(setLogoToast, { type: 'success', message: 'Logo uploaded' });
     } catch {
-      showToast(setLogoToast, { type: 'error', message: 'Hálózati hiba' });
+      showToast(setLogoToast, { type: 'error', message: 'Network error' });
     }
   };
 
@@ -121,7 +121,7 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
       return (
         <span className="inline-flex items-center gap-1.5 text-sm text-gray-400">
           <Loader2 className="w-4 h-4 animate-spin" />
-          Mentés…
+          Saving…
         </span>
       );
     }
@@ -148,13 +148,13 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
       {/* ── Branding fields ── */}
       <section className="rounded-xl bg-gray-900 border border-gray-800 p-6 space-y-6">
         <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">
-          Alkalmazás neve
+          Application Name
         </h3>
 
         {/* App name */}
         <div>
           <label className="block text-sm text-gray-400 mb-1.5" htmlFor="app-name">
-            Alkalmazás neve
+            Application Name
           </label>
           <input
             id="app-name"
@@ -169,7 +169,7 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
         {/* Primary color */}
         <div>
           <label className="block text-sm text-gray-400 mb-1.5">
-            Elsődleges szín
+            Primary Color
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -177,7 +177,7 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
               value={primaryColor}
               onChange={(e) => setPrimaryColor(e.target.value)}
               className="h-9 w-14 cursor-pointer rounded-md border border-gray-700 bg-gray-800 p-0.5"
-              title="Elsődleges szín"
+              title="Primary Color"
             />
             <input
               type="text"
@@ -190,7 +190,7 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
             <div
               className="h-9 w-9 rounded-md border border-gray-700 flex-shrink-0"
               style={{ backgroundColor: primaryColor }}
-              title="Előnézet"
+              title="Preview"
             />
           </div>
         </div>
@@ -198,7 +198,7 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
         {/* Secondary color */}
         <div>
           <label className="block text-sm text-gray-400 mb-1.5">
-            Másodlagos szín
+            Secondary Color
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -206,7 +206,7 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
               value={secondaryColor}
               onChange={(e) => setSecondaryColor(e.target.value)}
               className="h-9 w-14 cursor-pointer rounded-md border border-gray-700 bg-gray-800 p-0.5"
-              title="Másodlagos szín"
+              title="Secondary Color"
             />
             <input
               type="text"
@@ -219,7 +219,7 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
             <div
               className="h-9 w-9 rounded-md border border-gray-700 flex-shrink-0"
               style={{ backgroundColor: secondaryColor }}
-              title="Előnézet"
+              title="Preview"
             />
           </div>
         </div>
@@ -232,7 +232,7 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
             className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 text-sm font-medium text-white transition-colors"
           >
             <Save className="w-4 h-4" />
-            Mentés
+            Save
           </button>
           <Toast state={settingsToast} />
         </div>
@@ -241,7 +241,7 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
       {/* ── Logo upload ── */}
       <section className="rounded-xl bg-gray-900 border border-gray-800 p-6 space-y-4">
         <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">
-          Logó
+          Logo
         </h3>
 
         {/* Current logo preview */}
@@ -250,7 +250,7 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
             <div className="relative h-16 w-40 rounded-lg bg-gray-800 border border-gray-700 overflow-hidden flex items-center justify-center">
               <Image
                 src={logoPath}
-                alt="Jelenlegi logó"
+                alt="Current logo"
                 fill
                 className="object-contain p-2"
                 unoptimized
@@ -260,7 +260,7 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
           </div>
         ) : (
           <div className="h-16 w-40 rounded-lg bg-gray-800 border border-dashed border-gray-700 flex items-center justify-center">
-            <p className="text-xs text-gray-600">Nincs logó</p>
+            <p className="text-xs text-gray-600">No logo</p>
           </div>
         )}
 
@@ -272,7 +272,7 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
             accept="image/jpeg,image/png,image/svg+xml,image/webp"
             onChange={handleFileChange}
             className="sr-only"
-            aria-label="Logó feltöltése"
+            aria-label="Upload logo"
           />
           <button
             onClick={() => fileInputRef.current?.click()}
@@ -280,13 +280,13 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
             className="inline-flex items-center gap-2 rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 text-sm font-medium text-gray-200 transition-colors"
           >
             <Upload className="w-4 h-4" />
-            Logó feltöltése
+            Upload Logo
           </button>
           <Toast state={logoToast} />
         </div>
 
         <p className="text-xs text-gray-600">
-          JPG, PNG, SVG vagy WebP — max. 2 MB. A fájl neve <code className="text-gray-500">logo.&#123;ext&#125;</code> lesz.
+          JPG, PNG, SVG or WebP — max. 2 MB. File will be named <code className="text-gray-500">logo.&#123;ext&#125;</code>.
         </p>
       </section>
     </div>

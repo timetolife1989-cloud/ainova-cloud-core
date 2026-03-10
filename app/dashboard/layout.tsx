@@ -1,7 +1,10 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getAuth } from '@/lib/auth';
+import { getLocale, getTranslationsForLocale } from '@/lib/i18n';
 import { Header } from '@/components/core/Header';
+import { CommandPalette } from '@/components/core/CommandPalette';
+import { I18nProvider } from '@/components/core/I18nProvider';
 
 export default async function DashboardLayout({
   children,
@@ -20,16 +23,23 @@ export default async function DashboardLayout({
     redirect('/login');
   }
 
+  const locale = await getLocale();
+  const translations = await getTranslationsForLocale(locale);
+
   return (
-    <div className="min-h-screen bg-gray-950">
-      <Header
-        appName={process.env.NEXT_PUBLIC_APP_NAME ?? 'Ainova'}
-        username={session.fullName || session.username}
-        role={session.role}
-      />
-      <main className="pt-16">
-        {children}
-      </main>
-    </div>
+    <I18nProvider locale={locale} translations={translations}>
+      <div className="min-h-screen bg-gray-950">
+        <Header
+          appName={process.env.NEXT_PUBLIC_APP_NAME ?? 'Ainova'}
+          username={session.fullName || session.username}
+          role={session.role}
+          locale={locale}
+        />
+        <main className="pt-16">
+          {children}
+        </main>
+        <CommandPalette />
+      </div>
+    </I18nProvider>
   );
 }

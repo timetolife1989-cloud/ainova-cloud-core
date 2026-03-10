@@ -1,17 +1,16 @@
 import { type NextRequest } from 'next/server';
-import { checkSession, checkCsrf } from '@/lib/api-utils';
+import { checkCsrf } from '@/lib/api-utils';
+import { checkAuth } from '@/lib/rbac/middleware';
 import { getAuth } from '@/lib/auth';
 import { CreateUserSchema } from '@/lib/validators/user';
+import { canCreateUser } from '@/lib/license';
 import bcrypt from 'bcryptjs';
 import { BCRYPT_ROUNDS, DEFAULT_PAGE_SIZE } from '@/lib/constants';
 
 // GET /api/admin/users?search=&role=&isActive=&page=
 export async function GET(request: NextRequest) {
-  const session = await checkSession(request);
-  if (!session.valid) return session.response;
-  if (session.role !== 'admin' && session.role !== 'manager') {
-    return Response.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  const auth = await checkAuth(request, 'users.view');
+  if (!auth.valid) return auth.response;
 
   const { searchParams } = new URL(request.url);
   const filter = {
@@ -30,14 +29,19 @@ export async function GET(request: NextRequest) {
 
 // POST /api/admin/users
 export async function POST(request: NextRequest) {
-  const session = await checkSession(request);
-  if (!session.valid) return session.response;
-  if (session.role !== 'admin') {
-    return Response.json({ error: 'Csak admin hozhat létre felhasználót' }, { status: 403 });
-  }
+  const auth = await checkAuth(request, 'users.manage');
+  if (!auth.valid) return auth.response;
 
   const csrf = checkCsrf(request);
   if (!csrf.valid) return csrf.response;
+
+  const userLimitOk = await canCreateUser();
+  if (!userLimitOk) {
+    return Response.json(
+      { error: 'Elérte a maximális felhasználó számot a jelenlegi licenccsomagban.' },
+      { status: 403 }
+    );
+  }
 
   const body = await request.json() as unknown;
   const parsed = CreateUserSchema.safeParse(body);

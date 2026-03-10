@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ROLE_COLORS, ROLE_LABELS, ROLES, type Role } from '@/lib/validators/user';
+import { ROLE_COLORS, ROLE_LABELS, FALLBACK_ROLES } from '@/lib/validators/user';
 import type { UserRecord } from '@/lib/auth';
 
 interface UserTableProps {
@@ -10,8 +10,8 @@ interface UserTableProps {
   onDeactivate: (userId: number, username: string) => void;
 }
 
-function isRole(value: string): value is Role {
-  return (ROLES as readonly string[]).includes(value);
+function isRole(value: string): boolean {
+  return (FALLBACK_ROLES as readonly string[]).includes(value);
 }
 
 function RoleBadge({ role }: { role: string }) {

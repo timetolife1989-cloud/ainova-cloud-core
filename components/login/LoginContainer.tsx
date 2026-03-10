@@ -5,14 +5,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { InputField } from './InputField';
 import { RippleButton } from './RippleButton';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type GlowState = 'idle' | 'success' | 'error';
 
-const ERROR_MESSAGES: Record<string, string> = {
-  invalid_credentials: 'Hibás felhasználónév vagy jelszó',
-  rate_limited: 'Túl sok sikertelen kísérlet. Próbáld újra 15 perc múlva.',
-  server_error: 'Szerverhiba. Kérjük, próbáld újra.',
-};
+// Error messages will be handled by useTranslation hook
 
 function getBorderColor(state: GlowState): string {
   if (state === 'error') return 'rgba(239, 68, 68, 0.8)';
@@ -26,12 +23,10 @@ function getGlowColor(state: GlowState): string {
   return 'rgba(99, 102, 241, 0.3)';
 }
 
-function mapErrorCode(code: string): string {
-  return ERROR_MESSAGES[code] ?? ERROR_MESSAGES.server_error;
-}
 
 export function LoginContainer() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -52,7 +47,7 @@ export function LoginContainer() {
     e.preventDefault();
 
     if (!username.trim() || !password) {
-      showError('Hiányzó felhasználónév vagy jelszó');
+      showError(t('auth.login_failed'));
       return;
     }
 
@@ -63,7 +58,7 @@ export function LoginContainer() {
       // 1. Fetch CSRF token
       const csrfRes = await fetch('/api/csrf');
       if (!csrfRes.ok) {
-        showError(ERROR_MESSAGES.server_error);
+        showError(t('auth.server_error'));
         return;
       }
       const { token: csrfToken } = (await csrfRes.json()) as { token: string };
@@ -80,15 +75,23 @@ export function LoginContainer() {
       });
 
       const data = (await res.json()) as {
-        success: boolean;
+        ok?: boolean;
+        success?: boolean;
         error?: string;
         user?: { firstLogin?: boolean };
         firstLogin?: boolean;
+        role?: string;
       };
 
-      if (!data.success) {
+      if (!data.ok && !data.success) {
         const code = data.error ?? 'server_error';
-        showError(mapErrorCode(code));
+        if (code === 'invalid_credentials') {
+          showError(t('auth.login_failed'));
+        } else if (code === 'rate_limited') {
+          showError(t('auth.rate_limited'));
+        } else {
+          showError(t('auth.server_error'));
+        }
         return;
       }
 
@@ -101,11 +104,12 @@ export function LoginContainer() {
 
       const isFirstLogin = data.firstLogin ?? data.user?.firstLogin ?? false;
 
+      // Immediate redirect with full page reload to ensure cookies are set
       setTimeout(() => {
-        router.push(isFirstLogin ? '/change-password?firstLogin=true' : '/dashboard');
-      }, 800);
+        window.location.href = isFirstLogin ? '/change-password?firstLogin=true' : '/dashboard';
+      }, 500);
     } catch {
-      showError('Nincs internetkapcsolat, vagy a szerver nem elérhető.');
+      showError('No internet connection or server unreachable.');
     } finally {
       setLoading(false);
     }
@@ -185,21 +189,21 @@ export function LoginContainer() {
         <div className="relative z-10">
           <form onSubmit={handleSubmit} noValidate>
             <InputField
-              label="Felhasználónév"
+              label={t('auth.username')}
               type="text"
               value={username}
               onChange={setUsername}
-              placeholder="Írd be a felhasználóneved"
+              placeholder={t('auth.username')}
               disabled={loading || isSuccess}
               autoComplete="username"
             />
 
             <InputField
-              label="Jelszó"
+              label={t('auth.password')}
               type="password"
               value={password}
               onChange={setPassword}
-              placeholder="Írd be a jelszavad"
+              placeholder={t('auth.password')}
               disabled={loading || isSuccess}
               autoComplete="current-password"
             />
@@ -210,7 +214,7 @@ export function LoginContainer() {
                 loading={loading}
                 disabled={loading || isSuccess}
               >
-                Bejelentkezés
+                {t('auth.login_button')}
               </RippleButton>
             </div>
           </form>
@@ -290,7 +294,7 @@ export function LoginContainer() {
                   textShadow: '0 0 10px rgba(16,185,129,0.5)',
                 }}
               >
-                Sikeres belépés!
+                Login successful!
               </p>
             </div>
           </motion.div>

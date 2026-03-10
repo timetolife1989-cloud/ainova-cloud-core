@@ -9,6 +9,10 @@ import type { ModuleDefinition } from '@/lib/modules/registry';
 interface ModulesResponse {
   modules: ModuleDefinition[];
   activeIds: string[];
+  license?: {
+    tier: string;
+    modulesAllowed: string[];
+  };
 }
 
 export default function ModulesPage() {
@@ -62,8 +66,8 @@ export default function ModulesPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <DashboardSectionHeader
-        title="Modulok"
-        subtitle="Modulok be- és kikapcsolása. A függőségek automatikusan ellenőrizve."
+        title="Modules"
+        subtitle="Enable and disable modules. Dependencies are automatically checked."
       />
 
       {loading ? (
@@ -75,11 +79,11 @@ export default function ModulesPage() {
       ) : !data || data.modules.length === 0 ? (
         <div className="rounded-xl border border-gray-800 bg-gray-900 p-12 text-center">
           <Package className="w-12 h-12 text-gray-700 mx-auto mb-4" />
-          <p className="text-gray-400 font-medium mb-2">Nincsenek telepített modulok</p>
+          <p className="text-gray-400 font-medium mb-2">No installed modules</p>
           <p className="text-sm text-gray-600">
-            Fázis 2-ben az üzleti modulok (workforce, performance, sap-import) regisztrálódnak ide.
+            Business modules (workforce, performance, sap-import) will be registered here in Phase 2.
             <br />
-            Minden modul önállóan be- és kikapcsolható, a függőségek automatikusan ellenőrizve.
+            Each module can be independently enabled/disabled with automatic dependency checking.
           </p>
         </div>
       ) : (
@@ -92,6 +96,7 @@ export default function ModulesPage() {
               activeIds={data.activeIds}
               allModules={data.modules}
               onToggle={handleToggle}
+              licensedModules={data.license?.modulesAllowed}
             />
           ))}
         </div>

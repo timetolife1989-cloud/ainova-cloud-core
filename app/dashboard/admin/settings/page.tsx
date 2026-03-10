@@ -13,8 +13,8 @@ export default async function SettingsPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <DashboardSectionHeader
-        title="Branding & Beállítások"
-        subtitle="Az alkalmazás megjelenése és alapkonfigurációja"
+        title="Branding & Settings"
+        subtitle="Application appearance and basic configuration"
       />
       <BrandingForm initialSettings={settings} />
     </div>

@@ -1,14 +1,11 @@
 import { type NextRequest } from 'next/server';
-import { checkSession } from '@/lib/api-utils';
+import { checkAuth } from '@/lib/rbac/middleware';
 import { getDb } from '@/lib/db';
 
 // GET /api/admin/audit-log?page=1&eventType=&username=&success=&dateFrom=&dateTo=
 export async function GET(request: NextRequest) {
-  const session = await checkSession(request);
-  if (!session.valid) return session.response;
-  if (session.role !== 'admin') {
-    return Response.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  const auth = await checkAuth(request, 'audit.view');
+  if (!auth.valid) return auth.response;
 
   const { searchParams } = new URL(request.url);
   const page      = parseInt(searchParams.get('page') ?? '1', 10);

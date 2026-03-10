@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ROLES, ROLE_LABELS } from '@/lib/validators/user';
+import { FALLBACK_ROLES, ROLE_LABELS } from '@/lib/validators/user';
 import type { UserRecord } from '@/lib/auth';
 
 // -----------------------------------------------------------------------
@@ -162,7 +162,7 @@ export function UserForm({ user }: UserFormProps) {
           required
           className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-600/50"
         >
-          {ROLES.map((r) => (
+          {FALLBACK_ROLES.map((r: string) => (
             <option key={r} value={r}>
               {ROLE_LABELS[r]}
             </option>

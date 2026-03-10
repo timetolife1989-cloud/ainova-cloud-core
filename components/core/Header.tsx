@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -8,9 +8,12 @@ interface HeaderProps {
   appName: string;
   username: string;
   role: string;
+  locale?: string;
 }
 
-const HU_DAYS = ['vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat'] as const;
+function getDayName(date: Date, locale: string): string {
+  return date.toLocaleDateString(locale, { weekday: 'long' });
+}
 
 function getInitials(name: string): string {
   if (!name) return '?';
@@ -46,11 +49,55 @@ function getRoleBadgeColor(role: string): string {
   return 'bg-gray-600 text-white';
 }
 
-export function Header({ appName, username, role }: HeaderProps) {
+const LOCALE_LABELS: Record<string, { flag: string; label: string }> = {
+  hu: { flag: '🇭🇺', label: 'Magyar' },
+  en: { flag: '🇬🇧', label: 'English' },
+  de: { flag: '🇩🇪', label: 'Deutsch' },
+};
+
+export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) {
   const router = useRouter();
-  const [currentTime, setCurrentTime] = React.useState(new Date());
+  const [currentTime, setCurrentTime] = React.useState<Date | null>(null);
+  const [langOpen, setLangOpen] = React.useState(false);
+  const langRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLocaleChange = async (newLocale: string) => {
+    setLangOpen(false);
+    
+    try {
+      const csrfRes = await fetch('/api/csrf');
+      if (!csrfRes.ok) throw new Error('CSRF token fetch failed');
+      const { token } = await csrfRes.json();
+      
+      const res = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
+        body: JSON.stringify({ key: 'app_locale', value: newLocale }),
+      });
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Failed to save locale: ${res.status} ${errorText}`);
+      }
+      
+      // Force full page reload to pick up new locale from server
+      window.location.reload();
+    } catch (err) {
+      console.error('[Header] Locale change failed:', err);
+      alert(`Language change failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
+
+  React.useEffect(() => {
+    setCurrentTime(new Date());
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000);
@@ -138,17 +185,70 @@ export function Header({ appName, username, role }: HeaderProps) {
             </div>
           </div>
 
-          {/* 3. Spacer */}
+          {/* 3. Language Switcher */}
+          <div className="relative flex-shrink-0 px-3 border-r border-gray-700" ref={langRef}>
+            <button
+              onClick={() => setLangOpen(!langOpen)}
+              className="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/10 transition-colors text-sm"
+            >
+              <span className="text-base">{LOCALE_LABELS[locale]?.flag ?? '🌐'}</span>
+              <span className="text-gray-300 text-xs font-medium">{locale.toUpperCase()}</span>
+              <svg className={`w-3 h-3 text-gray-400 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+            </button>
+            <AnimatePresence>
+              {langOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="absolute top-full right-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden z-50 min-w-[140px]"
+                >
+                  {Object.entries(LOCALE_LABELS).map(([code, { flag, label }]) => (
+                    <button
+                      key={code}
+                      onClick={() => handleLocaleChange(code)}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-blue-600/30 transition-colors ${
+                        code === locale ? 'bg-blue-600/20 text-blue-300' : 'text-gray-300'
+                      }`}
+                    >
+                      <span>{flag}</span>
+                      <span>{label}</span>
+                      {code === locale && <span className="ml-auto text-blue-400">✓</span>}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* 3b. Search trigger (Ctrl+K) */}
+          <div className="flex-shrink-0 px-2">
+            <button
+              onClick={() => document.dispatchEvent(new CustomEvent('toggle-command-palette'))}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-800/80 hover:bg-gray-700 border border-gray-700 transition-colors text-sm"
+            >
+              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <span className="text-gray-500 text-xs">Ctrl+K</span>
+            </button>
+          </div>
+
+          {/* 4. Spacer */}
           <div className="flex-1" />
 
           {/* 4. Date / time */}
           <div className="flex flex-col items-end text-sm px-4 border-r border-gray-700 flex-shrink-0">
-            <span className="text-white font-mono font-semibold text-xs">
-              {formatDateTime(currentTime)}
-            </span>
-            <span className="text-gray-400 text-[10px]">
-              {HU_DAYS[currentTime.getDay()]} &bull; {getWeekNumber(currentTime)}. hét
-            </span>
+            {currentTime ? (
+              <>
+                <span className="text-white font-mono font-semibold text-xs">
+                  {formatDateTime(currentTime)}
+                </span>
+                <span className="text-gray-400 text-[10px]">
+                  {getDayName(currentTime, locale)} &bull; {getWeekNumber(currentTime)}. hét
+                </span>
+              </>
+            ) : (
+              <span className="text-gray-500 font-mono text-xs">&mdash;</span>
+            )}
           </div>
 
           {/* 5. Logout */}
@@ -169,7 +269,7 @@ export function Header({ appName, username, role }: HeaderProps) {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <span className="tracking-wide">KILÉPÉS</span>
+                <span className="tracking-wide">{locale === 'en' ? 'LOGOUT' : locale === 'de' ? 'ABMELDEN' : 'KILÉPÉS'}</span>
               </span>
               <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-transparent pointer-events-none" />
             </motion.button>

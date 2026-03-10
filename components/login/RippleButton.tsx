@@ -51,12 +51,12 @@ export function RippleButton({
       disabled={disabled || loading}
       className="
         relative w-full py-3
-        bg-indigo-600 hover:bg-indigo-700
-        text-white font-medium rounded-lg text-sm
+        bg-blue-600 hover:bg-blue-500
+        text-white font-semibold rounded-xl text-sm
         disabled:opacity-50 disabled:cursor-not-allowed
         transition-all duration-200
         overflow-hidden
-        shadow-lg hover:shadow-xl hover:shadow-indigo-900/30
+        shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-500/40
       "
     >
       {/* Ripple animations */}
@@ -107,7 +107,7 @@ export function RippleButton({
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            <span>Bejelentkezés...</span>
+            <span>Signing in...</span>
           </>
         ) : (
           children

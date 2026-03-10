@@ -1,14 +1,11 @@
 import { type NextRequest } from 'next/server';
-import { checkSession } from '@/lib/api-utils';
+import { checkAuth } from '@/lib/rbac/middleware';
 import { getDb } from '@/lib/db';
 import { getActiveModuleIds } from '@/lib/modules/registry';
 
 export async function GET(request: NextRequest) {
-  const session = await checkSession(request);
-  if (!session.valid) return session.response;
-  if (session.role !== 'admin') {
-    return Response.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  const auth = await checkAuth(request, 'admin.access');
+  if (!auth.valid) return auth.response;
 
   const db = getDb();
 

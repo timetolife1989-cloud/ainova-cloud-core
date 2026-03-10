@@ -1,8 +1,14 @@
 import { getSetting } from '@/lib/settings';
+import { isModuleAllowed } from '@/lib/license';
+import { getDb } from '@/lib/db';
+import type { ModuleManifest, AdminSettingDef } from './types';
+
+// Re-export types
+export type { ModuleManifest, AdminSettingDef };
 
 /**
  * Module definition — registered by each module in their manifest.ts
- * Phase 2 modules will call registerModule() to add themselves here.
+ * Extended with optional manifest fields for full module support.
  */
 export interface ModuleDefinition {
   /** Unique module ID (e.g. 'workforce', 'performance') */
@@ -39,6 +45,18 @@ export interface ModuleDefinition {
 
   /** Module version for display */
   version?: string;
+
+  /** License tier required for this module */
+  tier?: 'basic' | 'professional' | 'enterprise';
+
+  /** Module-specific permissions */
+  permissions?: string[];
+
+  /** Admin panel settings definitions */
+  adminSettings?: AdminSettingDef[];
+
+  /** Migration file names */
+  migrations?: string[];
 }
 
 /** All registered modules — Phase 2 modules push into this array */
@@ -49,6 +67,35 @@ export function registerModule(mod: ModuleDefinition): void {
   const existing = ALL_MODULES.find(m => m.id === mod.id);
   if (!existing) {
     ALL_MODULES.push(mod);
+  }
+
+  // Auto-regisztráció: modul permission-ök (best-effort, non-blocking)
+  if (mod.permissions && mod.permissions.length > 0) {
+    ensurePermissionsExist(mod.id, mod.permissions).catch(() => {});
+  }
+}
+
+/**
+ * Ensure module permissions exist in the database.
+ * Non-blocking, best-effort — won't fail if DB is unavailable.
+ */
+async function ensurePermissionsExist(moduleId: string, permissions: string[]): Promise<void> {
+  try {
+    const db = getDb();
+    for (const perm of permissions) {
+      await db.query(
+        `IF NOT EXISTS (SELECT 1 FROM core_permissions WHERE permission_code = @p0)
+         INSERT INTO core_permissions (permission_code, description, module_id, is_builtin)
+         VALUES (@p0, @p1, @p2, 0)`,
+        [
+          { name: 'p0', type: 'nvarchar', value: perm },
+          { name: 'p1', type: 'nvarchar', value: `${moduleId} modul jogosultság` },
+          { name: 'p2', type: 'nvarchar', value: moduleId },
+        ]
+      );
+    }
+  } catch {
+    // Ignore — DB might not be ready yet
   }
 }
 
@@ -120,7 +167,13 @@ export async function getActiveModules(role: string): Promise<ModuleDefinition[]
     activeIds = [];
   }
 
-  const active = ALL_MODULES.filter(m => activeIds.includes(m.id));
+  // Szűrés: csak licencben engedélyezett ÉS admin által aktivált modulok
+  const licenseChecks = await Promise.all(
+    ALL_MODULES
+      .filter(m => activeIds.includes(m.id))
+      .map(async m => ({ mod: m, allowed: await isModuleAllowed(m.id) }))
+  );
+  const active = licenseChecks.filter(c => c.allowed).map(c => c.mod);
 
   if (role === 'admin') {
     active.push(ADMIN_MODULE);
@@ -140,17 +193,3 @@ export async function getActiveModuleIds(): Promise<string[]> {
     return [];
   }
 }
-
-// =====================================================
-// LAC modul regisztráció
-// =====================================================
-
-registerModule({
-  id: 'lac-napi-perces',
-  name: 'Napi Perces',
-  description: 'LAC gyártási teljesítmény — napi/heti/havi kimutatás',
-  icon: 'BarChart2',
-  href: '/dashboard/napi-perces',
-  color: 'bg-blue-500',
-  dependsOn: [],
-});

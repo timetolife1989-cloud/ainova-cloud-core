@@ -23,13 +23,17 @@ export function InputField({
   autoComplete,
   error,
 }: InputFieldProps) {
+  const fieldId = `field-${type}-${label.toLowerCase().replace(/\s+/g, '-')}`;
+  
   return (
     <div className="mb-5">
-      <label className="block text-sm text-gray-300 font-medium mb-2">
+      <label htmlFor={fieldId} className="block text-sm text-gray-300 font-medium mb-2">
         {label}
       </label>
 
       <input
+        id={fieldId}
+        name={fieldId}
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
