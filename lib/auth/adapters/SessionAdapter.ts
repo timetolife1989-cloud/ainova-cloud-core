@@ -62,9 +62,9 @@ interface UserRow {
   full_name: string | null;
   email: string | null;
   role: string;
-  is_active: boolean;
-  first_login: boolean;
-  created_at?: Date;
+  is_active: boolean | number;
+  first_login: boolean | number;
+  created_at?: Date | string | null;
 }
 
 interface SessionRow {
@@ -72,8 +72,8 @@ interface SessionRow {
   username: string;
   full_name: string | null;
   role: string;
-  expires_at: Date;
-  last_activity: Date | null;
+  expires_at: Date | string;
+  last_activity: Date | string | null;
 }
 
 interface CountRow {
@@ -286,7 +286,7 @@ export class SessionAdapter implements IAuthAdapter {
       const now = new Date();
 
       try {
-        const sessionParams = [
+        const sessionParams: QueryParam[] = [
           { name: 'session_id',    type: 'uuid',      value: sessionId },
           { name: 'user_id',       type: 'int',       value: user.id },
           { name: 'expires_at',    type: 'datetime2', value: expiresAt },
@@ -327,7 +327,7 @@ export class SessionAdapter implements IAuthAdapter {
         sessionId,
         userId: user.id,
         role: user.role,
-        firstLogin: user.first_login,
+        firstLogin: Boolean(user.first_login),
       };
     } catch (err) {
       if (err instanceof Error && err.message === 'rate_limited') {
@@ -666,6 +666,7 @@ export class SessionAdapter implements IAuthAdapter {
   // -------------------------------------------------------------------
 
   private mapUserRow(row: UserRow): UserRecord {
+    const createdAt = row.created_at ? new Date(row.created_at) : undefined;
     return {
       id:         row.id,
       username:   row.username,
@@ -674,7 +675,7 @@ export class SessionAdapter implements IAuthAdapter {
       role:       row.role,
       isActive:   Boolean(row.is_active),
       firstLogin: Boolean(row.first_login),
-      createdAt:  row.created_at,
+      createdAt:  Number.isNaN(createdAt?.getTime()) ? undefined : createdAt,
     };
   }
 }
