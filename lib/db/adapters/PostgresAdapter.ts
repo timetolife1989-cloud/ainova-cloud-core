@@ -98,7 +98,15 @@ function convertSqlSyntax(sqlStr: string): string {
   // OUTPUT INSERTED.id → RETURNING id
   s = s.replace(/OUTPUT\s+INSERTED\.(\w+)/gi, 'RETURNING $1');
 
-  // BIT values: is_active = 1 → is_active = TRUE (skip for now, keep compatible)
+  // BIT/BOOLEAN columns: = 1 → = true, = 0 → = false
+  // Matches patterns like: is_active = 1, first_login = 0, success = 0
+  s = s.replace(/\b(is_active|first_login|success|is_read|is_default)\s*=\s*1\b/gi, '$1 = true');
+  s = s.replace(/\b(is_active|first_login|success|is_read|is_default)\s*=\s*0\b/gi, '$1 = false');
+  // CASE WHEN bool_col = 1 THEN 1 ELSE 0 END → bool_col::int
+  s = s.replace(/CASE\s+WHEN\s+(\w+)\s*=\s*1\s+THEN\s+1\s+ELSE\s+0\s+END/gi, '$1::int');
+  // SET first_login = 0 / SET first_login = 1 (in UPDATE statements)
+  s = s.replace(/\b(first_login)\s*=\s*1\b/gi, '$1 = true');
+  s = s.replace(/\b(first_login)\s*=\s*0\b/gi, '$1 = false');
 
   // MERGE → handled by dialect helper, not auto-converted here
 
