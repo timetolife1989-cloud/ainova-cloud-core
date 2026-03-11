@@ -2,7 +2,7 @@
  * =====================================================================
  * MASTER DEMO SEEDER — Ainova Cloud Intelligence (ACI)
  * 30 days · 200-person factory · multilingual employees · OEE math
- * Usage:  DB_ADAPTER=sqlite npx tsx scripts/seed-demo-data.ts
+ * Usage:  npx tsx scripts/seed-demo-data.ts
  * =====================================================================
  */
 import * as dotenv from 'dotenv';
@@ -11,6 +11,24 @@ dotenv.config({ path: '.env.local' });
 import { getDb } from '../lib/db';
 import type { IDatabaseAdapter } from '../lib/db/IDatabase';
 import * as bcrypt from 'bcryptjs';
+
+const DB_ADAPTER = process.env.DB_ADAPTER ?? 'mssql';
+
+/**
+ * Convert INSERT OR IGNORE (SQLite) to the correct syntax for the active adapter.
+ * - SQLite: INSERT OR IGNORE INTO ...
+ * - PostgreSQL: INSERT INTO ... ON CONFLICT DO NOTHING
+ * - MSSQL: handled separately
+ */
+function insertIgnore(sql: string): string {
+  if (DB_ADAPTER === 'postgres') {
+    // Remove "OR IGNORE" and append ON CONFLICT DO NOTHING
+    const cleaned = sql.replace(/INSERT\s+OR\s+IGNORE\s+INTO/gi, 'INSERT INTO');
+    return cleaned.trimEnd().replace(/;?\s*$/, '') + ' ON CONFLICT DO NOTHING';
+  }
+  // SQLite: keep as is
+  return sql;
+}
 
 // ── Utilities ─────────────────────────────────────────────────────────
 function daysAgo(n: number) { const d = new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
@@ -24,7 +42,15 @@ function track(t: string, n=1) { stats[t]=(stats[t]??0)+n; }
 
 async function ex(db: IDatabaseAdapter, table: string, sql: string, params: {name:string;type:string;value:unknown}[]) {
   try {
-    const r = await db.execute(sql, params as Parameters<typeof db.execute>[1]);
+    let finalSql = sql;
+    // PostgreSQL: convert hardcoded integer boolean literals in VALUES clauses
+    // Only replace trailing ,1) and ,0) and the ,1,0) pattern for is_active+first_login
+    if (DB_ADAPTER === 'postgres') {
+      finalSql = finalSql.replace(/,1,0\)/g, ',true,false)');
+      finalSql = finalSql.replace(/,1\)/g, ',true)');
+      finalSql = finalSql.replace(/,0\)/g, ',false)');
+    }
+    const r = await db.execute(finalSql, params as Parameters<typeof db.execute>[1]);
     if (r.rowsAffected>0) track(table);
   } catch(e) {
     const msg=(e as Error).message??'';
@@ -134,9 +160,24 @@ const CUSTOMERS = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────
-// SECTION -1: CREATE TABLES IF NOT EXISTS (SQLite-native syntax)
+// SECTION -1: CREATE TABLES IF NOT EXISTS
+// For PostgreSQL: skip (migrations handle table creation)
+// For SQLite: create tables inline (SQLite-native syntax)
 // ─────────────────────────────────────────────────────────────────────
 async function createTablesIfNeeded(db: IDatabaseAdapter) {
+  if (DB_ADAPTER === 'postgres') {
+    console.log('[Seed] PostgreSQL — tábla létrehozás kihagyva (migrációk kezelik).');
+    // Bootstrap admin with known password
+    const adminHash = await bcrypt.hash('Admin1234!', 10);
+    try {
+      await db.execute(
+        `INSERT INTO core_users (username, password_hash, full_name, role, is_active, first_login) VALUES (@p0,@p1,@p2,@p3,true,false) ON CONFLICT (username) DO UPDATE SET password_hash=EXCLUDED.password_hash, full_name='Demo Admin', first_login=false`,
+        [{name:'p0',type:'nvarchar',value:'admin'},{name:'p1',type:'nvarchar',value:adminHash},
+         {name:'p2',type:'nvarchar',value:'Demo Admin'},{name:'p3',type:'nvarchar',value:'admin'}]);
+    } catch(e) { console.warn(`  [Admin upsert] ${(e as Error).message?.slice(0,80)}`); }
+    return;
+  }
+
   const ddl = [
     // core tables
     `CREATE TABLE IF NOT EXISTS core_users (
@@ -480,7 +521,12 @@ async function seedUsers(db: IDatabaseAdapter) {
        {name:'p2',type:'nvarchar',value:u.full},{name:'p3',type:'nvarchar',value:u.email},{name:'p4',type:'nvarchar',value:u.role}]
     );
   }
-  try { await db.execute(`UPDATE core_users SET first_login=0, full_name='Demo Admin' WHERE username='admin'`,[]); } catch{}
+  try {
+    const updateSql = DB_ADAPTER === 'postgres'
+      ? `UPDATE core_users SET first_login=false, full_name='Demo Admin' WHERE username='admin'`
+      : `UPDATE core_users SET first_login=0, full_name='Demo Admin' WHERE username='admin'`;
+    await db.execute(updateSql,[]);
+  } catch{}
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -498,8 +544,8 @@ async function seedSettings(db: IDatabaseAdapter) {
     try {
       await db.execute(`UPDATE core_settings SET setting_value=@p1 WHERE setting_key=@p0`,
         [{name:'p0',type:'nvarchar',value:k},{name:'p1',type:'nvarchar',value:v}]);
-      // SQLite fallback
-      await db.execute(`INSERT OR IGNORE INTO core_settings (setting_key,setting_value) VALUES (@p0,@p1)`,
+      // Fallback insert if setting didn't exist yet
+      await db.execute(insertIgnore(`INSERT OR IGNORE INTO core_settings (setting_key,setting_value) VALUES (@p0,@p1)`),
         [{name:'p0',type:'nvarchar',value:k},{name:'p1',type:'nvarchar',value:v}]);
     } catch {}
     track('core_settings');
@@ -948,14 +994,13 @@ async function seedScheduling(db: IDatabaseAdapter) {
       const planned = rand(35,42,1);
       const alloc   = rand(28,planned,1);
       const actual  = parseFloat(Math.min(alloc*rand(90,105)/100, planned).toFixed(1));
-      await db.execute(
+      await ex(db,'scheduling_capacity',
         `INSERT INTO scheduling_capacity (week_start,resource_type,resource_name,planned_hours,allocated_hours,actual_hours,created_by) VALUES (@p0,@p1,@p2,@p3,@p4,@p5,@p6)`,
         [{name:'p0',type:'nvarchar',value:weekStart},{name:'p1',type:'nvarchar',value:'area'},
          {name:'p2',type:'nvarchar',value:area},{name:'p3',type:'float',value:planned},
          {name:'p4',type:'float',value:alloc},{name:'p5',type:'float',value:actual},
          {name:'p6',type:'nvarchar',value:'manager_hu'}]
       );
-      track('scheduling_capacity');
       // 2-3 allocations per capacity slot
       const capRows = await db.query<{id:number}>(`SELECT id FROM scheduling_capacity WHERE week_start=@p0 AND resource_name=@p1`,
         [{name:'p0',type:'nvarchar',value:weekStart},{name:'p1',type:'nvarchar',value:area}]);

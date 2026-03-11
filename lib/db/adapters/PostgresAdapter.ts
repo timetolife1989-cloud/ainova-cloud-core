@@ -26,6 +26,8 @@ async function getPg(): Promise<any> {
 }
 
 function getConfig() {
+  const isCloud = (process.env.DEPLOYMENT_FLAVOR === 'cloud') ||
+                  (process.env.DB_SERVER ?? '').includes('supabase.com');
   return {
     host:     process.env.DB_SERVER ?? 'localhost',
     database: process.env.DB_DATABASE ?? 'ainova',
@@ -35,6 +37,11 @@ function getConfig() {
     max:      parseInt(process.env.DB_POOL_MAX ?? '10', 10),
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT ?? '30000', 10),
+    application_name: 'ainova-cloud-core',
+    // Supabase Transaction Pooler (PgBouncer) requires SSL and no prepared statements
+    ...(isCloud ? {
+      ssl: { rejectUnauthorized: false },
+    } : {}),
   };
 }
 
@@ -57,7 +64,12 @@ function convertParams(
   for (const p of sorted) {
     const regex = new RegExp(`@${p.name}\\b`, 'g');
     if (regex.test(converted)) {
-      values.push(p.value);
+      // Convert BIT type values to proper JS booleans for PostgreSQL BOOLEAN columns
+      let val = p.value;
+      if (p.type?.toLowerCase() === 'bit' && typeof val === 'number') {
+        val = val !== 0;
+      }
+      values.push(val);
       const paramIndex = values.length;
       converted = converted.replace(regex, `$${paramIndex}`);
     }
@@ -124,7 +136,8 @@ export class PostgresAdapter implements IDatabaseAdapter {
   ): Promise<T[]> {
     const pool = await this.getPool();
     const converted = convertParams(convertSqlSyntax(sqlStr), params);
-    const result = await pool.query(converted.sql, converted.values);
+    // Use unnamed (no prepared) statements for PgBouncer transaction-mode compatibility
+    const result = await pool.query({ text: converted.sql, values: converted.values, rowMode: undefined });
     return result.rows as T[];
   }
 
@@ -134,7 +147,7 @@ export class PostgresAdapter implements IDatabaseAdapter {
   ): Promise<{ rowsAffected: number }> {
     const pool = await this.getPool();
     const converted = convertParams(convertSqlSyntax(sqlStr), params);
-    const result = await pool.query(converted.sql, converted.values);
+    const result = await pool.query({ text: converted.sql, values: converted.values, rowMode: undefined });
     return { rowsAffected: result.rowCount ?? 0 };
   }
 
