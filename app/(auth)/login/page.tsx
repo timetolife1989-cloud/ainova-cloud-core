@@ -36,7 +36,7 @@ export default function LoginPage() {
         </motion.div>
 
         <div className="text-center">
-          <h1 className="text-2xl font-bold tracking-wider text-white">AINOVA CLOUD CORE</h1>
+          <h1 className="text-2xl font-bold tracking-wider text-white">AINOVA CLOUD INTELLIGENCE</h1>
           <p className="text-xs text-gray-500 mt-1 tracking-widest uppercase">Manufacturing Management Platform</p>
         </div>
       </div>

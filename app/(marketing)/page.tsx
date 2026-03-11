@@ -71,7 +71,7 @@ export default function LandingPage() {
 
             <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-6">
               <span className="bg-gradient-to-r from-blue-400 via-white to-purple-400 bg-clip-text text-transparent">
-                Ainova Cloud Core
+                Ainova Cloud Intelligence
               </span>
             </h1>
 
@@ -236,7 +236,7 @@ export default function LandingPage() {
       <footer className="border-t border-gray-800 py-8">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} Ainova Cloud Core. Minden jog fenntartva.
+            © {new Date().getFullYear()} Ainova Cloud Intelligence. Minden jog fenntartva.
           </div>
           <div className="flex items-center gap-6 text-sm text-gray-500">
             <a href="/login" className="hover:text-gray-300 transition-colors">Sign In</a>

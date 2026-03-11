@@ -1,5 +1,5 @@
 // =====================================================
-// Ainova Cloud Core - API Utility Functions
+// Ainova Cloud Intelligence - API Utility Functions
 // =====================================================
 // Central API helpers: error handling, response formatting,
 // session checking, CSRF validation.

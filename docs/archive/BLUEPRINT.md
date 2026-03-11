@@ -1,4 +1,4 @@
-# Ainova Cloud Core — Teljeskörű Tervrajz (Blueprint)
+# Ainova Cloud Intelligence — Teljeskörű Tervrajz (Blueprint)
 
 > **Készült:** 2026-03-08
 > **Cél:** Eladható dobozos szoftver — gyártási területekre és cégekre optimalizálva

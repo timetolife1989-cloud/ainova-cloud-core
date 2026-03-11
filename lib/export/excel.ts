@@ -26,7 +26,7 @@ export async function generateExcelBuffer(options: ExcelExportOptions): Promise<
   const { title, sheetName, companyName, columns, rows, locale = 'hu' } = options;
 
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = companyName ?? 'Ainova Cloud Core';
+  workbook.creator = companyName ?? 'Ainova Cloud Intelligence';
   workbook.created = new Date();
 
   const sheet = workbook.addWorksheet(sheetName ?? title.slice(0, 31));

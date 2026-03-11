@@ -1,5 +1,5 @@
 /**
- * Ainova Cloud Core - Error Message Sanitization
+ * Ainova Cloud Intelligence - Error Message Sanitization
  * Prevents information disclosure through error messages.
  */
 

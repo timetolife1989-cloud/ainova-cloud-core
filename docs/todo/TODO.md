@@ -1,4 +1,4 @@
-# Ainova Cloud Core — Fejlesztési TODO
+# Ainova Cloud Intelligence — Fejlesztési TODO
 
 > **Referencia:** `BLUEPRINT.md` — teljes architektúra terv
 > **Szabály:** Minden pont EGYENKÉNT végrehajtandó, sorrendben. Egy pont = egy commit.

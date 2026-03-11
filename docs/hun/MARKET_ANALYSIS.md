@@ -1,4 +1,4 @@
-# Ainova Cloud Core — Piackutatás & Eladhatósági Elemzés
+# Ainova Cloud Intelligence — Piackutatás & Eladhatósági Elemzés
 
 > Részletes elemzés a szoftver piaci pozíciójáról, versenytársakról, árképzésről és értékesítési stratégiáról.
 
@@ -50,7 +50,7 @@ A magyar gyártási szektor sajátosságai:
 
 ---
 
-## 2. AZ AINOVA CLOUD CORE PIACI POZÍCIÓJA
+## 2. AZ Ainova Cloud Intelligence PIACI POZÍCIÓJA
 
 ### 2.1 Unique Selling Points (USP)
 

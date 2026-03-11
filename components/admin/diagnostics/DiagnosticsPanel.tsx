@@ -12,6 +12,7 @@ import {
   Settings,
   Layers,
   Server,
+  Cloud,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -39,6 +40,10 @@ interface DiagnosticsData {
     version:         string;
     uptime:          number;
     uptimeFormatted: string;
+  };
+  deployment?: {
+    flavor:      string;
+    flavorLabel: string;
   };
   timestamp: string;
 }
@@ -220,6 +225,15 @@ export function DiagnosticsPanel() {
               </div>
             </div>
           </StatCard>
+
+          {/* Deployment Flavor */}
+          {data.deployment && (
+            <StatCard icon={<Cloud className="w-5 h-5" />} label="Deployment">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-900/60 text-blue-300 border border-blue-700">
+                {data.deployment.flavorLabel}
+              </span>
+            </StatCard>
+          )}
         </div>
       ) : null}
     </div>

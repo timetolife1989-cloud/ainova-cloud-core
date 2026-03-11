@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Ainova Cloud Core — Automatikus DB migráció
+ * Ainova Cloud Intelligence — Automatikus DB migráció
  * Plain JS, fut: node scripts/migrate-all.js
  * Hívja a Docker entrypoint induláskor.
  * Idempotens: biztonságos többször futtatni.
@@ -28,14 +28,14 @@ const cfg = {
 async function waitForDb(retries, delayMs) {
   for (let i = 1; i <= retries; i++) {
     try {
-      process.stdout.write(`[migrate] DB kapcsolódás... (${i}/${retries})\n`);
+      process.stdout.write(`[ACI:migrate] DB kapcsolódás... (${i}/${retries})\n`);
       // Először master-be, hogy létre tudjuk hozni az adatbázist
       const pool = await sql.connect({ ...cfg, database: 'master' });
-      process.stdout.write('[migrate] Kapcsolódva.\n');
+      process.stdout.write('[ACI:migrate] Kapcsolódva.\n');
       return pool;
     } catch (e) {
       if (i === retries) throw e;
-      process.stdout.write(`[migrate] Várok ${delayMs}ms... (${e.message})\n`);
+      process.stdout.write(`[ACI:migrate] Várok ${delayMs}ms... (${e.message})\n`);
       await new Promise(r => setTimeout(r, delayMs));
       await sql.close().catch(() => {});
     }
@@ -52,8 +52,8 @@ async function runBatches(pool, sqlText, label) {
     try {
       await pool.request().query(batches[i]);
     } catch (e) {
-      process.stderr.write(`[migrate] ❌ ${label} batch ${i + 1}: ${e.message}\n`);
-      process.stderr.write(`[migrate]    SQL: ${batches[i].slice(0, 150)}\n`);
+      process.stderr.write(`[ACI:migrate] ❌ ${label} batch ${i + 1}: ${e.message}\n`);
+      process.stderr.write(`[ACI:migrate]    SQL: ${batches[i].slice(0, 150)}\n`);
       throw e;
     }
   }
@@ -66,7 +66,7 @@ async function main() {
   const masterPool = await waitForDb(30, 3000);
 
   // 2. Adatbázis létrehozása ha nem létezik
-  process.stdout.write(`[migrate] Adatbázis: ${dbName}\n`);
+  process.stdout.write(`[ACI:migrate] Adatbázis: ${dbName}\n`);
   await masterPool.request().query(
     `IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = '${dbName}')
        CREATE DATABASE [${dbName}]`
@@ -84,19 +84,19 @@ async function main() {
       .filter(f => f.endsWith('.sql'))
       .sort();
 
-    process.stdout.write(`[migrate] ${files.length} core migráció...\n`);
+    process.stdout.write(`[ACI:migrate] ${files.length} core migráció...\n`);
     for (const f of files) {
       const sqlText = fs.readFileSync(path.join(coreDir, f), 'utf8');
       await runBatches(pool, sqlText, f);
-      process.stdout.write(`[migrate] ✅ ${f}\n`);
+      process.stdout.write(`[ACI:migrate] ✅ ${f}\n`);
     }
   }
 
   await pool.close();
-  process.stdout.write('[migrate] ✅ Minden migráció kész!\n');
+  process.stdout.write('[ACI:migrate] ✅ Minden migráció kész!\n');
 }
 
 main().catch(e => {
-  process.stderr.write(`[migrate] FATÁLIS HIBA: ${e.message}\n`);
+  process.stderr.write(`[ACI:migrate] FATÁLIS HIBA: ${e.message}\n`);
   process.exit(1);
 });

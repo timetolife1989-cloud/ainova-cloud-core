@@ -30,7 +30,7 @@ export default async function DashboardLayout({
     <I18nProvider locale={locale} translations={translations}>
       <div className="min-h-screen bg-gray-950">
         <Header
-          appName={process.env.NEXT_PUBLIC_APP_NAME ?? 'Ainova'}
+          appName={process.env.NEXT_PUBLIC_APP_NAME ?? 'Ainova Cloud Intelligence'}
           username={session.fullName || session.username}
           role={session.role}
           locale={locale}

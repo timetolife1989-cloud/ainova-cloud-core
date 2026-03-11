@@ -1,4 +1,4 @@
-// Ainova Cloud Core — Service Worker (PWA)
+// Ainova Cloud Intelligence — Service Worker (PWA)
 const CACHE_NAME = 'ainova-v2';
 const STATIC_ASSETS = [
   '/manifest.json',

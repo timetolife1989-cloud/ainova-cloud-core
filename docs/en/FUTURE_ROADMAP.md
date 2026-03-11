@@ -1,4 +1,4 @@
-# Ainova Cloud Core — Product Roadmap
+# Ainova Cloud Intelligence — Product Roadmap
 
 ## Implementation Status
 

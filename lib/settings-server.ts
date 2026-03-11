@@ -17,7 +17,7 @@ export async function getAppBranding(): Promise<AppBranding> {
     ]);
 
     return {
-      appName:        appName        ?? (process.env.NEXT_PUBLIC_APP_NAME ?? 'Ainova Cloud Core'),
+      appName:        appName        ?? (process.env.NEXT_PUBLIC_APP_NAME ?? 'Ainova Cloud Intelligence'),
       primaryColor:   primaryColor   ?? '#6366f1',
       secondaryColor: secondaryColor ?? '#8b5cf6',
       logoPath:       logoPath || null,
@@ -25,7 +25,7 @@ export async function getAppBranding(): Promise<AppBranding> {
   } catch {
     // DB unreachable — use env/defaults
     return {
-      appName:        process.env.NEXT_PUBLIC_APP_NAME ?? 'Ainova Cloud Core',
+      appName:        process.env.NEXT_PUBLIC_APP_NAME ?? 'Ainova Cloud Intelligence',
       primaryColor:   '#6366f1',
       secondaryColor: '#8b5cf6',
       logoPath:       null,

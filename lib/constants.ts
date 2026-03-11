@@ -27,3 +27,14 @@ export const LOGIN_RATE_LIMIT_WINDOW_MINUTES = 15;
 
 /** Max file upload size for settings (logo etc.) */
 export const MAX_UPLOAD_SIZE_BYTES = 2 * 1024 * 1024; // 2 MB
+
+// ── Deployment Flavor ─────────────────────────────────────────────────
+export type DeploymentFlavor = 'cloud' | 'site';
+
+export const DEPLOYMENT_FLAVOR: DeploymentFlavor =
+  (process.env.DEPLOYMENT_FLAVOR as DeploymentFlavor) || 'cloud';
+
+export const DEPLOYMENT_FLAVOR_LABEL: Record<DeploymentFlavor, string> = {
+  cloud: 'ACI Cloud',
+  site:  'ACI Site',
+};

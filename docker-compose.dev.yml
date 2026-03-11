@@ -1,5 +1,5 @@
 # ============================================================
-# Ainova Cloud Core — Development docker-compose
+# Ainova Cloud Intelligence (ACI) — Development docker-compose
 #
 # Mounts source code for hot-reload. DB only — app runs on host.
 #
@@ -49,7 +49,8 @@ services:
       AUTH_ADAPTER: session
       SESSION_SECRET: "${SESSION_SECRET:-dev-secret-32-characters-minimum}"
       UPLOAD_DIR: /ainova-uploads
-      NEXT_PUBLIC_APP_NAME: "${NEXT_PUBLIC_APP_NAME:-Ainova Cloud Core (Dev)}"
+      NEXT_PUBLIC_APP_NAME: "${NEXT_PUBLIC_APP_NAME:-Ainova Cloud Intelligence (Dev)}"
+      DEPLOYMENT_FLAVOR: "${DEPLOYMENT_FLAVOR:-cloud}"
     ports:
       - "${APP_PORT:-3000}:3000"
     volumes:

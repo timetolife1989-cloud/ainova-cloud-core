@@ -1,5 +1,5 @@
 # ============================================================
-# Ainova Cloud Core — Production docker-compose
+# Ainova Cloud Intelligence (ACI) — Production docker-compose
 #
 # Gyors start:
 #   1. cp .env.example .env       (és állítsd be az SA_PASSWORD + SESSION_SECRET értékeket)
@@ -36,7 +36,7 @@ services:
       start_period: 30s
     restart: unless-stopped
 
-  # ---- Ainova Cloud Core (Next.js) ----
+  # ---- Ainova Cloud Intelligence (Next.js) ----
   app:
     build:
       context: .
@@ -59,7 +59,8 @@ services:
       UPLOAD_DIR: /ainova-uploads
       FE_LOGIN_RATE_LIMIT: "true"
       FE_LOGIN_AUDIT: "true"
-      NEXT_PUBLIC_APP_NAME: "${NEXT_PUBLIC_APP_NAME:-Ainova Cloud Core}"
+      NEXT_PUBLIC_APP_NAME: "${NEXT_PUBLIC_APP_NAME:-Ainova Cloud Intelligence}"
+      DEPLOYMENT_FLAVOR: "${DEPLOYMENT_FLAVOR:-cloud}"
     ports:
       - "${APP_PORT:-3000}:3000"
     volumes:

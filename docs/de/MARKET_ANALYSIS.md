@@ -1,4 +1,4 @@
-# Ainova Cloud Core — Marktanalyse
+# Ainova Cloud Intelligence — Marktanalyse
 
 ## 1. Globaler MES/MOM-Markt
 
@@ -52,7 +52,7 @@
 | Katana | 99-399€/Mo | SaaS | Kein OEE, keine SPS |
 | Tulip | Individuell | Low-Code | Teuer im Maßstab |
 
-### 3.3 Ainova Cloud Core Position
+### 3.3 Ainova Cloud Intelligence Position
 
 **Ainova füllt die Lücke** zwischen teuren Enterprise-MES und begrenzten Cloud-Tools:
 

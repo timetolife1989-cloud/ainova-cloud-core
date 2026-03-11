@@ -13,7 +13,7 @@ interface AiQueryResult {
   error?: string;
 }
 
-const SYSTEM_PROMPT = `You are a manufacturing data assistant for Ainova Cloud Core.
+const SYSTEM_PROMPT = `You are a manufacturing data assistant for Ainova Cloud Intelligence.
 You help users query production data using natural language.
 Available tables and their key columns:
 - mod_workforce (id, employee_name, department, date, shift, status, hours_worked)

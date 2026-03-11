@@ -1,6 +1,6 @@
 /**
  * =====================================================================
- * MASTER DEMO SEEDER — Ainova Cloud Core
+ * MASTER DEMO SEEDER — Ainova Cloud Intelligence (ACI)
  * 30 days · 200-person factory · multilingual employees · OEE math
  * Usage:  DB_ADAPTER=sqlite npx tsx scripts/seed-demo-data.ts
  * =====================================================================

@@ -1,5 +1,5 @@
 /**
- * Ainova Cloud Core - CSRF Protection
+ * Ainova Cloud Intelligence - CSRF Protection
  * Cross-Site Request Forgery protection via the double-submit cookie pattern.
  */
 

@@ -1,5 +1,5 @@
 // =====================================================================
-// Ainova Cloud Core - Health Check Endpoint
+// Ainova Cloud Intelligence - Health Check Endpoint
 // =====================================================================
 // Route:    GET /api/health
 // Response: { status, db: { status, responseMs }, uptime, version, timestamp }

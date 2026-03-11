@@ -2,7 +2,7 @@
 
 ## Gyors Áttekintés
 
-Az Ainova Cloud Core támogatja az SQLite adatbázist a könnyebb fejlesztés és deployment érdekében. SQLite használata esetén:
+Az Ainova Cloud Intelligence támogatja az SQLite adatbázist a könnyebb fejlesztés és deployment érdekében. SQLite használata esetén:
 - ✅ Nincs szükség külön MSSQL szerverre
 - ✅ Kisebb tárhely igény
 - ✅ Egyszerűbb deployment (egyetlen fájl)

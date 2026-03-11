@@ -1,4 +1,4 @@
-# Ainova Cloud Core — Feature Roadmap & Innovációs Terv
+# Ainova Cloud Intelligence — Feature Roadmap & Innovációs Terv
 
 > Ez a dokumentum a szoftver jövőbeli fejlesztési irányait, innovációs javaslatait és prioritásait tartalmazza. Minden javaslat a precizitás, gyorsaság, karbantarthatóság, átláthatóság és innováció elvei mentén készült.
 

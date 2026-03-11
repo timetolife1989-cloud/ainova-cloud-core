@@ -1,4 +1,4 @@
-# Ainova Cloud Core — Fejlesztői & Szoftvertulajdonosi Útmutató
+# Ainova Cloud Intelligence — Fejlesztői & Szoftvertulajdonosi Útmutató
 
 > Ez a dokumentum neked szól, mint a szoftver fejlesztőjének és tulajdonosának. Minden lényeges tudást tartalmaz arról, hogyan működik a rendszer, mit hol találsz, és hogyan készítheted elő az értékesítésre.
 

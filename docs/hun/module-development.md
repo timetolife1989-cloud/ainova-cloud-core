@@ -1,6 +1,6 @@
 # Modul fejlesztői útmutató
 
-Ez az útmutató lépésről-lépésre bemutatja, hogyan készíts új modult az Ainova Cloud Core rendszerhez.
+Ez az útmutató lépésről-lépésre bemutatja, hogyan készíts új modult az Ainova Cloud Intelligence rendszerhez.
 
 ## 1. Mappa struktúra létrehozása
 

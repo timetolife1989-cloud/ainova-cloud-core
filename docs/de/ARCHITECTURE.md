@@ -1,8 +1,8 @@
-# Ainova Cloud Core — Architekturdokumentation
+# Ainova Cloud Intelligence — Architekturdokumentation
 
 ## 1. Überblick
 
-Ainova Cloud Core ist eine **modulare, mandantenfähige Fertigungsmanagement-Plattform**, die als Standardsoftware an Fertigungsunternehmen verkauft wird. Das System ist in 3 Paketstufen erhältlich (Basic, Professional, Enterprise) und bietet vollständige Anpassbarkeit auf Admin-Ebene.
+Ainova Cloud Intelligence ist eine **modulare, mandantenfähige Fertigungsmanagement-Plattform**, die als Standardsoftware an Fertigungsunternehmen verkauft wird. Das System ist in 3 Paketstufen erhältlich (Basic, Professional, Enterprise) und bietet vollständige Anpassbarkeit auf Admin-Ebene.
 
 ### 1.1 Grundprinzipien
 

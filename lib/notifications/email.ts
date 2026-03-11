@@ -87,7 +87,7 @@ export async function sendAlertEmail(
   alertMessage: string,
   moduleName?: string
 ): Promise<boolean> {
-  const companyName = await getSetting('company_name') ?? 'Ainova Cloud Core';
+  const companyName = await getSetting('company_name') ?? 'Ainova Cloud Intelligence';
 
   const html = `
 <!DOCTYPE html>
@@ -127,7 +127,7 @@ export async function sendReportEmail(
   reportTitle: string,
   summaryHtml: string
 ): Promise<boolean> {
-  const companyName = await getSetting('company_name') ?? 'Ainova Cloud Core';
+  const companyName = await getSetting('company_name') ?? 'Ainova Cloud Intelligence';
 
   const html = `
 <!DOCTYPE html>

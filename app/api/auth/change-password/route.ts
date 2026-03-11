@@ -1,5 +1,5 @@
 // =====================================================================
-// Ainova Cloud Core - Change Password API Route
+// Ainova Cloud Intelligence - Change Password API Route
 // =====================================================================
 // Route:    POST /api/auth/change-password
 // Body:     { currentPassword: string, newPassword: string (min 8) }

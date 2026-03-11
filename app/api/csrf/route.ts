@@ -1,5 +1,5 @@
 // =====================================================================
-// Ainova Cloud Core - CSRF Token Endpoint
+// Ainova Cloud Intelligence - CSRF Token Endpoint
 // =====================================================================
 // Route:    GET /api/csrf
 // Response: { ok: true, token: string }

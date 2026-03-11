@@ -91,7 +91,7 @@ function main() {
   const signature = generateSignature(signatureData, 'ainova-secret-key');
 
   console.log('\n========================================');
-  console.log('       AINOVA CLOUD CORE LICENC');
+  console.log('       Ainova Cloud Intelligence LICENC');
   console.log('========================================\n');
   
   console.log('Licenc kulcs:', licenseKey);

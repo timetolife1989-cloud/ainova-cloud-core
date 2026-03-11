@@ -161,7 +161,7 @@ export function BrandingForm({ initialSettings }: BrandingFormProps) {
             type="text"
             value={appName}
             onChange={(e) => setAppName(e.target.value)}
-            placeholder="Ainova Cloud Core"
+            placeholder="Ainova Cloud Intelligence"
             className="w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
           />
         </div>

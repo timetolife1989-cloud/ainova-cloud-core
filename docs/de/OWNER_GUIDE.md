@@ -1,4 +1,4 @@
-# Ainova Cloud Core — Entwickler- & Eigentümerhandbuch
+# Ainova Cloud Intelligence — Entwickler- & Eigentümerhandbuch
 
 > Dieses Dokument richtet sich an Sie als Softwareentwickler und Eigentümer. Es enthält alle wesentlichen Informationen über die Funktionsweise des Systems, wo Sie Dinge finden und wie Sie es für den Verkauf vorbereiten.
 

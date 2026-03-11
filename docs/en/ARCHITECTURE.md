@@ -1,8 +1,8 @@
-# Ainova Cloud Core — Architecture Documentation
+# Ainova Cloud Intelligence — Architecture Documentation
 
 ## 1. Overview
 
-Ainova Cloud Core is a **modular, multi-tenant manufacturing management platform**, sold as a boxed software product to manufacturing companies. The system is available at 3 package levels (Basic, Professional, Enterprise) and provides full admin-level customization.
+Ainova Cloud Intelligence is a **modular, multi-tenant manufacturing management platform**, sold as a boxed software product to manufacturing companies. The system is available at 3 package levels (Basic, Professional, Enterprise) and provides full admin-level customization.
 
 ### 1.1 Core Principles
 

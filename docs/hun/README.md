@@ -1,4 +1,4 @@
-# Ainova Cloud Core
+# Ainova Cloud Intelligence
 
 **Moduláris gyártásmenedzsment platform** — testreszabható, dobozos szoftver gyártási területekre.
 
@@ -106,4 +106,4 @@ npx tsx scripts/generate-license.ts --tier professional --customer "Cég Kft." -
 
 ---
 
-© 2026 Ainova Cloud Core
+© 2026 Ainova Cloud Intelligence

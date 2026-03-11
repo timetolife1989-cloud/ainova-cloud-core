@@ -6,7 +6,7 @@ import { getLocale } from '@/lib/i18n';
 import '@/modules/_loader';
 
 export const metadata: Metadata = {
-  title: process.env.NEXT_PUBLIC_APP_NAME ?? 'Ainova Cloud Core',
+  title: process.env.NEXT_PUBLIC_APP_NAME ?? 'Ainova Cloud Intelligence',
   description: 'Manufacturing & Enterprise Dashboard Platform',
 };
 

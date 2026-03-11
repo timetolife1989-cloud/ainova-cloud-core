@@ -1,5 +1,5 @@
 // =====================================================================
-// Ainova Cloud Core - Logout API Route
+// Ainova Cloud Intelligence - Logout API Route
 // =====================================================================
 // Route:    POST /api/auth/logout
 // Body:     (none — uses session cookie)

@@ -1,5 +1,5 @@
 // =====================================================
-// Ainova Cloud Core - Structured Logger
+// Ainova Cloud Intelligence - Structured Logger
 // =====================================================
 // Purpose: Centralised, environment-aware, secure logging
 // Features: Log levels, structured JSON output, sensitive data sanitization

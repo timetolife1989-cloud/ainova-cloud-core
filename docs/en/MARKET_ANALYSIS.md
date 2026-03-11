@@ -1,4 +1,4 @@
-# Ainova Cloud Core — Market Analysis
+# Ainova Cloud Intelligence — Market Analysis
 
 ## 1. Global MES/MOM Market
 
@@ -57,7 +57,7 @@
 | Prodsmart | €200+/mo | SaaS | Acquired by Autodesk |
 | Tulip | Custom | Low-code | Expensive at scale |
 
-### 3.3 Ainova Cloud Core Position
+### 3.3 Ainova Cloud Intelligence Position
 
 **Ainova fills the gap** between expensive enterprise MES and limited cloud tools:
 

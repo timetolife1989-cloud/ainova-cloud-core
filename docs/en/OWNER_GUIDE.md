@@ -1,4 +1,4 @@
-# Ainova Cloud Core — Developer & Owner Guide
+# Ainova Cloud Intelligence — Developer & Owner Guide
 
 > This document is for you, the software developer and owner. It contains all essential knowledge about how the system works, where to find things, and how to prepare it for sale.
 

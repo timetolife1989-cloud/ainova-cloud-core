@@ -1,4 +1,4 @@
-# Ainova Cloud Core — Termékterv
+# Ainova Cloud Intelligence — Termékterv
 
 > **Státusz:** Tervezési fázis — 2026-03-07  
 > **Előző:** Ainova v1 (LAC-specifikus gyártáskövetés, MSSQL-hardwired)  
@@ -8,7 +8,7 @@
 
 ## 1. Mi ez?
 
-**Ainova Cloud Core** egy white-label termelési / vállalati dashboard platform.
+**Ainova Cloud Intelligence** egy white-label termelési / vállalati dashboard platform.
 
 - Nem egy konkrét cégre szabott rendszer
 - Admin panelből **minden** konfigurálható (branding, modulok, DB, auth)

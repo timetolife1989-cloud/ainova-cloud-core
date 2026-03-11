@@ -1,5 +1,5 @@
 // =====================================================================
-// Ainova Cloud Core - Login API Route
+// Ainova Cloud Intelligence - Login API Route
 // =====================================================================
 // Route:    POST /api/auth/login
 // Body:     { username: string, password: string }

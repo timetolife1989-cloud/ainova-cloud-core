@@ -1,5 +1,5 @@
 // =====================================================================
-// AINOVA CLOUD CORE - Raw mssql ConnectionPool Shim
+// Ainova Cloud Intelligence - Raw mssql ConnectionPool Shim
 // =====================================================================
 // Purpose: Expose a raw sql.ConnectionPool for routes that need direct
 //          mssql access (bulk operations, sql.Table, MERGE statements).

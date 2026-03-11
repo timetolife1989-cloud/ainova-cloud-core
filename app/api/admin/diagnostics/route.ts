@@ -2,6 +2,7 @@ import { type NextRequest } from 'next/server';
 import { checkAuth } from '@/lib/rbac/middleware';
 import { getDb } from '@/lib/db';
 import { getActiveModuleIds } from '@/lib/modules/registry';
+import { DEPLOYMENT_FLAVOR, DEPLOYMENT_FLAVOR_LABEL } from '@/lib/constants';
 
 export async function GET(request: NextRequest) {
   const auth = await checkAuth(request, 'admin.access');
@@ -67,6 +68,10 @@ export async function GET(request: NextRequest) {
       version:         process.version,
       uptime:          Math.round(process.uptime()),
       uptimeFormatted: formatUptime(process.uptime()),
+    },
+    deployment: {
+      flavor:      DEPLOYMENT_FLAVOR,
+      flavorLabel: DEPLOYMENT_FLAVOR_LABEL[DEPLOYMENT_FLAVOR],
     },
     timestamp: new Date().toISOString(),
   });

@@ -1,5 +1,5 @@
 # ============================================================
-# Ainova Cloud Core — Multi-stage Dockerfile
+# Ainova Cloud Intelligence (ACI) — Multi-stage Dockerfile
 # Stage 1: builder  (installs deps + builds Next.js)
 # Stage 2: runner   (lean production image, auto-migrates on start)
 # ============================================================

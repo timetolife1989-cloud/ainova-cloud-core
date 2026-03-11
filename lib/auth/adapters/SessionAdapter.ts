@@ -1,5 +1,5 @@
 // =====================================================================
-// Ainova Cloud Core - SessionAdapter
+// Ainova Cloud Intelligence - SessionAdapter
 // =====================================================================
 // Purpose: DB-backed session auth using the IDatabaseAdapter interface.
 // Tables:  core_users, core_sessions, core_audit_log

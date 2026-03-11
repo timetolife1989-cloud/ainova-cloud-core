@@ -7,7 +7,7 @@
 
 ## 1. MI EZ A PROGRAM? (Egyszerűen)
 
-Az Ainova Cloud Core egy **gyártásmenedzsment szoftver**, amit böngészőben használnak.
+Az Ainova Cloud Intelligence egy **gyártásmenedzsment szoftver**, amit böngészőben használnak.
 
 Képzeld el úgy, mint egy **okos Excel-t a gyárnak**:
 - A dolgozók bejelentkeznek böngészőben

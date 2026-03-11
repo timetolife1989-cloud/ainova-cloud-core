@@ -1,5 +1,5 @@
 // =====================================================================
-// Ainova Cloud Core - Validate Session API Route
+// Ainova Cloud Intelligence - Validate Session API Route
 // =====================================================================
 // Route:    GET /api/auth/validate-session
 // Cookies:  sessionId (read from cookie)

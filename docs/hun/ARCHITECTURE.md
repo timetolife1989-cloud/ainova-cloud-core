@@ -1,8 +1,8 @@
-# Ainova Cloud Core — Részletes Architektúra Dokumentáció
+# Ainova Cloud Intelligence — Részletes Architektúra Dokumentáció
 
 ## 1. Áttekintés
 
-Az Ainova Cloud Core egy **moduláris, multi-tenant gyártásmenedzsment platform**, amelyet dobozos szoftverként értékesítünk gyártó cégeknek. A rendszer 3 csomagszinten érhető el (Basic, Professional, Enterprise), és teljes admin-szintű testreszabhatóságot biztosít.
+Az Ainova Cloud Intelligence egy **moduláris, multi-tenant gyártásmenedzsment platform**, amelyet dobozos szoftverként értékesítünk gyártó cégeknek. A rendszer 3 csomagszinten érhető el (Basic, Professional, Enterprise), és teljes admin-szintű testreszabhatóságot biztosít.
 
 ### 1.1 Alapelvek
 

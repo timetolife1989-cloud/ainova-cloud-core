@@ -1,6 +1,6 @@
 {
-  "name": "Ainova Cloud Core",
-  "short_name": "Ainova",
+  "name": "Ainova Cloud Intelligence",
+  "short_name": "ACI",
   "description": "Manufacturing & Enterprise Dashboard Platform",
   "start_url": "/dashboard",
   "display": "standalone",

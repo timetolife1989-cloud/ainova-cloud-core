@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Ainova Cloud Core - CSRF Hook
+ * Ainova Cloud Intelligence - CSRF Hook
  *
  * Implements the double-submit cookie pattern:
  *   1. The server sets a `csrf-token` cookie (httpOnly: false) via /api/csrf.

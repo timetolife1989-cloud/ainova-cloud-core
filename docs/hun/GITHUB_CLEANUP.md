@@ -12,7 +12,7 @@ A `design-collaborator-hub` repo README.md fájlját írd át erre:
 ```markdown
 # Ainova Cloud — Website
 
-Marketing website for Ainova Cloud Core manufacturing management platform.
+Marketing website for Ainova Cloud Intelligence manufacturing management platform.
 
 ## Tech Stack
 - React

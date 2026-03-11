@@ -181,7 +181,7 @@ export default function SetupPage() {
           <div className="space-y-4">
             {currentStep === 'welcome' && (
               <div className="text-center space-y-4">
-                <p className="text-gray-300">This wizard will help you set up Ainova Cloud Core.</p>
+                <p className="text-gray-300">This wizard will help you set up Ainova Cloud Intelligence.</p>
                 <div className="grid grid-cols-2 gap-3 text-left">
                   <div className="bg-gray-950 rounded-lg p-3"><p className="text-xs text-gray-500">Step 1</p><p className="text-sm text-white">Create admin account</p></div>
                   <div className="bg-gray-950 rounded-lg p-3"><p className="text-xs text-gray-500">Step 2</p><p className="text-sm text-white">Company name & language</p></div>
@@ -250,7 +250,7 @@ export default function SetupPage() {
                 <div className="inline-flex p-4 bg-green-900/30 rounded-full">
                   <CheckCircle className="w-12 h-12 text-green-400" />
                 </div>
-                <p className="text-gray-300">Ainova Cloud Core has been successfully configured!</p>
+                <p className="text-gray-300">Ainova Cloud Intelligence has been successfully configured!</p>
                 <p className="text-sm text-gray-500">Click the "Launch" button to proceed to login.</p>
               </div>
             )}
