@@ -55,7 +55,7 @@ const CreateSchema = z.object({
   description: z.string().max(500).optional(),
   sourceModule: z.string().max(50).optional(),
   sourceTable: z.string().max(100).optional(),
-  chartType: z.enum(['bar', 'line', 'pie', 'table']).optional(),
+  chartType: z.enum(['bar', 'line', 'pie', 'area', 'table']).optional(),
   config: z.record(z.string(), z.unknown()).optional(),
   isPublic: z.boolean().optional(),
 });

@@ -3,7 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
-import { PieChart, BarChart3, LineChart, Table, Plus, Eye, Download } from 'lucide-react';
+import { PieChart, BarChart3, LineChart, Table, Plus, Eye, Download, Trash2, TrendingUp } from 'lucide-react';
+import { ReportViewer } from './ReportViewer';
+import { ReportEditor } from './ReportEditor';
 
 interface SavedReport {
   id: number;
@@ -20,6 +22,7 @@ const CHART_ICONS: Record<string, React.ReactNode> = {
   bar: <BarChart3 className="w-5 h-5" />,
   line: <LineChart className="w-5 h-5" />,
   pie: <PieChart className="w-5 h-5" />,
+  area: <TrendingUp className="w-5 h-5" />,
   table: <Table className="w-5 h-5" />,
 };
 
@@ -27,6 +30,9 @@ export default function ReportsDashboardPage() {
   const { t } = useTranslation();
   const [reports, setReports] = useState<SavedReport[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewReport, setViewReport] = useState<SavedReport | null>(null);
+  const [showEditor, setShowEditor] = useState(false);
+  const [deleting, setDeleting] = useState<number | null>(null);
 
   const fetchReports = useCallback(async () => {
     try {
@@ -47,6 +53,22 @@ export default function ReportsDashboardPage() {
     void fetchReports();
   }, [fetchReports]);
 
+  const getCsrfToken = () =>
+    document.cookie.split('; ').find(c => c.startsWith('csrf-token='))?.split('=')[1] ?? '';
+
+  const handleDelete = async (id: number) => {
+    setDeleting(id);
+    try {
+      const res = await fetch(`/api/modules/reports/${id}`, {
+        method: 'DELETE',
+        headers: { 'X-CSRF-Token': getCsrfToken() },
+      });
+      if (res.ok) await fetchReports();
+    } finally {
+      setDeleting(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -62,7 +84,7 @@ export default function ReportsDashboardPage() {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('reports.title')} subtitle={t('reports.subtitle')} />
-        <button className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-sm font-medium">
+        <button onClick={() => setShowEditor(true)} className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-sm font-medium">
           <Plus className="w-4 h-4" /> {t('reports.new_report')}
         </button>
       </div>
@@ -125,11 +147,17 @@ export default function ReportsDashboardPage() {
                 {CHART_ICONS[report.chartType ?? 'bar'] ?? <BarChart3 className="w-5 h-5" />}
               </div>
               <div className="flex gap-1">
-                <button className="p-1.5 hover:bg-gray-800 rounded text-gray-500 hover:text-white" title={t('reports.view')}>
+                <button onClick={() => setViewReport(report)}
+                  className="p-1.5 hover:bg-gray-800 rounded text-gray-500 hover:text-white" title={t('reports.view')}>
                   <Eye className="w-4 h-4" />
                 </button>
-                <button className="p-1.5 hover:bg-gray-800 rounded text-gray-500 hover:text-white" title={t('reports.export')}>
+                <button onClick={() => window.open(`/api/modules/reports/export?format=xlsx&table=${report.sourceTable ?? ''}`, '_blank')}
+                  className="p-1.5 hover:bg-gray-800 rounded text-gray-500 hover:text-white" title={t('reports.export')}>
                   <Download className="w-4 h-4" />
+                </button>
+                <button onClick={() => handleDelete(report.id)} disabled={deleting === report.id}
+                  className="p-1.5 hover:bg-gray-800 rounded text-gray-500 hover:text-red-400 disabled:opacity-50" title={t('reports.delete')}>
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -175,6 +203,24 @@ export default function ReportsDashboardPage() {
           <p className="text-xs text-gray-500">{t('reports.table_export')}</p>
         </button>
       </div>
+
+      {/* Report viewer modal */}
+      {viewReport && (
+        <ReportViewer
+          reportId={viewReport.id}
+          reportName={viewReport.reportName}
+          chartType={viewReport.chartType ?? 'bar'}
+          onClose={() => setViewReport(null)}
+        />
+      )}
+
+      {/* Report editor modal */}
+      {showEditor && (
+        <ReportEditor
+          onClose={() => setShowEditor(false)}
+          onSaved={() => void fetchReports()}
+        />
+      )}
     </div>
   );
 }
