@@ -16,15 +16,16 @@ import WorkforceCharts from './WorkforceCharts';
 interface ShiftDef {
   id: string;
   name: string;
+  labelKey: string;
   startTime: string;
   endTime: string;
   color: string;
 }
 
 const SHIFT_DEFINITIONS: ShiftDef[] = [
-  { id: 'morning',   name: 'Reggeli',   startTime: '06:00', endTime: '14:00', color: '#8B5CF6' },
-  { id: 'afternoon', name: 'Délutáni',  startTime: '14:00', endTime: '22:00', color: '#3B82F6' },
-  { id: 'night',     name: 'Éjszakai',  startTime: '22:00', endTime: '06:00', color: '#1E40AF' },
+  { id: 'morning',   name: 'Reggeli',   labelKey: 'workforce.shift_morning',   startTime: '06:00', endTime: '14:00', color: '#8B5CF6' },
+  { id: 'afternoon', name: 'D\u00e9lut\u00e1ni',  labelKey: 'workforce.shift_afternoon',  startTime: '14:00', endTime: '22:00', color: '#3B82F6' },
+  { id: 'night',     name: '\u00c9jszakai',  labelKey: 'workforce.shift_night',     startTime: '22:00', endTime: '06:00', color: '#1E40AF' },
 ];
 
 /** Determine current shift + effective date (night shift → previous day after midnight) */
@@ -544,7 +545,7 @@ export default function WorkforceDashboardPage() {
                             className="w-2 h-2 rounded-full flex-shrink-0"
                             style={{ backgroundColor: shiftDef?.color ?? '#6B7280' }}
                           />
-                          {item.shiftName}
+                          {shiftDef ? t(shiftDef.labelKey) : item.shiftName}
                         </span>
                       ) : (
                         <span className="text-gray-600">—</span>
@@ -560,7 +561,7 @@ export default function WorkforceDashboardPage() {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span className={item.overtimeHours > 0 ? 'text-amber-400 font-medium' : 'text-gray-500'}>
-                        {item.overtimeHours > 0 ? `${item.overtimeHours}h / ${item.overtimeWorkers} fő` : '—'}
+                        {item.overtimeHours > 0 ? `${item.overtimeHours}h / ${item.overtimeWorkers} ${t('workforce.persons')}` : '—'}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -676,7 +677,7 @@ export default function WorkforceDashboardPage() {
                           boxShadow: `0 4px 20px ${s.color}40`,
                         } : {}}
                       >
-                        <span className="block">{s.name}</span>
+                        <span className="block">{t(s.labelKey)}</span>
                         <span className="block text-[10px] opacity-75 mt-0.5">
                           <Clock className="w-3 h-3 inline mr-0.5 -mt-0.5" />
                           {s.startTime}–{s.endTime}

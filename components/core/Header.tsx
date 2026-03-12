@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface HeaderProps {
   appName: string;
@@ -57,6 +58,7 @@ const LOCALE_LABELS: Record<string, { flag: string; label: string }> = {
 
 export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [currentTime, setCurrentTime] = React.useState<Date | null>(null);
   const [langOpen, setLangOpen] = React.useState(false);
   const langRef = React.useRef<HTMLDivElement>(null);
@@ -92,7 +94,7 @@ export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) 
       window.location.reload();
     } catch (err) {
       console.error('[Header] Locale change failed:', err);
-      alert(`Language change failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      alert(`${t('common.lang_change_failed')}: ${err instanceof Error ? err.message : ''}`);
     }
   };
 
@@ -130,12 +132,12 @@ export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) 
         {/* Inner glow */}
         <div className="absolute inset-0 bg-gradient-to-b from-blue-400/5 to-transparent pointer-events-none" />
 
-        <div className="relative h-16 px-6 flex items-center gap-4">
+        <div className="relative h-16 px-2 md:px-6 flex items-center gap-1.5 md:gap-4">
 
           {/* 1. App Logo + Name */}
           <div
             onClick={() => router.push('/dashboard')}
-            className="flex items-center gap-3 pr-5 border-r border-gray-700 cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
+            className="flex items-center gap-2 md:gap-3 pr-2 md:pr-5 border-r border-gray-700 cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
           >
             {/* Animated geometric logo — matches CoreLogo style */}
             <motion.div
@@ -162,20 +164,20 @@ export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) 
             <motion.span
               animate={{ opacity: [0.8, 1, 0.8] }}
               transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              className="text-xl font-bold tracking-wider bg-gradient-to-r from-blue-300 via-white to-blue-300 bg-clip-text text-transparent"
+              className="hidden md:inline text-xl font-bold tracking-wider bg-gradient-to-r from-blue-300 via-white to-blue-300 bg-clip-text text-transparent"
             >
               {appName.toUpperCase()}
             </motion.span>
           </div>
 
           {/* 2. User info */}
-          <div className="flex items-center gap-3 px-4 border-r border-gray-700 flex-shrink-0">
+          <div className="flex items-center gap-2 md:gap-3 px-2 md:px-4 border-r border-gray-700 flex-shrink-0">
             {/* Avatar */}
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+            <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs md:text-sm flex-shrink-0">
               {getInitials(username)}
             </div>
-            {/* Name + role */}
-            <div className="flex flex-col">
+            {/* Name + role — hidden on mobile */}
+            <div className="hidden md:flex flex-col">
               <span className="text-white text-sm font-medium leading-tight">
                 {username}
               </span>
@@ -185,8 +187,8 @@ export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) 
             </div>
           </div>
 
-          {/* 3. Language Switcher */}
-          <div className="relative flex-shrink-0 px-3 border-r border-gray-700" ref={langRef}>
+          {/* 3. Language Switcher — always visible, even on mobile */}
+          <div className="relative flex-shrink-0 px-1.5 md:px-3 border-r border-gray-700" ref={langRef}>
             <button
               onClick={() => setLangOpen(!langOpen)}
               className="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/10 transition-colors text-sm"
@@ -221,8 +223,8 @@ export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) 
             </AnimatePresence>
           </div>
 
-          {/* 3b. Search trigger (Ctrl+K) */}
-          <div className="flex-shrink-0 px-2">
+          {/* 3b. Search trigger (Ctrl+K) — hidden on mobile */}
+          <div className="hidden md:block flex-shrink-0 px-2">
             <button
               onClick={() => document.dispatchEvent(new CustomEvent('toggle-command-palette'))}
               className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-800/80 hover:bg-gray-700 border border-gray-700 transition-colors text-sm"
@@ -235,15 +237,15 @@ export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) 
           {/* 4. Spacer */}
           <div className="flex-1" />
 
-          {/* 4. Date / time */}
-          <div className="flex flex-col items-end text-sm px-4 border-r border-gray-700 flex-shrink-0">
+          {/* 4. Date / time — hidden on mobile */}
+          <div className="hidden md:flex flex-col items-end text-sm px-4 border-r border-gray-700 flex-shrink-0">
             {currentTime ? (
               <>
                 <span className="text-white font-mono font-semibold text-xs">
                   {formatDateTime(currentTime)}
                 </span>
                 <span className="text-gray-400 text-[10px]">
-                  {getDayName(currentTime, locale)} &bull; {getWeekNumber(currentTime)}. hét
+                  {getDayName(currentTime, locale)} &bull; {getWeekNumber(currentTime)}. {t('common.week_short')}
                 </span>
               </>
             ) : (
@@ -269,7 +271,7 @@ export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) 
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <span className="tracking-wide">{locale === 'en' ? 'LOGOUT' : locale === 'de' ? 'ABMELDEN' : 'KILÉPÉS'}</span>
+                <span className="hidden md:inline tracking-wide">{t('common.logout').toUpperCase()}</span>
               </span>
               <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-transparent pointer-events-none" />
             </motion.button>
