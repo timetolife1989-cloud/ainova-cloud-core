@@ -20,7 +20,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
   }
 
   try {
-    const rows = await getDb().query<{ id: number; record_date: Date; shift_name: string | null; area_name: string | null; planned_count: number; actual_count: number; absent_count: number; notes: string | null; recorded_by: string | null; created_at: Date }>(
+    const rows = await getDb().query<{ id: number; record_date: Date; shift_name: string | null; area_name: string | null; planned_count: number; actual_count: number; absent_count: number; overtime_hours: number; overtime_workers: number; notes: string | null; recorded_by: string | null; created_at: Date }>(
       'SELECT * FROM workforce_daily WHERE id = @p0',
       [{ name: 'p0', type: 'int', value: itemId }]
     );
@@ -38,6 +38,8 @@ export async function GET(request: NextRequest, context: RouteContext) {
       plannedCount: Number(r.planned_count) || 0,
       actualCount: Number(r.actual_count) || 0,
       absentCount: Number(r.absent_count) || 0,
+      overtimeHours: Number(r.overtime_hours) || 0,
+      overtimeWorkers: Number(r.overtime_workers) || 0,
       notes: r.notes,
       recordedBy: r.recorded_by,
       createdAt: String(r.created_at),
@@ -55,6 +57,8 @@ const UpdateSchema = z.object({
   plannedCount: z.number().min(0).optional(),
   actualCount: z.number().min(0).optional(),
   absentCount: z.number().min(0).optional(),
+  overtimeHours: z.number().min(0).optional(),
+  overtimeWorkers: z.number().min(0).optional(),
   notes: z.string().max(500).nullable().optional(),
 });
 
@@ -78,7 +82,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
   }
 
-  const { recordDate, shiftName, areaName, plannedCount, actualCount, absentCount, notes } = parsed.data;
+  const { recordDate, shiftName, areaName, plannedCount, actualCount, absentCount, overtimeHours, overtimeWorkers, notes } = parsed.data;
 
   try {
     const updates: string[] = ['updated_at = SYSDATETIME()'];
@@ -115,6 +119,16 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     if (absentCount !== undefined) {
       updates.push(`absent_count = @p${paramIdx}`);
       params.push({ name: `p${paramIdx}`, type: 'nvarchar', value: absentCount });
+      paramIdx++;
+    }
+    if (overtimeHours !== undefined) {
+      updates.push(`overtime_hours = @p${paramIdx}`);
+      params.push({ name: `p${paramIdx}`, type: 'nvarchar', value: overtimeHours });
+      paramIdx++;
+    }
+    if (overtimeWorkers !== undefined) {
+      updates.push(`overtime_workers = @p${paramIdx}`);
+      params.push({ name: `p${paramIdx}`, type: 'nvarchar', value: overtimeWorkers });
       paramIdx++;
     }
     if (notes !== undefined) {

@@ -64,6 +64,8 @@ interface WorkforceDaily {
   plannedCount: number;
   actualCount: number;
   absentCount: number;
+  overtimeHours: number;
+  overtimeWorkers: number;
   notes: string | null;
   recordedBy: string | null;
 }
@@ -75,6 +77,8 @@ interface FormState {
   planned: number;
   actual: number;
   absent: number;
+  overtimeHrs: number;
+  overtimeWkrs: number;
   notes: string;
 }
 
@@ -88,6 +92,8 @@ const emptyForm = (): FormState => {
     planned: 0,
     actual: 0,
     absent: 0,
+    overtimeHrs: 0,
+    overtimeWkrs: 0,
     notes: '',
   };
 };
@@ -172,6 +178,8 @@ export default function WorkforceDashboardPage() {
       planned: item.plannedCount,
       actual: item.actualCount,
       absent: item.absentCount,
+      overtimeHrs: item.overtimeHours,
+      overtimeWkrs: item.overtimeWorkers,
       notes: item.notes ?? '',
     });
     setError(null);
@@ -190,6 +198,8 @@ export default function WorkforceDashboardPage() {
         plannedCount: form.planned,
         actualCount: form.actual,
         absentCount: form.absent,
+        overtimeHours: form.overtimeHrs,
+        overtimeWorkers: form.overtimeWkrs,
         notes: reason
           ? `[RIPORT: ${reason}] ${form.notes || ''}`.trim()
           : (form.notes || null),
@@ -291,6 +301,7 @@ export default function WorkforceDashboardPage() {
     const header = [
       t('workforce.date'), t('workforce.shift'), t('workforce.area'),
       t('workforce.planned'), t('workforce.actual'), t('workforce.absent'),
+      t('workforce.overtime_hours'), t('workforce.overtime_workers'),
       t('workforce.rate'), t('workforce.notes'),
     ];
     const rows = items.map(i => {
@@ -298,6 +309,7 @@ export default function WorkforceDashboardPage() {
       return [
         i.recordDate, i.shiftName ?? '', i.areaName ?? '',
         String(i.plannedCount), String(i.actualCount), String(i.absentCount),
+        String(i.overtimeHours), String(i.overtimeWorkers),
         `${rate}%`, i.notes ?? '',
       ];
     });
@@ -320,6 +332,7 @@ export default function WorkforceDashboardPage() {
   const totalPlanned = todayItems.reduce((s, i) => s + i.plannedCount, 0);
   const totalActual = todayItems.reduce((s, i) => s + i.actualCount, 0);
   const totalAbsent = todayItems.reduce((s, i) => s + i.absentCount, 0);
+  const totalOvertimeHrs = todayItems.reduce((s, i) => s + i.overtimeHours, 0);
   const attendanceRate = totalPlanned > 0 ? Math.round((totalActual / totalPlanned) * 100) : 0;
 
   const uniqueShifts = [...new Set(items.map(i => i.shiftName).filter(Boolean))] as string[];
@@ -426,7 +439,7 @@ export default function WorkforceDashboardPage() {
       )}
 
       {/* ═══ Summary Cards ═══ */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         {[
           {
             label: t('workforce.planned_today'),
@@ -451,6 +464,14 @@ export default function WorkforceDashboardPage() {
             gradient: 'from-red-950/80 to-red-900/30',
             border: 'border-red-800/40',
             valueColor: totalAbsent > 0 ? 'text-red-400' : 'text-white',
+          },
+          {
+            label: t('workforce.overtime_today'),
+            value: `${totalOvertimeHrs}h`,
+            icon: <Clock className="w-5 h-5 text-amber-400" />,
+            gradient: 'from-amber-950/80 to-amber-900/30',
+            border: 'border-amber-800/40',
+            valueColor: totalOvertimeHrs > 0 ? 'text-amber-400' : 'text-white',
           },
           {
             label: t('workforce.attendance_rate'),
@@ -499,6 +520,7 @@ export default function WorkforceDashboardPage() {
                 <th className="px-4 py-3 text-center">{t('workforce.planned')}</th>
                 <th className="px-4 py-3 text-center">{t('workforce.actual')}</th>
                 <th className="px-4 py-3 text-center">{t('workforce.absent')}</th>
+                <th className="px-4 py-3 text-center">{t('workforce.overtime_hours')}</th>
                 <th className="px-4 py-3 text-center">{t('workforce.rate')}</th>
                 <th className="px-4 py-3 text-left">{t('workforce.notes')}</th>
                 <th className="px-4 py-3 text-center w-20">{t('common.actions')}</th>
@@ -534,6 +556,11 @@ export default function WorkforceDashboardPage() {
                     <td className="px-4 py-3 text-center">
                       <span className={item.absentCount > 0 ? 'text-red-400 font-medium' : 'text-gray-500'}>
                         {item.absentCount}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={item.overtimeHours > 0 ? 'text-amber-400 font-medium' : 'text-gray-500'}>
+                        {item.overtimeHours > 0 ? `${item.overtimeHours}h / ${item.overtimeWorkers} fő` : '—'}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -685,6 +712,18 @@ export default function WorkforceDashboardPage() {
                 <div>
                   <label className="block text-xs font-medium text-gray-400 mb-1.5">{t('workforce.absent')}</label>
                   <input type="number" value={form.absent} min={0} onChange={e => setForm(f => ({ ...f, absent: parseInt(e.target.value) || 0 }))} className={inputCls} />
+                </div>
+              </div>
+
+              {/* Overtime */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">{t('workforce.overtime_hours')}</label>
+                  <input type="number" value={form.overtimeHrs} min={0} step={0.5} onChange={e => setForm(f => ({ ...f, overtimeHrs: parseFloat(e.target.value) || 0 }))} className={inputCls} />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">{t('workforce.overtime_workers')}</label>
+                  <input type="number" value={form.overtimeWkrs} min={0} onChange={e => setForm(f => ({ ...f, overtimeWkrs: parseInt(e.target.value) || 0 }))} className={inputCls} />
                 </div>
               </div>
 

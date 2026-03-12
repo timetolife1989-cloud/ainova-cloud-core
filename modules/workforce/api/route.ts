@@ -12,6 +12,8 @@ interface WorkforceRow {
   planned_count: number;
   actual_count: number;
   absent_count: number;
+  overtime_hours: number;
+  overtime_workers: number;
   notes: string | null;
   recorded_by: string | null;
   created_at: Date;
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
   const pageSize = 50;
 
   try {
-    let sql = `SELECT id, record_date, shift_name, area_name, planned_count, actual_count, absent_count, notes, recorded_by, created_at
+    let sql = `SELECT id, record_date, shift_name, area_name, planned_count, actual_count, absent_count, overtime_hours, overtime_workers, notes, recorded_by, created_at
                FROM workforce_daily WHERE 1=1`;
     const params: Array<{ name: string; type: 'nvarchar'; value: unknown }> = [];
     let paramIdx = 0;
@@ -69,6 +71,8 @@ export async function GET(request: NextRequest) {
       plannedCount: Number(r.planned_count) || 0,
       actualCount: Number(r.actual_count) || 0,
       absentCount: Number(r.absent_count) || 0,
+      overtimeHours: Number(r.overtime_hours) || 0,
+      overtimeWorkers: Number(r.overtime_workers) || 0,
       notes: r.notes,
       recordedBy: r.recorded_by,
       createdAt: String(r.created_at),
@@ -88,6 +92,8 @@ const CreateSchema = z.object({
   plannedCount: z.number().min(0),
   actualCount: z.number().min(0),
   absentCount: z.number().min(0).optional(),
+  overtimeHours: z.number().min(0).optional(),
+  overtimeWorkers: z.number().min(0).optional(),
   notes: z.string().max(500).optional(),
 });
 
@@ -105,13 +111,13 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
   }
 
-  const { recordDate, shiftName, areaName, plannedCount, actualCount, absentCount, notes } = parsed.data;
+  const { recordDate, shiftName, areaName, plannedCount, actualCount, absentCount, overtimeHours, overtimeWorkers, notes } = parsed.data;
 
   try {
     const result = await getDb().query<{ id: number }>(
-      `INSERT INTO workforce_daily (record_date, shift_name, area_name, planned_count, actual_count, absent_count, notes, recorded_by)
+      `INSERT INTO workforce_daily (record_date, shift_name, area_name, planned_count, actual_count, absent_count, overtime_hours, overtime_workers, notes, recorded_by)
        OUTPUT INSERTED.id
-       VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7)`,
+       VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9)`,
       [
         { name: 'p0', type: 'nvarchar', value: recordDate },
         { name: 'p1', type: 'nvarchar', value: shiftName ?? null },
@@ -119,8 +125,10 @@ export async function POST(request: NextRequest) {
         { name: 'p3', type: 'nvarchar', value: plannedCount },
         { name: 'p4', type: 'nvarchar', value: actualCount },
         { name: 'p5', type: 'nvarchar', value: absentCount ?? 0 },
-        { name: 'p6', type: 'nvarchar', value: notes ?? null },
-        { name: 'p7', type: 'nvarchar', value: auth.username },
+        { name: 'p6', type: 'nvarchar', value: overtimeHours ?? 0 },
+        { name: 'p7', type: 'nvarchar', value: overtimeWorkers ?? 0 },
+        { name: 'p8', type: 'nvarchar', value: notes ?? null },
+        { name: 'p9', type: 'nvarchar', value: auth.username },
       ]
     );
 
