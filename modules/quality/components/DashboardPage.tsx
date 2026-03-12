@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
+import { ExportButton } from '@/components/core/ExportButton';
 import { ShieldCheck, Plus, X, Check, AlertTriangle, CheckCircle, XCircle, FileText, Eye, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Inspection {
@@ -165,6 +166,7 @@ export default function QualityDashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('quality.title')} subtitle={t('quality.subtitle')} />
         <div className="flex items-center gap-2">
+          <ExportButton moduleId="quality" table="mod_quality_inspections" />
           {tab === 'inspections' && (
             <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium"><Plus className="w-4 h-4" /> {t('quality.new_inspection')}</button>
           )}

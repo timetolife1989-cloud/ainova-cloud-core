@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
+import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Truck, Plus, X, Check, AlertTriangle, Package, DollarSign, Scale } from 'lucide-react';
 
@@ -110,9 +111,12 @@ export default function DeliveryDashboardPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('delivery.title')} subtitle={t('delivery.subtitle')} />
-        <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium">
-          <Plus className="w-4 h-4" /> {t('delivery.new_shipment')}
-        </button>
+        <div className="flex items-center gap-2">
+          <ExportButton moduleId="delivery" table="mod_deliveries" />
+          <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium">
+            <Plus className="w-4 h-4" /> {t('delivery.new_shipment')}
+          </button>
+        </div>
       </div>
 
       {/* Summary */}

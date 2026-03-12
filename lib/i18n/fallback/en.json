@@ -622,6 +622,7 @@
   "plc.network_error": "Network error",
   "plc.error_occurred": "Error occurred",
 
+  "export.title": "Export",
   "import.title": "File Import",
   "import.subtitle": "Import Excel and CSV files",
   "import.uploading": "Uploading...",

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
+import { ExportButton } from '@/components/core/ExportButton';
 import { ClipboardCheck, Plus, X, Check, AlertTriangle, Clock, CheckCircle, Circle, AlertCircle } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -171,12 +172,15 @@ export default function TrackingDashboardPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
-        <button
-          onClick={() => setModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium"
-        >
-          <Plus className="w-4 h-4" /> {t('tracking.new_task')}
-        </button>
+        <div className="flex items-center gap-2">
+          <ExportButton moduleId="tracking" table="mod_tracking" />
+          <button
+            onClick={() => setModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium"
+          >
+            <Plus className="w-4 h-4" /> {t('tracking.new_task')}
+          </button>
+        </div>
       </div>
 
       {/* Summary cards */}

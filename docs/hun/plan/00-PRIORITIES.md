@@ -43,7 +43,7 @@
 - ✅ Maintenance: "kész" jelölés + napló UI (complete API, log API, tab UI — commit 10cfac1)
 - ✅ Quality: 8D riport UI (CRUD API, wizard D1-D8, viewer modal, i18n — commit 5433b6d)
 - ✅ Performance: célérték beállító UI (targets CRUD API, tab UI, modal — commit e13b520)
-- ⬜ Excel/PDF export javítás minden modulban
+- ✅ Excel/PDF export javítás minden modulban (SQL injection fix, ExportButton 9 modulba, i18n)
 
 ## P4 — NICE TO HAVE (később)
 

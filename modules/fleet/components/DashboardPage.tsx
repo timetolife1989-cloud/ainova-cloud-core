@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
+import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Car, Plus, X, Check, AlertTriangle, Fuel, Route } from 'lucide-react';
 
@@ -183,12 +184,15 @@ export default function FleetDashboardPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('fleet.title')} subtitle={t('fleet.subtitle')} />
-        <button
-          onClick={() => setModalOpen('vehicle')}
-          className="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium"
-        >
-          <Plus className="w-4 h-4" /> {t('fleet.new_vehicle')}
-        </button>
+        <div className="flex items-center gap-2">
+          <ExportButton moduleId="fleet" table="mod_fleet_trips" />
+          <button
+            onClick={() => setModalOpen('vehicle')}
+            className="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium"
+          >
+            <Plus className="w-4 h-4" /> {t('fleet.new_vehicle')}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

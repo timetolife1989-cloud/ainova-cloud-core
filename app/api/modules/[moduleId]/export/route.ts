@@ -4,6 +4,9 @@ import { getDb } from '@/lib/db';
 import { createExcelResponse } from '@/lib/export/excel';
 import { createPdfResponse } from '@/lib/export/pdf';
 
+// Only allow table names that match safe patterns (alphanumeric + underscores)
+const SAFE_TABLE_RE = /^[a-zA-Z][a-zA-Z0-9_]{0,63}$/;
+
 /**
  * Generic module data export endpoint.
  * GET /api/modules/[moduleId]/export?format=xlsx|pdf
@@ -19,6 +22,10 @@ export async function GET(
   const { searchParams } = new URL(request.url);
   const format = searchParams.get('format') ?? 'xlsx';
   const table = searchParams.get('table') ?? `mod_${moduleId.replace(/-/g, '_')}`;
+
+  if (!SAFE_TABLE_RE.test(table)) {
+    return Response.json({ error: 'Invalid table name' }, { status: 400 });
+  }
 
   try {
     const rows = await getDb().query<Record<string, unknown>>(

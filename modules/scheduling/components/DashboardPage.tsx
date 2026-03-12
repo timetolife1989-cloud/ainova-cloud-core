@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
+import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Calendar, Plus, X, Check, AlertTriangle, Users, Cpu, MapPin } from 'lucide-react';
 
@@ -137,6 +138,7 @@ export default function SchedulingDashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('scheduling.title')} subtitle={t('scheduling.subtitle')} />
         <div className="flex items-center gap-3">
+          <ExportButton moduleId="scheduling" table="mod_capacity_entries" />
           <input
             type="date"
             value={selectedWeek}

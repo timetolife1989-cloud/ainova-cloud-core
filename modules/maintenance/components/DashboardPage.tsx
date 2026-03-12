@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
+import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Wrench, Plus, X, Check, AlertTriangle, AlertCircle, Clock, CheckCircle, ClipboardCheck, History } from 'lucide-react';
 
@@ -112,7 +113,10 @@ export default function MaintenanceDashboardPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('maintenance.title')} subtitle={t('maintenance.subtitle')} />
-        <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-stone-600 hover:bg-stone-700 text-white rounded-lg text-sm font-medium"><Plus className="w-4 h-4" /> {t('maintenance.new_schedule')}</button>
+        <div className="flex items-center gap-2">
+          <ExportButton moduleId="maintenance" table="mod_maintenance_schedules" />
+          <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-stone-600 hover:bg-stone-700 text-white rounded-lg text-sm font-medium"><Plus className="w-4 h-4" /> {t('maintenance.new_schedule')}</button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">

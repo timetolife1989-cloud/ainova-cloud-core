@@ -622,6 +622,7 @@
   "plc.network_error": "Hálózati hiba",
   "plc.error_occurred": "Hiba történt",
 
+  "export.title": "Exportálás",
   "import.title": "Fájl Import",
   "import.subtitle": "Excel és CSV fájlok importálása",
   "import.uploading": "Feltöltés...",

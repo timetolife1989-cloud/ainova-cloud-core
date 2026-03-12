@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
+import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Package, Plus, X, Check, AlertTriangle, ArrowDown, ArrowUp, AlertCircle } from 'lucide-react';
 
@@ -121,9 +122,12 @@ export default function InventoryDashboardPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('inventory.title')} subtitle={t('inventory.subtitle')} />
-        <button onClick={() => { setError(null); setModalOpen('item'); }} className="flex items-center gap-2 px-4 py-2 bg-lime-600 hover:bg-lime-700 text-white rounded-lg text-sm font-medium">
-          <Plus className="w-4 h-4" /> {t('inventory.new_product')}
-        </button>
+        <div className="flex items-center gap-2">
+          <ExportButton moduleId="inventory" table="mod_inventory" />
+          <button onClick={() => { setError(null); setModalOpen('item'); }} className="flex items-center gap-2 px-4 py-2 bg-lime-600 hover:bg-lime-700 text-white rounded-lg text-sm font-medium">
+            <Plus className="w-4 h-4" /> {t('inventory.new_product')}
+          </button>
+        </div>
       </div>
 
       {/* Summary */}
