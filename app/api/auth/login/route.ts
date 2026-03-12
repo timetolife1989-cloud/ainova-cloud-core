@@ -20,13 +20,13 @@ import { generateCsrfToken, getCsrfCookieOptions, CSRF_COOKIE_NAME } from '@/lib
 const LoginSchema = z.object({
   username: z
     .string()
-    .min(1, 'A felhasználónév nem lehet üres')
-    .max(100, 'A felhasználónév túl hosszú')
+    .min(1, 'auth.error.username_empty')
+    .max(100, 'auth.error.username_too_long')
     .transform((v) => v.trim()),
   password: z
     .string()
-    .min(1, 'A jelszó nem lehet üres')
-    .max(500, 'A jelszó túl hosszú'),
+    .min(1, 'auth.error.password_empty')
+    .max(500, 'auth.error.password_too_long'),
 });
 
 // -----------------------------------------------------------------------
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     rawBody = await request.json();
   } catch {
     return NextResponse.json(
-      { error: 'Érvénytelen JSON formátum' },
+      { error: 'auth.error.invalid_json' },
       { status: 400 }
     );
   }
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
   // 2. Validate with Zod
   const parsed = LoginSchema.safeParse(rawBody);
   if (!parsed.success) {
-    const firstError = parsed.error.issues[0]?.message ?? 'Érvénytelen bemenet';
+    const firstError = parsed.error.issues[0]?.message ?? 'auth.error.invalid_input';
     return NextResponse.json({ error: firstError }, { status: 400 });
   }
 
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error('[API] /auth/login unexpected error:', err);
     return NextResponse.json(
-      { error: 'Váratlan hiba történt. Próbáld újra.' },
+      { error: 'auth.error.unexpected' },
       { status: 500 }
     );
   }
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
   response.cookies.set('sessionId', result.sessionId!, {
     httpOnly: true,
     secure:   isProduction,
-    sameSite: 'lax',
+    sameSite: 'strict',
     maxAge:   86400, // 24 hours
     path:     '/',
   });

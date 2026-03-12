@@ -14,10 +14,13 @@
 - ✅ DECIMAL/NUMERIC oszlopok számként jönnek (nem string) — pg.types parser
 - ✅ Workforce API Number() biztonsági réteg
 - ✅ .gitignore UTF-8 javítás (korábban UTF-16 korrumpálódott)
+- ✅ Workforce UX teljes újraírás (shift gombok, overwrite detection, report-required, validációk)
+- ✅ Inaktivitás érzékelés (25p figyelmeztetés, 30p auto-kijelentkezés)
+- ✅ Túlóra rögzítés (overtime_hours + overtime_workers — DB, API, UI, i18n)
 
 ## P1 — ELLENŐRZÉSRE VÁR (push-olva, Vercel redeploy kell)
 
-- 🔧 Workforce összesítő kártyák (ma: tervezett/tényleges/hiányzó) — DECIMAL fix push-olva
+- 🔧 Workforce összesítő kártyák (5 kártya: tervezett/tényleges/hiányzó/túlóra/jelenlét%)
 - 🔧 Workforce chartok (oszlop/terület/bontás) — DECIMAL fix push-olva
 - 🔧 Workforce CRUD (létrehozás/szerkesztés/törlés) — tesztelni kell live-ban
 - 🔧 Tracking modul — tesztelni kell Vercel-en

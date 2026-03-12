@@ -220,7 +220,7 @@ export default function WorkforceDashboardPage() {
       setShowOverwrite(false);
       setShowReportRequired(false);
       setReportReason('');
-      addToast('success', editItem ? 'Sikeresen módosítva!' : 'Sikeresen rögzítve!');
+      addToast('success', editItem ? t('workforce.save_success_edit') : t('workforce.save_success_create'));
       await fetchData();
     } catch (e) {
       const msg = e instanceof Error ? e.message : t('common.error');
@@ -239,13 +239,13 @@ export default function WorkforceDashboardPage() {
 
     // Validation 1: Future date
     if (selectedDate > todayDate) {
-      addToast('warning', 'Nem lehet jövőbeli dátumra rögzíteni!');
+      addToast('warning', t('workforce.error_future_date'));
       return;
     }
 
     // Validation 2: Zero headcount
     if (form.planned === 0 && form.actual === 0 && form.absent === 0) {
-      addToast('warning', 'Adj meg legalább 1 főt (tervezett, tényleges vagy hiányzó)!');
+      addToast('warning', t('workforce.error_zero_headcount'));
       return;
     }
 
@@ -288,7 +288,7 @@ export default function WorkforceDashboardPage() {
         throw new Error(json.error ?? t('common.error'));
       }
       setDeleteConfirmId(null);
-      addToast('success', 'Sikeresen törölve!');
+      addToast('success', t('workforce.delete_success'));
       await fetchData();
     } catch (e) {
       const msg = e instanceof Error ? e.message : t('common.error');
@@ -323,7 +323,7 @@ export default function WorkforceDashboardPage() {
     a.download = `workforce_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    addToast('success', 'CSV exportálva!');
+    addToast('success', t('workforce.csv_exported'));
   };
 
   // ── Computed ────────────────────────────────────────────────────
@@ -796,7 +796,7 @@ export default function WorkforceDashboardPage() {
               <div className="p-3 rounded-xl bg-gray-800/80 border border-amber-500/20 mb-4 text-sm">
                 <div className="flex items-center gap-2 text-gray-300">
                   <Users className="w-4 h-4 text-amber-400" />
-                  <span>Rögzítette: <strong className="text-amber-200">{existingInfo.savedBy}</strong></span>
+                  <span>{t('workforce.overwrite_recorded_by')}: <strong className="text-amber-200">{existingInfo.savedBy}</strong></span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-400 mt-1.5">
                   <Clock className="w-4 h-4" />
@@ -804,19 +804,19 @@ export default function WorkforceDashboardPage() {
                 </div>
               </div>
             )}
-            <p className="text-gray-400 text-sm mb-5">Szeretnéd felülírni a korábbi adatokat?</p>
+            <p className="text-gray-400 text-sm mb-5">{t('workforce.overwrite_confirm')}</p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowOverwrite(false)}
                 className="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm font-medium transition-colors"
               >
-                Mégsem
+                {t('common.cancel')}
               </button>
               <button
                 onClick={() => void performSave()}
                 className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium transition-colors"
               >
-                Igen, felülírom
+                {t('workforce.overwrite_yes')}
               </button>
             </div>
           </div>
@@ -829,23 +829,23 @@ export default function WorkforceDashboardPage() {
           <div className="bg-gray-900 border border-orange-500/50 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
             <h3 className="text-lg font-bold text-orange-400 mb-3 flex items-center gap-2">
               <span className="text-2xl">📋</span>
-              Riport köteles módosítás
+              {t('workforce.report_required_title')}
             </h3>
             <p className="text-gray-300 mb-2">
-              A kiválasztott dátum <strong className="text-orange-300">{form.date}</strong> több mint 1 nappal régebbi.
+              {t('workforce.report_date_old')}
             </p>
             <p className="text-gray-400 text-sm mb-4">
-              Az utólagos rögzítéshez kötelező indoklást megadni. Az admin értesítést kap.
+              {t('workforce.report_required_desc')}
             </p>
             <div className="mb-5">
               <label className="block text-xs font-medium text-gray-400 mb-1.5">
-                Indoklás <span className="text-red-400">*</span>
+                {t('workforce.report_reason')} <span className="text-red-400">*</span>
               </label>
               <textarea
                 value={reportReason}
                 onChange={e => setReportReason(e.target.value)}
                 rows={3}
-                placeholder="Miért szükséges az utólagos rögzítés?"
+                placeholder={t('workforce.report_reason_placeholder')}
                 className={inputCls}
               />
             </div>
@@ -854,14 +854,14 @@ export default function WorkforceDashboardPage() {
                 onClick={() => { setShowReportRequired(false); setReportReason(''); }}
                 className="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm font-medium transition-colors"
               >
-                Mégsem
+                {t('common.cancel')}
               </button>
               <button
                 onClick={() => void performSave(reportReason)}
                 disabled={!reportReason.trim() || saving}
                 className="px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium transition-colors disabled:opacity-50"
               >
-                {saving ? 'Mentés...' : 'Mentés indoklással'}
+                {saving ? `${t('common.saving')}...` : t('workforce.save_with_reason')}
               </button>
             </div>
           </div>

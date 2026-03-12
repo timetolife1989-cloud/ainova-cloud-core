@@ -89,6 +89,10 @@ export function LoginContainer() {
           showError(t('auth.login_failed'));
         } else if (code === 'rate_limited') {
           showError(t('auth.rate_limited'));
+        } else if (code === 'account_disabled') {
+          showError(t('auth.account_disabled'));
+        } else if (code.startsWith('auth.error.')) {
+          showError(t(code));
         } else {
           showError(t('auth.server_error'));
         }
@@ -109,7 +113,7 @@ export function LoginContainer() {
         window.location.href = isFirstLogin ? '/change-password?firstLogin=true' : '/dashboard';
       }, 500);
     } catch {
-      showError('No internet connection or server unreachable.');
+      showError(t('auth.error.unexpected'));
     } finally {
       setLoading(false);
     }
