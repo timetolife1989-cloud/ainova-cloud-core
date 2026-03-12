@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import * as LucideIcons from 'lucide-react';
 
@@ -39,12 +38,9 @@ export const MenuTile = React.memo(function MenuTile({
   };
 
   return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ duration: 0.15 }}
+    <div
       onClick={handleClick}
-      className="group relative overflow-hidden bg-gray-900 hover:bg-gray-800 rounded-xl shadow-lg cursor-pointer transition-colors duration-200 border border-gray-800 hover:border-gray-700"
+      className="group relative overflow-hidden bg-gray-900 hover:bg-gray-800 rounded-xl shadow-lg cursor-pointer transition-all duration-150 border border-gray-800 hover:border-gray-700 hover:scale-[1.02] active:scale-[0.98]"
     >
       {/* Left accent stripe using the module color */}
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${color} rounded-l-xl`} />
@@ -92,6 +88,6 @@ export const MenuTile = React.memo(function MenuTile({
 
       {/* Bottom shine */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-    </motion.div>
+    </div>
   );
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { useTranslation } from '@/hooks/useTranslation';
 import { TrendingUp, Plus, X, Check, AlertTriangle, Users, Clock, Target, Zap } from 'lucide-react';
@@ -105,14 +105,14 @@ export default function PerformanceDashboardPage() {
     setFormActualTime('');
   };
 
-  // Summary calculations
-  const todayEntries = entries.filter(e => e.entryDate === new Date().toISOString().split('T')[0]);
-  const totalQuantity = todayEntries.reduce((sum, e) => sum + e.quantity, 0);
-  const totalNormTime = todayEntries.reduce((sum, e) => sum + (e.normTime ?? 0), 0);
-  const totalActualTime = todayEntries.reduce((sum, e) => sum + (e.actualTime ?? 0), 0);
-  const avgEfficiency = todayEntries.length > 0
+  // Summary calculations (memoized)
+  const todayEntries = useMemo(() => entries.filter(e => e.entryDate === new Date().toISOString().split('T')[0]), [entries]);
+  const totalQuantity = useMemo(() => todayEntries.reduce((sum, e) => sum + e.quantity, 0), [todayEntries]);
+  const totalNormTime = useMemo(() => todayEntries.reduce((sum, e) => sum + (e.normTime ?? 0), 0), [todayEntries]);
+  const totalActualTime = useMemo(() => todayEntries.reduce((sum, e) => sum + (e.actualTime ?? 0), 0), [todayEntries]);
+  const avgEfficiency = useMemo(() => todayEntries.length > 0
     ? Math.round(todayEntries.reduce((sum, e) => sum + (e.efficiency ?? 0), 0) / todayEntries.length)
-    : 0;
+    : 0, [todayEntries]);
 
   const getEfficiencyColor = (eff: number | null) => {
     if (eff === null) return 'text-gray-400';

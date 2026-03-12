@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { Gauge, Plus, X, Check, AlertTriangle } from 'lucide-react';
@@ -67,7 +67,10 @@ export default function OeeDashboardPage() {
     finally { setSaving(false); }
   };
 
-  const avgOee = records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.oeePct ?? 0), 0) / records.filter(r => r.oeePct !== null).length) : 0;
+  const avgOee = useMemo(() => records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.oeePct ?? 0), 0) / records.filter(r => r.oeePct !== null).length) : 0, [records]);
+  const avgAvailability = useMemo(() => records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.availabilityPct ?? 0), 0) / records.length) : 0, [records]);
+  const avgPerformance = useMemo(() => records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.performancePct ?? 0), 0) / records.filter(r => r.performancePct !== null).length || 0) : 0, [records]);
+  const avgQuality = useMemo(() => records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.qualityPct ?? 0), 0) / records.length) : 0, [records]);
 
   if (loading) {
     return (<div className="max-w-7xl mx-auto px-4 py-8"><DashboardSectionHeader title={t('oee.title')} subtitle={t('oee.subtitle')} /><div className="animate-pulse mt-6 h-64 bg-gray-800 rounded-xl" /></div>);
@@ -89,15 +92,15 @@ export default function OeeDashboardPage() {
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
           <p className="text-xs text-gray-500">{t('oee.availability')}</p>
-          <p className="text-2xl font-bold text-blue-400">{records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.availabilityPct ?? 0), 0) / records.length) : 0}%</p>
+          <p className="text-2xl font-bold text-blue-400">{avgAvailability}%</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
           <p className="text-xs text-gray-500">{t('oee.performance')}</p>
-          <p className="text-2xl font-bold text-amber-400">{records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.performancePct ?? 0), 0) / records.filter(r => r.performancePct !== null).length || 0) : 0}%</p>
+          <p className="text-2xl font-bold text-amber-400">{avgPerformance}%</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
           <p className="text-xs text-gray-500">{t('oee.quality')}</p>
-          <p className="text-2xl font-bold text-green-400">{records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.qualityPct ?? 0), 0) / records.length) : 0}%</p>
+          <p className="text-2xl font-bold text-green-400">{avgQuality}%</p>
         </div>
       </div>
 

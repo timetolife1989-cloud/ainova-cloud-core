@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import {
   Users, Plus, Calendar, TrendingUp, UserMinus, X, Check,
@@ -327,16 +327,16 @@ export default function WorkforceDashboardPage() {
     addToast('success', t('workforce.csv_exported'));
   };
 
-  // ── Computed ────────────────────────────────────────────────────
+  // ── Computed (memoized) ─────────────────────────────────────────
   const todayStr = new Date().toISOString().split('T')[0];
-  const todayItems = items.filter(i => i.recordDate === todayStr);
-  const totalPlanned = todayItems.reduce((s, i) => s + i.plannedCount, 0);
-  const totalActual = todayItems.reduce((s, i) => s + i.actualCount, 0);
-  const totalAbsent = todayItems.reduce((s, i) => s + i.absentCount, 0);
-  const totalOvertimeHrs = todayItems.reduce((s, i) => s + i.overtimeHours, 0);
-  const attendanceRate = totalPlanned > 0 ? Math.round((totalActual / totalPlanned) * 100) : 0;
+  const todayItems = useMemo(() => items.filter(i => i.recordDate === todayStr), [items, todayStr]);
+  const totalPlanned = useMemo(() => todayItems.reduce((s, i) => s + i.plannedCount, 0), [todayItems]);
+  const totalActual = useMemo(() => todayItems.reduce((s, i) => s + i.actualCount, 0), [todayItems]);
+  const totalAbsent = useMemo(() => todayItems.reduce((s, i) => s + i.absentCount, 0), [todayItems]);
+  const totalOvertimeHrs = useMemo(() => todayItems.reduce((s, i) => s + i.overtimeHours, 0), [todayItems]);
+  const attendanceRate = useMemo(() => totalPlanned > 0 ? Math.round((totalActual / totalPlanned) * 100) : 0, [totalPlanned, totalActual]);
 
-  const uniqueShifts = [...new Set(items.map(i => i.shiftName).filter(Boolean))] as string[];
+  const uniqueShifts = useMemo(() => [...new Set(items.map(i => i.shiftName).filter(Boolean))] as string[], [items]);
 
   const inputCls = 'w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-colors';
 

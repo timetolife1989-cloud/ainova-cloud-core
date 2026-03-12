@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { ClipboardCheck, Plus, X, Check, AlertTriangle, Clock, CheckCircle, Circle, AlertCircle } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -147,11 +147,11 @@ export default function TrackingDashboardPage() {
     setFormDueDate('');
   };
 
-  // Summary
-  const openCount = items.filter(i => i.status === 'Nyitott').length;
-  const inProgressCount = items.filter(i => i.status === 'Folyamatban').length;
-  const doneCount = items.filter(i => i.status === 'Kész' || i.status === 'Lezárt').length;
-  const overdueCount = items.filter(i => i.dueDate && new Date(i.dueDate) < new Date() && i.status !== 'Kész' && i.status !== 'Lezárt').length;
+  // Summary (memoized)
+  const openCount = useMemo(() => items.filter(i => i.status === 'Nyitott').length, [items]);
+  const inProgressCount = useMemo(() => items.filter(i => i.status === 'Folyamatban').length, [items]);
+  const doneCount = useMemo(() => items.filter(i => i.status === 'Kész' || i.status === 'Lezárt').length, [items]);
+  const overdueCount = useMemo(() => items.filter(i => i.dueDate && new Date(i.dueDate) < new Date() && i.status !== 'Kész' && i.status !== 'Lezárt').length, [items]);
 
   if (loading) {
     return (

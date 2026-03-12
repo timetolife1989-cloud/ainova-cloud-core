@@ -395,6 +395,30 @@ async function createTablesIfNeeded(db: IDatabaseAdapter) {
       status TEXT DEFAULT 'pending', notes TEXT, created_by TEXT,
       created_at TEXT DEFAULT (datetime('now'))
     )`,
+    `CREATE TABLE IF NOT EXISTS reports_saved (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      report_name TEXT NOT NULL,
+      description TEXT,
+      source_module TEXT,
+      source_table TEXT,
+      chart_type TEXT,
+      config TEXT,
+      created_by TEXT,
+      is_public INTEGER DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now'))
+    )`,
+    `CREATE TABLE IF NOT EXISTS mod_plc_devices (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      protocol TEXT NOT NULL DEFAULT 's7',
+      ip_address TEXT NOT NULL,
+      port INTEGER NOT NULL DEFAULT 102,
+      rack INTEGER DEFAULT 0,
+      slot INTEGER DEFAULT 1,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      last_seen_at TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    )`,
     `CREATE TABLE IF NOT EXISTS core_sessions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       session_id TEXT NOT NULL UNIQUE,
@@ -494,6 +518,8 @@ async function cleanup(db: IDatabaseAdapter) {
     'tracking_history','tracking_items',
     'workforce_daily',
     'core_notifications','core_sync_events','core_audit_log',
+    'reports_saved',
+    'mod_plc_devices',
   ];
   process.stdout.write('[Seed] Cleaning...');
   for (const t of tables) { try { await db.execute(`DELETE FROM ${t}`,[]);} catch{} }
@@ -1020,7 +1046,84 @@ async function seedScheduling(db: IDatabaseAdapter) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// SECTION 17: DELIVERY SHIPMENTS (30 days)
+// SECTION 17A: REPORTS (saved report definitions)
+// ─────────────────────────────────────────────────────────────────────
+async function seedReports(db: IDatabaseAdapter) {
+  const reports = [
+    {name:'Havi OEE összesítő',     desc:'Gépenkénti OEE mutatók havi bontásban',     module:'oee',         table:'oee_records',         chart:'bar'},
+    {name:'Létszám trendek',        desc:'Napi létszám trend a teljes gyártásban',     module:'workforce',   table:'workforce_daily',     chart:'line'},
+    {name:'Karbantartási költségek', desc:'Karbantartási költségek eszközönként',       module:'maintenance', table:'maintenance_log',     chart:'bar'},
+    {name:'Minőségi selejt arány',  desc:'Selejt ráta napi bontásban',                module:'quality',     table:'quality_inspections', chart:'area'},
+    {name:'Szállítási teljesítmény', desc:'Szállítmányok státusz eloszlása hetente',   module:'delivery',    table:'delivery_shipments',  chart:'pie'},
+    {name:'Készlet forgási sebesség',desc:'Készletforgás termékcsoportonként',          module:'inventory',   table:'inventory_movements', chart:'bar'},
+    {name:'Flotta kihasználtság',   desc:'Járművek havi futásteljesítménye',           module:'fleet',       table:'fleet_trips',         chart:'line'},
+    {name:'Teljesítmény ranking',   desc:'Dolgozói hatékonyság top lista',             module:'performance', table:'performance_entries', chart:'bar'},
+  ];
+  for (const r of reports) {
+    const config = JSON.stringify({dateRange:'last_30_days',groupBy:'day',showLegend:true});
+    await ex(db,'reports_saved',
+      `INSERT INTO reports_saved (report_name,description,source_module,source_table,chart_type,config,created_by,is_public) VALUES (@p0,@p1,@p2,@p3,@p4,@p5,@p6,1)`,
+      [{name:'p0',type:'nvarchar',value:r.name},{name:'p1',type:'nvarchar',value:r.desc},
+       {name:'p2',type:'nvarchar',value:r.module},{name:'p3',type:'nvarchar',value:r.table},
+       {name:'p4',type:'nvarchar',value:r.chart},{name:'p5',type:'nvarchar',value:config},
+       {name:'p6',type:'nvarchar',value:'admin'}]
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// SECTION 17B: PLC CONNECTOR (demo devices + registers + data)
+// ─────────────────────────────────────────────────────────────────────
+async function seedPlcConnector(db: IDatabaseAdapter) {
+  const devices = [
+    {name:'Siemens S7-1500 (CNC sor)',  proto:'s7',    ip:'192.168.1.10', port:102, rack:0, slot:1},
+    {name:'Modbus Gateway (Préssor)',    proto:'modbus',ip:'192.168.1.20', port:502, rack:0, slot:0},
+    {name:'Festősor PLC (Allen-Bradley)',proto:'s7',    ip:'192.168.1.30', port:102, rack:0, slot:2},
+    {name:'Hegesztő robot controller',   proto:'s7',    ip:'192.168.1.40', port:102, rack:0, slot:1},
+  ];
+
+  for (const dev of devices) {
+    const lastSeen = hoursAgo(rand(0,6));
+    await ex(db,'mod_plc_devices',
+      `INSERT INTO mod_plc_devices (name,protocol,ip_address,port,rack,slot,is_active,last_seen_at) VALUES (@p0,@p1,@p2,@p3,@p4,@p5,1,@p6)`,
+      [{name:'p0',type:'nvarchar',value:dev.name},{name:'p1',type:'nvarchar',value:dev.proto},
+       {name:'p2',type:'nvarchar',value:dev.ip},{name:'p3',type:'int',value:dev.port},
+       {name:'p4',type:'int',value:dev.rack},{name:'p5',type:'int',value:dev.slot},
+       {name:'p6',type:'nvarchar',value:lastSeen}]
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// SECTION 17C: QUALITY 8D REPORTS
+// ─────────────────────────────────────────────────────────────────────
+async function seedQuality8D(db: IDatabaseAdapter) {
+  const reports8d = [
+    {num:'8D-2026-001', d2:'Felületi karcolások a KHP-42 sorozatban', d4:'Szállítószalag kopott gumiszalag', status:'closed'},
+    {num:'8D-2026-002', d2:'Mérettűrés túllépés az XT-7 burkolatoknál', d4:'CNC szerszám kopás nem észlelt', status:'closed'},
+    {num:'8D-2026-003', d2:'Hegesztési varrat porozitás CF-220 alkatrészeknél', d4:'Védőgáz nyomás elégtelen', status:'implemented'},
+    {num:'8D-2026-004', d2:'Porlakk leválás TEN-88 termékeknél', d4:'Előkezelési hőmérséklet ingadozás', status:'open'},
+  ];
+  for (const r of reports8d) {
+    await ex(db,'quality_8d_reports',
+      `INSERT INTO quality_8d_reports (report_number,d1_team,d2_problem,d3_containment,d4_root_cause,d5_corrective,d6_implemented,d7_preventive,d8_recognition,status,created_by) VALUES (@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9,@p10)`,
+      [{name:'p0',type:'nvarchar',value:r.num},
+       {name:'p1',type:'nvarchar',value:'Kovács Gábor, Molnár Eszter, Fischer Maria'},
+       {name:'p2',type:'nvarchar',value:r.d2},
+       {name:'p3',type:'nvarchar',value:'Érintett tétel karanténba helyezve'},
+       {name:'p4',type:'nvarchar',value:r.d4},
+       {name:'p5',type:'nvarchar',value:'Javítás végrehajtva a gyártósoron'},
+       {name:'p6',type:'nvarchar',value:r.status==='open'?'':'Módosítva, ellenőrizve'},
+       {name:'p7',type:'nvarchar',value:r.status==='open'?'':'Megelőző intézkedés bevezetése'},
+       {name:'p8',type:'nvarchar',value:r.status==='closed'?'Csapat elismerése':''},
+       {name:'p9',type:'nvarchar',value:r.status},
+       {name:'p10',type:'nvarchar',value:'admin'}]
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// SECTION 18: DELIVERY SHIPMENTS (30 days)
 // ─────────────────────────────────────────────────────────────────────
 async function seedDelivery(db: IDatabaseAdapter) {
   const statuses = ['pending','shipped','delivered','returned'];
@@ -1075,6 +1178,9 @@ async function seed() {
     ['Quality inspections',                              () => seedQuality(db)],
     ['Scheduling capacity + allocations',                () => seedScheduling(db)],
     ['Delivery shipments (30d)',                         () => seedDelivery(db)],
+    ['Reports (8 saved definitions)',                    () => seedReports(db)],
+    ['PLC Connector (4 demo devices)',                   () => seedPlcConnector(db)],
+    ['Quality 8D reports (4 reports)',                   () => seedQuality8D(db)],
   ];
 
   for (const [label, fn] of steps) {

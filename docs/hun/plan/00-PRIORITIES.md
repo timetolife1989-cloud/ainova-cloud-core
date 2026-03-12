@@ -29,8 +29,8 @@
 - ✅ Header i18n (logout, hét, nyelvváltás hiba)
 - ✅ Landing page i18n (50+ kulcs hu/en/de, marketing layout + I18nProvider)
 - ✅ Audit napló oldal i18n (szűrők, gombok, paginálás — 23 kulcs hu/en/de)
-- ⬜ Lassú mobilon ÉS PC-n is — teljesítmény audit szükséges
-- ⬜ Egyes modulokban nincs adat → demo seed bővítés
+- ⬜ Lassú mobilon ÉS PC-n is → ✅ Teljesítmény optimalizálás (useMemo 6 modulban, staleTime 5min, refetchOnWindowFocus kikapcsolva, MenuTile CSS-only, CommandPalette lazy load, dead Inter import törölve)
+- ⬜ Egyes modulokban nincs adat → ✅ Demo seed bővítés (reports 8 mentett definíció, PLC connector 4 eszköz, quality 8D 4 riport)
 
 ## P2 — FONTOS (ezen a héten)
 

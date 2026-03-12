@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Calendar, Plus, X, Check, AlertTriangle, Users, Cpu, MapPin } from 'lucide-react';
@@ -111,12 +111,12 @@ export default function SchedulingDashboardPage() {
     return 'bg-gray-600';
   };
 
-  // Summary
-  const totalPlanned = entries.reduce((sum, e) => sum + e.plannedHours, 0);
-  const totalAllocated = entries.reduce((sum, e) => sum + e.allocatedHours, 0);
-  const avgUtilization = entries.length > 0
+  // Summary (memoized)
+  const totalPlanned = useMemo(() => entries.reduce((sum, e) => sum + e.plannedHours, 0), [entries]);
+  const totalAllocated = useMemo(() => entries.reduce((sum, e) => sum + e.allocatedHours, 0), [entries]);
+  const avgUtilization = useMemo(() => entries.length > 0
     ? Math.round(entries.reduce((sum, e) => sum + e.utilizationPercent, 0) / entries.length)
-    : 0;
+    : 0, [entries]);
 
   if (loading) {
     return (

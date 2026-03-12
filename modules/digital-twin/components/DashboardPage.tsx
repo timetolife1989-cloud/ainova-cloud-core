@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 
 interface Machine {
@@ -60,8 +60,8 @@ export default function DigitalTwinDashboardPage() {
   ];
 
   const machines = layout?.machines ?? demoMachines;
-  const running = machines.filter(m => m.status === 'running').length;
-  const stopped = machines.filter(m => m.status !== 'running').length;
+  const running = useMemo(() => machines.filter(m => m.status === 'running').length, [machines]);
+  const stopped = useMemo(() => machines.filter(m => m.status !== 'running').length, [machines]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

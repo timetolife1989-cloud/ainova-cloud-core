@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { getAuth } from '@/lib/auth';
 import { getLocale, getTranslationsForLocale } from '@/lib/i18n';
 import { Header } from '@/components/core/Header';
-import { CommandPalette } from '@/components/core/CommandPalette';
+import { LazyCommandPalette } from '@/components/core/LazyCommandPalette';
 import { I18nProvider } from '@/components/core/I18nProvider';
 import { InactivityGuard } from '@/components/core/InactivityGuard';
 
@@ -39,7 +39,7 @@ export default async function DashboardLayout({
         <main className="pt-16">
           {children}
         </main>
-        <CommandPalette />
+        <LazyCommandPalette />
         <InactivityGuard />
       </div>
     </I18nProvider>
