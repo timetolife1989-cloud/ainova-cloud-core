@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from '@/hooks/useTranslation';
 import { FALLBACK_ROLES, ROLE_LABELS } from '@/lib/validators/user';
 import type { UserRecord } from '@/lib/auth';
 
@@ -40,6 +41,7 @@ interface UserFormProps {
 
 export function UserForm({ user }: UserFormProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const isEdit = !!user;
 
   const [username, setUsername] = useState(user?.username ?? '');
@@ -86,13 +88,13 @@ export function UserForm({ user }: UserFormProps) {
       const data = await res.json() as { ok?: boolean; error?: string };
 
       if (!res.ok || !data.ok) {
-        throw new Error(data.error ?? 'Ismeretlen hiba');
+        throw new Error(data.error ?? t('admin.unknown_error'));
       }
 
       router.push('/dashboard/admin/users');
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ismeretlen hiba');
+      setError(err instanceof Error ? err.message : t('admin.unknown_error'));
     } finally {
       setLoading(false);
     }
@@ -110,7 +112,7 @@ export function UserForm({ user }: UserFormProps) {
       {!isEdit && (
         <div>
           <label className="block text-xs font-medium text-gray-400 mb-1">
-            Felhasználónév <span className="text-red-400">*</span>
+            {t('admin.username')} <span className="text-red-400">*</span>
           </label>
           <input
             type="text"
@@ -127,7 +129,7 @@ export function UserForm({ user }: UserFormProps) {
 
       {/* Full name */}
       <div>
-        <label className="block text-xs font-medium text-gray-400 mb-1">Teljes név</label>
+        <label className="block text-xs font-medium text-gray-400 mb-1">{t('admin.full_name')}</label>
         <input
           type="text"
           value={fullName}
@@ -140,7 +142,7 @@ export function UserForm({ user }: UserFormProps) {
 
       {/* Email */}
       <div>
-        <label className="block text-xs font-medium text-gray-400 mb-1">E-mail</label>
+        <label className="block text-xs font-medium text-gray-400 mb-1">{t('admin.email')}</label>
         <input
           type="email"
           value={email}
@@ -154,7 +156,7 @@ export function UserForm({ user }: UserFormProps) {
       {/* Role */}
       <div>
         <label className="block text-xs font-medium text-gray-400 mb-1">
-          Szerepkör <span className="text-red-400">*</span>
+            {t('admin.role')} <span className="text-red-400">*</span>
         </label>
         <select
           value={role}
@@ -174,7 +176,7 @@ export function UserForm({ user }: UserFormProps) {
       {!isEdit && (
         <div>
           <label className="block text-xs font-medium text-gray-400 mb-1">
-            Jelszó <span className="text-red-400">*</span>
+            {t('admin.password')} <span className="text-red-400">*</span>
           </label>
           <input
             type="password"
@@ -184,7 +186,7 @@ export function UserForm({ user }: UserFormProps) {
             minLength={8}
             maxLength={100}
             className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-600/50"
-            placeholder="Min. 8 karakter"
+            placeholder={t('admin.password_hint')}
           />
         </div>
       )}
@@ -200,7 +202,7 @@ export function UserForm({ user }: UserFormProps) {
             className="w-4 h-4 rounded border-gray-600 bg-gray-900 text-indigo-500 focus:ring-indigo-600/50"
           />
           <label htmlFor="isActive" className="text-sm text-gray-300 cursor-pointer">
-            Aktív fiók
+            {t('admin.active_account')}
           </label>
         </div>
       )}
@@ -212,14 +214,14 @@ export function UserForm({ user }: UserFormProps) {
           disabled={loading}
           className="flex-1 bg-indigo-700 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
         >
-          {loading ? 'Mentés...' : isEdit ? 'Mentés' : 'Létrehozás'}
+          {loading ? t('common.saving') : isEdit ? t('common.save') : t('admin.create')}
         </button>
         <button
           type="button"
           onClick={() => router.back()}
           className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 border border-gray-700 rounded-lg transition-colors"
         >
-          Mégse
+          {t('common.cancel')}
         </button>
       </div>
     </form>

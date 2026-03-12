@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { AlertTriangle, CheckCircle, Clock, XCircle, RefreshCw } from 'lucide-react';
 
 interface SyncStatusSummary {
@@ -18,21 +19,22 @@ interface SyncStatusSummary {
   }>;
 }
 
-function formatRelativeTime(dateStr: string | null): string {
-  if (!dateStr) return 'Soha';
+function formatRelativeTime(dateStr: string | null, t: (key: string) => string): string {
+  if (!dateStr) return t('sync.never');
   const date = new Date(dateStr);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return 'Most';
-  if (diffMins < 60) return `${diffMins} perce`;
+  if (diffMins < 1) return t('sync.now');
+  if (diffMins < 60) return `${diffMins} ${t('sync.minutes_ago')}`;
   const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `${diffHours} órája`;
+  if (diffHours < 24) return `${diffHours} ${t('sync.hours_ago')}`;
   const diffDays = Math.floor(diffHours / 24);
-  return `${diffDays} napja`;
+  return `${diffDays} ${t('sync.days_ago')}`;
 }
 
 export function SyncStatusWidget() {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<SyncStatusSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
@@ -73,28 +75,28 @@ export function SyncStatusWidget() {
     ok: {
       bg: 'bg-emerald-950/60 border-emerald-700',
       icon: <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />,
-      title: 'Adatfolyam rendben',
+      title: t('sync.data_ok'),
       titleClass: 'text-emerald-300',
       dot: 'bg-emerald-400 animate-pulse',
     },
     warning: {
       bg: 'bg-yellow-950/60 border-yellow-700',
       icon: <Clock className="w-5 h-5 text-yellow-400 flex-shrink-0" />,
-      title: 'Figyelem — Nincs friss adat',
+      title: t('sync.no_fresh_data'),
       titleClass: 'text-yellow-300',
       dot: 'bg-yellow-400 animate-pulse',
     },
     error: {
       bg: 'bg-red-950/60 border-red-700',
       icon: <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />,
-      title: `⚠ Adatszinkronizációs hiba — ${status?.errorCount24h ?? 0} hiba az elmúlt 24 órában`,
+      title: `⚠ ${t('sync.sync_error')} — ${status?.errorCount24h ?? 0} ${t('sync.errors_24h')}`,
       titleClass: 'text-red-300 font-semibold',
       dot: 'bg-red-500 animate-ping',
     },
     unknown: {
       bg: 'bg-gray-800 border-gray-700',
       icon: <AlertTriangle className="w-5 h-5 text-gray-400 flex-shrink-0" />,
-      title: 'Szinkronizáció állapota ismeretlen',
+      title: t('sync.status_unknown'),
       titleClass: 'text-gray-300',
       dot: 'bg-gray-500',
     },
@@ -117,10 +119,10 @@ export function SyncStatusWidget() {
         )}
 
         <p className="text-xs text-gray-500 mt-1">
-          Utolsó szinkron: {formatRelativeTime(status?.lastEventAt ?? null)}
+          {t('sync.last_sync')}: {formatRelativeTime(status?.lastEventAt ?? null, t)}
           {lastChecked && (
             <span className="ml-2 text-gray-600">
-              (ellenőrzés: {lastChecked.toLocaleTimeString('hu-HU')})
+              ({t('sync.check')}: {lastChecked.toLocaleTimeString('hu-HU')})
             </span>
           )}
         </p>
@@ -130,7 +132,7 @@ export function SyncStatusWidget() {
       <button
         onClick={() => { setLoading(true); void fetchStatus(); }}
         className="text-gray-500 hover:text-gray-300 transition-colors flex-shrink-0"
-        title="Frissítés"
+        title={t('sync.refresh')}
       >
         <RefreshCw className="w-4 h-4" />
       </button>

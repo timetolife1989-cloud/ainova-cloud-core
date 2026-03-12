@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { CheckCircle, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
 export interface AuditLogEntry {
@@ -20,20 +21,21 @@ interface AuditLogTableProps {
 
 // ── Event type badge ──────────────────────────────────────────────────────────
 
-const EVENT_BADGE: Record<string, { label: string; className: string }> = {
-  login_success: { label: 'Belépés',       className: 'bg-emerald-900/60 text-emerald-300 border border-emerald-700' },
-  login_failed:  { label: 'Sikertelen',    className: 'bg-red-900/60    text-red-300    border border-red-700'     },
-  logout:        { label: 'Kilépés',       className: 'bg-gray-800      text-gray-400   border border-gray-700'    },
+const EVENT_BADGE: Record<string, { labelKey: string; className: string }> = {
+  login_success: { labelKey: 'audit.login_success', className: 'bg-emerald-900/60 text-emerald-300 border border-emerald-700' },
+  login_failed:  { labelKey: 'audit.login_failed',  className: 'bg-red-900/60    text-red-300    border border-red-700'     },
+  logout:        { labelKey: 'audit.logout',         className: 'bg-gray-800      text-gray-400   border border-gray-700'    },
 };
 
 function EventBadge({ eventType }: { eventType: string }) {
+  const { t } = useTranslation();
   const cfg = EVENT_BADGE[eventType] ?? {
-    label:     eventType,
+    labelKey:  eventType,
     className: 'bg-indigo-900/60 text-indigo-300 border border-indigo-700',
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${cfg.className}`}>
-      {cfg.label}
+      {t(cfg.labelKey)}
     </span>
   );
 }
@@ -84,10 +86,12 @@ function formatTs(raw: string): string {
 // ── Main table ────────────────────────────────────────────────────────────────
 
 export function AuditLogTable({ logs }: AuditLogTableProps) {
+  const { t } = useTranslation();
+
   if (logs.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500 text-sm">
-        Nincs találat a megadott szűrőkre.
+        {t('audit.no_results')}
       </div>
     );
   }
@@ -98,22 +102,22 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
         <thead>
           <tr className="border-b border-gray-800 bg-gray-900/60">
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">
-              Időpont
+              {t('audit.timestamp')}
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">
-              Esemény
+              {t('audit.event')}
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">
-              Felhasználó
+              {t('audit.user')}
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">
-              IP cím
+              {t('audit.ip_address')}
             </th>
             <th className="px-4 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">
-              Siker
+              {t('audit.success')}
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              Részletek
+              {t('audit.details')}
             </th>
           </tr>
         </thead>

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslation } from '@/hooks/useTranslation';
 import { ROLE_COLORS, ROLE_LABELS, FALLBACK_ROLES } from '@/lib/validators/user';
 import type { UserRecord } from '@/lib/auth';
 
@@ -25,10 +26,12 @@ function RoleBadge({ role }: { role: string }) {
 }
 
 export function UserTable({ users, onResetPassword, onDeactivate }: UserTableProps) {
+  const { t } = useTranslation();
+
   if (users.length === 0) {
     return (
       <div className="text-center py-16 text-gray-500">
-        <p className="text-lg">📭 Nincs találat</p>
+        <p className="text-lg">{t('admin.no_results')}</p>
       </div>
     );
   }
@@ -38,11 +41,11 @@ export function UserTable({ users, onResetPassword, onDeactivate }: UserTablePro
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-800 text-left text-xs text-gray-500 uppercase tracking-wider">
-            <th className="px-4 py-3 font-medium">Felhasználónév</th>
-            <th className="px-4 py-3 font-medium">Teljes név</th>
-            <th className="px-4 py-3 font-medium">Szerepkör</th>
-            <th className="px-4 py-3 font-medium">Státusz</th>
-            <th className="px-4 py-3 font-medium text-right">Műveletek</th>
+            <th className="px-4 py-3 font-medium">{t('admin.username')}</th>
+            <th className="px-4 py-3 font-medium">{t('admin.full_name')}</th>
+            <th className="px-4 py-3 font-medium">{t('admin.role')}</th>
+            <th className="px-4 py-3 font-medium">{t('admin.status')}</th>
+            <th className="px-4 py-3 font-medium text-right">{t('admin.actions')}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-800/60">
@@ -64,12 +67,12 @@ export function UserTable({ users, onResetPassword, onDeactivate }: UserTablePro
                 {user.isActive ? (
                   <span className="inline-flex items-center gap-1 text-green-400 text-xs font-medium">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                    Aktív
+                    {t('admin.active')}
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 text-red-400 text-xs font-medium">
                     <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
-                    Inaktív
+                    {t('admin.inactive')}
                   </span>
                 )}
               </td>
@@ -78,14 +81,14 @@ export function UserTable({ users, onResetPassword, onDeactivate }: UserTablePro
                   <Link
                     href={`/dashboard/admin/users/${user.id}/edit`}
                     className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-400 hover:bg-indigo-900/30 transition-colors"
-                    title="Szerkesztés"
+                    title={t('admin.edit')}
                   >
                     ✏️
                   </Link>
                   <button
                     onClick={() => onResetPassword(user.id, user.username)}
                     className="p-1.5 rounded-lg text-gray-400 hover:text-yellow-400 hover:bg-yellow-900/30 transition-colors"
-                    title="Jelszó visszaállítása"
+                    title={t('admin.reset_password')}
                   >
                     🔑
                   </button>
@@ -93,7 +96,7 @@ export function UserTable({ users, onResetPassword, onDeactivate }: UserTablePro
                     onClick={() => onDeactivate(user.id, user.username)}
                     disabled={!user.isActive}
                     className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-900/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    title="Deaktiválás"
+                    title={t('admin.deactivate')}
                   >
                     🗑️
                   </button>

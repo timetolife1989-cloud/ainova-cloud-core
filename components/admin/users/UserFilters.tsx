@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { FALLBACK_ROLES, ROLE_LABELS } from '@/lib/validators/user';
 
 export interface UserFilterState {
@@ -15,6 +16,7 @@ interface UserFiltersProps {
 }
 
 export function UserFilters({ value, onChange }: UserFiltersProps) {
+  const { t } = useTranslation();
   const [localSearch, setLocalSearch] = useState(value.search);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -55,7 +57,7 @@ export function UserFilters({ value, onChange }: UserFiltersProps) {
           type="text"
           value={localSearch}
           onChange={handleSearchChange}
-          placeholder="Keresés (név, email)..."
+          placeholder={t('admin.search_placeholder')}
           className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 pr-9 text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-600/50 w-56"
         />
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 text-xs">🔍</span>
@@ -67,7 +69,7 @@ export function UserFilters({ value, onChange }: UserFiltersProps) {
         onChange={handleRoleChange}
         className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-600/50"
       >
-        <option value="">Minden szerepkör</option>
+        <option value="">{t('admin.all_roles')}</option>
         {FALLBACK_ROLES.map((r: string) => (
           <option key={r} value={r}>
             {ROLE_LABELS[r]}
@@ -81,9 +83,9 @@ export function UserFilters({ value, onChange }: UserFiltersProps) {
         onChange={handleActiveChange}
         className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-600/50"
       >
-        <option value="">Minden státusz</option>
-        <option value="true">Aktív</option>
-        <option value="false">Inaktív</option>
+        <option value="">{t('admin.all_statuses')}</option>
+        <option value="true">{t('admin.active')}</option>
+        <option value="false">{t('admin.inactive')}</option>
       </select>
 
       {/* Reset */}
@@ -92,7 +94,7 @@ export function UserFilters({ value, onChange }: UserFiltersProps) {
           onClick={reset}
           className="text-xs text-gray-500 hover:text-gray-200 transition-colors"
         >
-          ✕ Szűrők törlése
+          ✕ {t('admin.clear_filters')}
         </button>
       )}
     </div>
