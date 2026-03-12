@@ -1,18 +1,23 @@
 # TASKS_FOR_AI.md — Workforce modul
 
 > **Modul:** workforce
-> **Állapot:** ✅ Production Ready
+> **Állapot:** ✅ Működik (PG bugok javítva 2026.03.12)
 > **Csomag:** Basic
 
 ## Befejezett funkciók
 - [x] Backend: CRUD API (`/api/modules/workforce/data`)
 - [x] Backend: Szűrés (dátum tartomány, műszak, terület)
-- [x] Backend: Lapozás
+- [x] Backend: Lapozás (OFFSET ROWS FETCH → LIMIT OFFSET konverzió)
 - [x] Frontend: Rögzítő form (dátum/műszak/terület/létszám)
 - [x] Frontend: Táblázat megjelenítés szűrőkkel
-- [x] Frontend: Chart vizualizáció (WorkforceCharts)
+- [x] Frontend: Chart vizualizáció (WorkforceCharts — napi/heti/havi/éves)
+- [x] Frontend: CSV export (BOM-os UTF-8, Excel kompatibilis)
+- [x] Frontend: Összesítő kártyák (mai tervezett/tényleges/hiányzó/jelenlét %)
 - [x] DB: workforce_daily tábla migrációval
-- [x] Seeder: 30 napos demo adat
+- [x] Seeder: 30 napos demo adat (420 sor)
+- [x] PostgreSQL fix: DECIMAL(10,2) oszlopok számként (nem string)
+- [x] PostgreSQL fix: DATE oszlopok YYYY-MM-DD string (nem Date objektum)
+- [x] PostgreSQL fix: OUTPUT INSERTED → RETURNING konverzió
 
 ## Még hátralévő feladatok
 

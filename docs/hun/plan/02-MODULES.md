@@ -1,47 +1,57 @@
 # MODUL FEJLESZTÉSI FELADATOK
 
+> Utolsó frissítés: 2026.03.12 — ŐSZINTE státuszok, nem hazugság
+
 ## Státusz összefoglaló
 
-| Modul | Állapot | Fő tennivaló |
-|-------|---------|---------------|
-| workforce | ✅ Kész | Nyelvi gomboknál i18n |
-| tracking | ✅ Kész | — |
-| fleet | ✅ Kész | — |
+| Modul | Állapot | Megjegyzés |
+|-------|---------|------------|
+| workforce | ✅ Működik | CRUD, chartok, szűrők, CSV export — DECIMAL/dátum bug javítva |
+| tracking | ✅ Működik | CRUD + history, szűrők, státusz kezelés |
+| fleet | ✅ Működik | Járműnyilvántartás + útnapló |
+| inventory | ✅ Működik | Készlet + mozgások, alacsony készlet riasztás |
+| oee | ✅ Működik | A/P/Q/OEE kalkuláció, gépek, rekordok |
+| shift-management | ✅ Működik | Műszakdefiníciók + beosztás, ütközés detektálás |
+| delivery | ✅ Működik | Szállítmány CRUD, szűrők, összesítő kártyák |
+| performance | ✅ Működik | Teljesítmény CRUD, KPI kártyák (⚠️ célérték UI hiányzik) |
+| scheduling | ✅ Működik | Kapacitástervezés (⚠️ allokáció UI hiányzik) |
+| quality | ✅ Működik | Minőségellenőrzés CRUD (⚠️ 8D riport UI hiányzik) |
+| maintenance | ✅ Működik | Karbantartás ütemezés (⚠️ "kész" gomb / napló UI hiányzik) |
+| reports | ⚠️ Váz | Riport definíciókat ment, de NEM tud riportot futtatni |
 | file-import | ⚠️ Részleges | Saját API endpoint nincs |
-| reports | ✅ Kész | — |
-| performance | ✅ Kész | — |
-| scheduling | ✅ Kész | — |
-| delivery | ✅ Kész | — |
-| inventory | ✅ Kész | — |
-| oee | ✅ Kész | — |
-| shift-management | ✅ Kész | — |
-| quality | ✅ Kész | — |
-| maintenance | ✅ Kész | — |
-| plc-connector | ⚠️ Részleges | S7/Modbus/MQTT driver NINCS |
-| digital-twin | ⚠️ Részleges | API endpoint NINCS, hardcoded demo |
+| plc-connector | ⚠️ Részleges | Eszköz nyilvántartás van, S7/Modbus/MQTT driver NINCS |
+| digital-twin | ⚠️ Részleges | Hardcoded demo adat, API NINCS |
 
 ---
 
-## Modul-specifikus tennivalók
+## Kritikus javítások (2026.03.12)
 
-### workforce
-- ⬜ Form label-ek és gomb szövegek → useTranslation()
-- ⬜ Validációs hibaüzenetek → i18n
-- ⬜ Tesztelés Vercel-en Supabase-szel
+### PostgreSQL kompatibilitás — JAVÍTVA
+- ✅ `DECIMAL(10,2)` oszlopok string-ként jöttek vissza → `pg.types.setTypeParser(1700)` hozzáadva
+- ✅ `DATE` oszlopok Date objektumként jöttek vissza → `pg.types.setTypeParser(1082)` hozzáadva
+- ✅ API válaszokban `Number()` konverzió hozzáadva biztonsági rétegként
+- ✅ `OUTPUT INSERTED` → `RETURNING` konverzió
+- ✅ `OFFSET ROWS FETCH NEXT` → `LIMIT OFFSET` konverzió
+- ✅ `SYSDATETIME()` → `NOW()` konverzió
+- ✅ `ISNULL()` → `COALESCE()` konverzió
+- ✅ `GETDATE()` → `NOW()` konverzió
+- ✅ Boolean oszlopok (is_active stb.) `= 1` → `= true`
 
-### digital-twin
-- ⬜ `GET/POST /api/modules/digital-twin/data` endpoint implementálás
-- ⬜ DB integráció: `mod_dt_layouts` + `mod_dt_machines` táblákból olvasás
-- ⬜ Gép állapot frissítés API
-- ⬜ SSE valós idejű frissítés
+## Hiányzó al-funkciók működő moduloknál
 
-### plc-connector
-- ⬜ S7 driver (Siemens S7-1200/1500) — `nodes7` npm csomag
-- ⬜ Modbus TCP driver — `jsmodbus` npm csomag
-- ⬜ MQTT subscriber — `mqtt` npm csomag
-- ⬜ Polling engine (konfigurálaható intervallum)
-- ⬜ Idősor adat gyűjtés és tárolás
+### reports — SKELETON
+- ⬜ Nincs riport motor — csak definíciókat CRUD-ol
+- ⬜ "Megtekintés" és "Exportálás" gombok nem csinálnak semmit
+- ⬜ Komplett újragondolás kell (chart.js/recharts alapú riport engine)
 
-### file-import
-- ⬜ Saját API végpont (`/api/modules/file-import/...`)
-- ⬜ Import template kezelés
+### quality — 8D hiányzik
+- ⬜ `quality_8d_reports` tábla létezik, API/UI NINCS
+
+### maintenance — "Kész" jelölés hiányzik
+- ⬜ `maintenance_log` tábla létezik, de nincs API/UI a teljesítés rögzítésére
+
+### performance — Célértékek hiányzik
+- ⬜ `performance_targets` tábla létezik, nincs célérték beállító UI
+
+### scheduling — Allokáció hiányzik
+- ⬜ `scheduling_allocations` tábla létezik, nincs allokáció kezelő UI

@@ -35,9 +35,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
       recordDate: String(r.record_date).split('T')[0],
       shiftName: r.shift_name,
       areaName: r.area_name,
-      plannedCount: r.planned_count,
-      actualCount: r.actual_count,
-      absentCount: r.absent_count,
+      plannedCount: Number(r.planned_count) || 0,
+      actualCount: Number(r.actual_count) || 0,
+      absentCount: Number(r.absent_count) || 0,
       notes: r.notes,
       recordedBy: r.recorded_by,
       createdAt: String(r.created_at),
@@ -104,17 +104,17 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     }
     if (plannedCount !== undefined) {
       updates.push(`planned_count = @p${paramIdx}`);
-      params.push({ name: `p${paramIdx}`, type: 'nvarchar', value: String(plannedCount) });
+      params.push({ name: `p${paramIdx}`, type: 'nvarchar', value: plannedCount });
       paramIdx++;
     }
     if (actualCount !== undefined) {
       updates.push(`actual_count = @p${paramIdx}`);
-      params.push({ name: `p${paramIdx}`, type: 'nvarchar', value: String(actualCount) });
+      params.push({ name: `p${paramIdx}`, type: 'nvarchar', value: actualCount });
       paramIdx++;
     }
     if (absentCount !== undefined) {
       updates.push(`absent_count = @p${paramIdx}`);
-      params.push({ name: `p${paramIdx}`, type: 'nvarchar', value: String(absentCount) });
+      params.push({ name: `p${paramIdx}`, type: 'nvarchar', value: absentCount });
       paramIdx++;
     }
     if (notes !== undefined) {

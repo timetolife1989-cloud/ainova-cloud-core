@@ -17,6 +17,7 @@ const pgTypes = (pg as any).types;
 pgTypes.setTypeParser(1082, (val: string) => val); // DATE → 'YYYY-MM-DD'
 pgTypes.setTypeParser(1114, (val: string) => val); // TIMESTAMP → ISO string
 pgTypes.setTypeParser(1184, (val: string) => val); // TIMESTAMPTZ → ISO string
+pgTypes.setTypeParser(1700, (val: string) => parseFloat(val)); // NUMERIC/DECIMAL → number
 
 function getConfig() {
   const isCloud = (process.env.DEPLOYMENT_FLAVOR === 'cloud') ||
