@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Calendar, Plus, X, Check, AlertTriangle, Users, Cpu, MapPin } from 'lucide-react';
 
 interface CapacityEntry {
@@ -16,9 +17,9 @@ interface CapacityEntry {
 }
 
 const RESOURCE_TYPES = [
-  { value: 'worker', label: 'Dolgozó', icon: Users },
-  { value: 'machine', label: 'Gép', icon: Cpu },
-  { value: 'area', label: 'Terület', icon: MapPin },
+  { value: 'worker', labelKey: 'scheduling.type_worker', icon: Users },
+  { value: 'machine', labelKey: 'scheduling.type_machine', icon: Cpu },
+  { value: 'area', labelKey: 'scheduling.type_area', icon: MapPin },
 ];
 
 function getWeekStart(date: Date): string {
@@ -30,6 +31,7 @@ function getWeekStart(date: Date): string {
 }
 
 export default function SchedulingDashboardPage() {
+  const { t } = useTranslation();
   const [entries, setEntries] = useState<CapacityEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -69,7 +71,7 @@ export default function SchedulingDashboardPage() {
 
   const handleSave = async () => {
     if (!formResourceName.trim()) {
-      setError('Erőforrás neve kötelező');
+      setError(t('scheduling.resource_required'));
       return;
     }
 
@@ -89,14 +91,14 @@ export default function SchedulingDashboardPage() {
       });
 
       const body = await res.json() as { ok?: boolean; error?: string };
-      if (!res.ok) throw new Error(body.error ?? 'Hiba');
+      if (!res.ok) throw new Error(body.error ?? t('common.error'));
 
       setModalOpen(false);
       setFormResourceName('');
       setFormPlannedHours(40);
       await fetchData();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Hiba történt');
+      setError(e instanceof Error ? e.message : t('common.error'));
     } finally {
       setSaving(false);
     }
@@ -119,7 +121,7 @@ export default function SchedulingDashboardPage() {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <DashboardSectionHeader title="Kapacitás tervezés" subtitle="Heti erőforrás allokáció" />
+        <DashboardSectionHeader title={t('scheduling.title')} subtitle={t('scheduling.subtitle')} />
         <div className="animate-pulse space-y-4 mt-6">
           <div className="grid grid-cols-3 gap-4">
             {[1, 2, 3].map(i => <div key={i} className="h-24 bg-gray-800 rounded-xl" />)}
@@ -133,7 +135,7 @@ export default function SchedulingDashboardPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
-        <DashboardSectionHeader title="Kapacitás tervezés" subtitle="Heti erőforrás allokáció" />
+        <DashboardSectionHeader title={t('scheduling.title')} subtitle={t('scheduling.subtitle')} />
         <div className="flex items-center gap-3">
           <input
             type="date"
@@ -145,7 +147,7 @@ export default function SchedulingDashboardPage() {
             onClick={() => setModalOpen(true)}
             className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium"
           >
-            <Plus className="w-4 h-4" /> Erőforrás
+            <Plus className="w-4 h-4" /> {t('scheduling.resource')}
           </button>
         </div>
       </div>
@@ -153,15 +155,15 @@ export default function SchedulingDashboardPage() {
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-          <p className="text-xs text-gray-500 mb-1">Tervezett kapacitás</p>
-          <p className="text-2xl font-bold text-white">{totalPlanned} óra</p>
+          <p className="text-xs text-gray-500 mb-1">{t('scheduling.planned_capacity')}</p>
+          <p className="text-2xl font-bold text-white">{totalPlanned} {t('scheduling.hours')}</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-          <p className="text-xs text-gray-500 mb-1">Allokált</p>
-          <p className="text-2xl font-bold text-white">{totalAllocated} óra</p>
+          <p className="text-xs text-gray-500 mb-1">{t('scheduling.allocated')}</p>
+          <p className="text-2xl font-bold text-white">{totalAllocated} {t('scheduling.hours')}</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-          <p className="text-xs text-gray-500 mb-1">Átlag kihasználtság</p>
+          <p className="text-xs text-gray-500 mb-1">{t('scheduling.avg_utilization')}</p>
           <p className="text-2xl font-bold text-white">{avgUtilization}%</p>
         </div>
       </div>
@@ -178,12 +180,12 @@ export default function SchedulingDashboardPage() {
                 </div>
                 <div>
                   <p className="text-white font-medium">{entry.resourceName}</p>
-                  <p className="text-xs text-gray-500">{RESOURCE_TYPES.find(t => t.value === entry.resourceType)?.label}</p>
+                  <p className="text-xs text-gray-500">{RESOURCE_TYPES.find(rt => rt.value === entry.resourceType) ? t(RESOURCE_TYPES.find(rt => rt.value === entry.resourceType)!.labelKey) : entry.resourceType}</p>
                 </div>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Kihasználtság</span>
+                  <span className="text-gray-500">{t('scheduling.utilization')}</span>
                   <span className="text-white font-medium">{entry.utilizationPercent}%</span>
                 </div>
                 <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
@@ -193,8 +195,8 @@ export default function SchedulingDashboardPage() {
                   />
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>{entry.allocatedHours} / {entry.plannedHours} óra</span>
-                  <span>{entry.plannedHours - entry.allocatedHours} szabad</span>
+                  <span>{entry.allocatedHours} / {entry.plannedHours} {t('scheduling.hours')}</span>
+                  <span>{entry.plannedHours - entry.allocatedHours} {t('scheduling.free')}</span>
                 </div>
               </div>
             </div>
@@ -204,8 +206,8 @@ export default function SchedulingDashboardPage() {
         {entries.length === 0 && (
           <div className="col-span-3 bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
             <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-            <p className="text-gray-400">Nincs erőforrás erre a hétre</p>
-            <p className="text-xs text-gray-600 mt-1">Adj hozzá dolgozókat, gépeket vagy területeket</p>
+            <p className="text-gray-400">{t('scheduling.no_resources')}</p>
+            <p className="text-xs text-gray-600 mt-1">{t('scheduling.no_resources_hint')}</p>
           </div>
         )}
       </div>
@@ -215,7 +217,7 @@ export default function SchedulingDashboardPage() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-white">Erőforrás hozzáadása</h3>
+              <h3 className="text-lg font-medium text-white">{t('scheduling.add_resource')}</h3>
               <button onClick={() => setModalOpen(false)} className="p-1 hover:bg-gray-800 rounded">
                 <X className="w-5 h-5 text-gray-400" />
               </button>
@@ -223,17 +225,17 @@ export default function SchedulingDashboardPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Típus</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1">{t('scheduling.type')}</label>
                 <select value={formResourceType} onChange={e => setFormResourceType(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100">
-                  {RESOURCE_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  {RESOURCE_TYPES.map(rt => <option key={rt.value} value={rt.value}>{t(rt.labelKey)}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Név *</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1">{t('scheduling.name')} *</label>
                 <input type="text" value={formResourceName} onChange={e => setFormResourceName(e.target.value)} placeholder="pl. Kovács János" className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Tervezett órák (heti)</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1">{t('scheduling.planned_hours')}</label>
                 <input type="number" value={formPlannedHours} onChange={e => setFormPlannedHours(parseInt(e.target.value) || 0)} min={0} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" />
               </div>
             </div>
@@ -245,9 +247,9 @@ export default function SchedulingDashboardPage() {
             )}
 
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setModalOpen(false)} className="px-4 py-2 text-gray-400 text-sm">Mégse</button>
+              <button onClick={() => setModalOpen(false)} className="px-4 py-2 text-gray-400 text-sm">{t('common.cancel')}</button>
               <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium disabled:opacity-50">
-                <Check className="w-4 h-4" />{saving ? 'Mentés...' : 'Mentés'}
+                <Check className="w-4 h-4" />{saving ? t('common.saving') : t('common.save')}
               </button>
             </div>
           </div>

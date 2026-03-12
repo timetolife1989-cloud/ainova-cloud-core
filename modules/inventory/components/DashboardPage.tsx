@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Package, Plus, X, Check, AlertTriangle, ArrowDown, ArrowUp, AlertCircle } from 'lucide-react';
 
 interface InventoryItem {
@@ -18,6 +19,7 @@ interface InventoryItem {
 }
 
 export default function InventoryDashboardPage() {
+  const { t } = useTranslation();
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState<'item' | 'movement' | null>(null);
@@ -56,7 +58,7 @@ export default function InventoryDashboardPage() {
   const getCsrfToken = () => document.cookie.split('; ').find(c => c.startsWith('csrf-token='))?.split('=')[1] ?? '';
 
   const handleSaveItem = async () => {
-    if (!formSku.trim() || !formName.trim()) { setError('SKU és név kötelező'); return; }
+    if (!formSku.trim() || !formName.trim()) { setError(t('inventory.sku_required')); return; }
     setSaving(true); setError(null);
     try {
       const res = await fetch('/api/modules/inventory/data', {
@@ -65,16 +67,16 @@ export default function InventoryDashboardPage() {
         body: JSON.stringify({ sku: formSku, itemName: formName, category: formCategory || undefined, minQty: formMinQty, location: formLocation || undefined }),
       });
       const body = await res.json() as { ok?: boolean; error?: string };
-      if (!res.ok) throw new Error(body.error ?? 'Hiba');
+      if (!res.ok) throw new Error(body.error ?? t('common.error'));
       setModalOpen(null);
       setFormSku(''); setFormName(''); setFormCategory(''); setFormMinQty(0); setFormLocation('');
       await fetchData();
-    } catch (e) { setError(e instanceof Error ? e.message : 'Hiba'); }
+    } catch (e) { setError(e instanceof Error ? e.message : t('common.error')); }
     finally { setSaving(false); }
   };
 
   const handleSaveMovement = async () => {
-    if (!selectedItem || movQty <= 0) { setError('Mennyiség kötelező'); return; }
+    if (!selectedItem || movQty <= 0) { setError(t('inventory.qty_required')); return; }
     setSaving(true); setError(null);
     try {
       const res = await fetch(`/api/modules/inventory/data/${selectedItem.id}`, {
@@ -83,10 +85,10 @@ export default function InventoryDashboardPage() {
         body: JSON.stringify({ movementType: movType, quantity: movQty, reference: movRef || undefined }),
       });
       const body = await res.json() as { ok?: boolean; error?: string };
-      if (!res.ok) throw new Error(body.error ?? 'Hiba');
+      if (!res.ok) throw new Error(body.error ?? t('common.error'));
       setModalOpen(null); setSelectedItem(null); setMovQty(0); setMovRef('');
       await fetchData();
-    } catch (e) { setError(e instanceof Error ? e.message : 'Hiba'); }
+    } catch (e) { setError(e instanceof Error ? e.message : t('common.error')); }
     finally { setSaving(false); }
   };
 
@@ -107,7 +109,7 @@ export default function InventoryDashboardPage() {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <DashboardSectionHeader title="Készletnyilvántartás" subtitle="Termékek és mozgások" />
+        <DashboardSectionHeader title={t('inventory.title')} subtitle={t('inventory.subtitle')} />
         <div className="animate-pulse mt-6 grid grid-cols-3 gap-4">
           {[1, 2, 3].map(i => <div key={i} className="h-24 bg-gray-800 rounded-xl" />)}
         </div>
@@ -118,9 +120,9 @@ export default function InventoryDashboardPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
-        <DashboardSectionHeader title="Készletnyilvántartás" subtitle="Termékek és mozgások" />
+        <DashboardSectionHeader title={t('inventory.title')} subtitle={t('inventory.subtitle')} />
         <button onClick={() => { setError(null); setModalOpen('item'); }} className="flex items-center gap-2 px-4 py-2 bg-lime-600 hover:bg-lime-700 text-white rounded-lg text-sm font-medium">
-          <Plus className="w-4 h-4" /> Új termék
+          <Plus className="w-4 h-4" /> {t('inventory.new_product')}
         </button>
       </div>
 
@@ -129,19 +131,19 @@ export default function InventoryDashboardPage() {
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-lime-900/30 rounded-lg"><Package className="w-5 h-5 text-lime-400" /></div>
-            <div><p className="text-xs text-gray-500">Termékek</p><p className="text-2xl font-bold text-white">{totalItems}</p></div>
+            <div><p className="text-xs text-gray-500">{t('inventory.products')}</p><p className="text-2xl font-bold text-white">{totalItems}</p></div>
           </div>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-red-900/30 rounded-lg"><AlertCircle className="w-5 h-5 text-red-400" /></div>
-            <div><p className="text-xs text-gray-500">Alacsony készlet</p><p className="text-2xl font-bold text-white">{lowStockCount}</p></div>
+            <div><p className="text-xs text-gray-500">{t('inventory.low_stock')}</p><p className="text-2xl font-bold text-white">{lowStockCount}</p></div>
           </div>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-900/30 rounded-lg"><Package className="w-5 h-5 text-blue-400" /></div>
-            <div><p className="text-xs text-gray-500">Össz. mennyiség</p><p className="text-2xl font-bold text-white">{totalValue.toLocaleString()}</p></div>
+            <div><p className="text-xs text-gray-500">{t('inventory.total_qty')}</p><p className="text-2xl font-bold text-white">{totalValue.toLocaleString()}</p></div>
           </div>
         </div>
       </div>
@@ -164,10 +166,10 @@ export default function InventoryDashboardPage() {
                 <p className="text-xs text-gray-500">Min: {item.minQty}</p>
               </div>
               <div className="flex gap-1">
-                <button onClick={() => openMovement(item, 'in')} className="p-2 bg-green-900/30 hover:bg-green-900/50 rounded-lg" title="Bevét">
+                <button onClick={() => openMovement(item, 'in')} className="p-2 bg-green-900/30 hover:bg-green-900/50 rounded-lg" title={t('inventory.receive')}>
                   <ArrowDown className="w-4 h-4 text-green-400" />
                 </button>
-                <button onClick={() => openMovement(item, 'out')} className="p-2 bg-red-900/30 hover:bg-red-900/50 rounded-lg" title="Kiadás">
+                <button onClick={() => openMovement(item, 'out')} className="p-2 bg-red-900/30 hover:bg-red-900/50 rounded-lg" title={t('inventory.issue')}>
                   <ArrowUp className="w-4 h-4 text-red-400" />
                 </button>
               </div>
@@ -177,7 +179,7 @@ export default function InventoryDashboardPage() {
         {items.length === 0 && (
           <div className="col-span-3 bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
             <Package className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-            <p className="text-gray-400">Nincs termék</p>
+            <p className="text-gray-400">{t('inventory.no_products')}</p>
           </div>
         )}
       </div>
@@ -187,24 +189,24 @@ export default function InventoryDashboardPage() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-white">Új termék</h3>
+              <h3 className="text-lg font-medium text-white">{t('inventory.new_product')}</h3>
               <button onClick={() => setModalOpen(null)} className="p-1 hover:bg-gray-800 rounded"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-xs font-medium text-gray-400 mb-1">SKU *</label><input type="text" value={formSku} onChange={e => setFormSku(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
-                <div><label className="block text-xs font-medium text-gray-400 mb-1">Min. készlet</label><input type="number" value={formMinQty} onChange={e => setFormMinQty(parseInt(e.target.value) || 0)} min={0} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
+                <div><label className="block text-xs font-medium text-gray-400 mb-1">{t('inventory.sku')} *</label><input type="text" value={formSku} onChange={e => setFormSku(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
+                <div><label className="block text-xs font-medium text-gray-400 mb-1">{t('inventory.min_stock')}</label><input type="number" value={formMinQty} onChange={e => setFormMinQty(parseInt(e.target.value) || 0)} min={0} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
               </div>
-              <div><label className="block text-xs font-medium text-gray-400 mb-1">Név *</label><input type="text" value={formName} onChange={e => setFormName(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
+              <div><label className="block text-xs font-medium text-gray-400 mb-1">{t('inventory.name')} *</label><input type="text" value={formName} onChange={e => setFormName(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-xs font-medium text-gray-400 mb-1">Kategória</label><input type="text" value={formCategory} onChange={e => setFormCategory(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
-                <div><label className="block text-xs font-medium text-gray-400 mb-1">Hely</label><input type="text" value={formLocation} onChange={e => setFormLocation(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
+                <div><label className="block text-xs font-medium text-gray-400 mb-1">{t('inventory.category')}</label><input type="text" value={formCategory} onChange={e => setFormCategory(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
+                <div><label className="block text-xs font-medium text-gray-400 mb-1">{t('inventory.location')}</label><input type="text" value={formLocation} onChange={e => setFormLocation(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
               </div>
             </div>
             {error && <div className="mt-4 p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-300 text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" /> {error}</div>}
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setModalOpen(null)} className="px-4 py-2 text-gray-400 text-sm">Mégse</button>
-              <button onClick={handleSaveItem} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-lime-600 hover:bg-lime-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"><Check className="w-4 h-4" />{saving ? 'Mentés...' : 'Mentés'}</button>
+              <button onClick={() => setModalOpen(null)} className="px-4 py-2 text-gray-400 text-sm">{t('common.cancel')}</button>
+              <button onClick={handleSaveItem} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-lime-600 hover:bg-lime-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"><Check className="w-4 h-4" />{saving ? t('common.saving') : t('common.save')}</button>
             </div>
           </div>
         </div>
@@ -215,20 +217,20 @@ export default function InventoryDashboardPage() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-white">{movType === 'in' ? 'Bevételezés' : 'Kiadás'}</h3>
+              <h3 className="text-lg font-medium text-white">{movType === 'in' ? t('inventory.receiving') : t('inventory.issuing')}</h3>
               <button onClick={() => setModalOpen(null)} className="p-1 hover:bg-gray-800 rounded"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <p className="text-sm text-gray-400 mb-4">{selectedItem.itemName} ({selectedItem.sku})</p>
             <div className="space-y-4">
-              <div><label className="block text-xs font-medium text-gray-400 mb-1">Mennyiség *</label><input type="number" value={movQty} onChange={e => setMovQty(parseInt(e.target.value) || 0)} min={1} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
-              <div><label className="block text-xs font-medium text-gray-400 mb-1">Hivatkozás</label><input type="text" value={movRef} onChange={e => setMovRef(e.target.value)} placeholder="pl. rendelés szám" className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
+              <div><label className="block text-xs font-medium text-gray-400 mb-1">{t('inventory.quantity')} *</label><input type="number" value={movQty} onChange={e => setMovQty(parseInt(e.target.value) || 0)} min={1} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
+              <div><label className="block text-xs font-medium text-gray-400 mb-1">{t('inventory.reference')}</label><input type="text" value={movRef} onChange={e => setMovRef(e.target.value)} placeholder="pl. rendelés szám" className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
             </div>
             {error && <div className="mt-4 p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-300 text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" /> {error}</div>}
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setModalOpen(null)} className="px-4 py-2 text-gray-400 text-sm">Mégse</button>
+              <button onClick={() => setModalOpen(null)} className="px-4 py-2 text-gray-400 text-sm">{t('common.cancel')}</button>
               <button onClick={handleSaveMovement} disabled={saving} className={`flex items-center gap-2 px-4 py-2 ${movType === 'in' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} text-white rounded-lg text-sm font-medium disabled:opacity-50`}>
                 {movType === 'in' ? <ArrowDown className="w-4 h-4" /> : <ArrowUp className="w-4 h-4" />}
-                {saving ? 'Mentés...' : movType === 'in' ? 'Bevét' : 'Kiadás'}
+                {saving ? t('common.saving') : movType === 'in' ? t('inventory.receive') : t('inventory.issue')}
               </button>
             </div>
           </div>
