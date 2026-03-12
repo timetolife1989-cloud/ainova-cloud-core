@@ -79,6 +79,20 @@ function convertSqlSyntax(sqlStr: string): string {
     return `(${field.trim()} ${sign} INTERVAL '${absAmount} ${pgUnit}')`;
   });
 
+  // SELECT TOP N ... → SELECT ... LIMIT N
+  s = s.replace(/SELECT\s+TOP\s+(\d+)\b/gi, (_match, n) => `SELECT /*TOP${n}*/`);
+  // After full query, append LIMIT (placed before final closing)
+  if (/\/\*TOP\d+\*\//.test(s)) {
+    const topMatch = s.match(/\/\*TOP(\d+)\*\//);
+    if (topMatch) {
+      const n = topMatch[1];
+      s = s.replace(`/*TOP${n}*/`, '');
+      // Remove any existing LIMIT clause to avoid duplicates
+      s = s.replace(/\bLIMIT\s+\d+\s*$/i, '');
+      s = s.trimEnd() + ` LIMIT ${n}`;
+    }
+  }
+
   // OUTPUT INSERTED.id → RETURNING id
   s = s.replace(/OUTPUT\s+INSERTED\.(\w+)/gi, 'RETURNING $1');
 
