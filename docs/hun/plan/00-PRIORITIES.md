@@ -17,20 +17,24 @@
 - ✅ Workforce UX teljes újraírás (shift gombok, overwrite detection, report-required, validációk)
 - ✅ Inaktivitás érzékelés (25p figyelmeztetés, 30p auto-kijelentkezés)
 - ✅ Túlóra rögzítés (overtime_hours + overtime_workers — DB, API, UI, i18n)
+- ✅ i18n: ÖSSZES modul DashboardPage (14 komponens konvertálva, 260+ kulcs hu/en/de)
+- ✅ i18n: Admin panel (UserTable, UserForm, UserFilters, AuditLogTable, SyncStatusWidget)
+- ✅ Security headers (CSP, HSTS, Permissions-Policy, SameSite=strict)
 
-## P1 — ELLENŐRZÉSRE VÁR (push-olva, Vercel redeploy kell)
+## P1 — MOST JAVÍTANDÓ (CEO feedback 2026.03.12)
 
-- 🔧 Workforce összesítő kártyák (5 kártya: tervezett/tényleges/hiányzó/túlóra/jelenlét%)
-- 🔧 Workforce chartok (oszlop/terület/bontás) — DECIMAL fix push-olva
-- 🔧 Workforce CRUD (létrehozás/szerkesztés/törlés) — tesztelni kell live-ban
-- 🔧 Tracking modul — tesztelni kell Vercel-en
-- 🔧 Többi modul live Vercel tesztelése
+- ✅ Mobile nyelvváltó javítva (Header responsive — logo+avatar+lang+logout mobilon is)
+- ✅ Dátum input mezők: dark theme CSS (color-scheme: dark, webkit-calendar invert)
+- ✅ Workforce shift nevek i18n (Reggeli/Délutáni/Éjszakai → labelKey pattern hu/en/de)
+- ✅ Header i18n (logout, hét, nyelvváltás hiba)
+- ✅ Landing page i18n (50+ kulcs hu/en/de, marketing layout + I18nProvider)
+- ✅ Audit napló oldal i18n (szűrők, gombok, paginálás — 23 kulcs hu/en/de)
+- ⬜ Lassú mobilon ÉS PC-n is — teljesítmény audit szükséges
+- ⬜ Egyes modulokban nincs adat → demo seed bővítés
 
 ## P2 — FONTOS (ezen a héten)
 
-- ⬜ i18n: hardcoded magyar stringek → useTranslation() a modulokban
 - ⬜ Dashboard nyelvváltó (nem frissül rendesen Vercel-en)
-- ⬜ Landing page (`/`) véglegesítése (marketing tartalom, árazás)
 - ⬜ Password change oldal tesztelése
 
 ## P3 — KÖZEPES (jövő hét)
@@ -47,5 +51,5 @@
 - ⬜ PLC Connector: S7/Modbus/MQTT driverek
 - ⬜ SAP import modul
 - ⬜ Demo környezet auto-reset
-- ⬜ Mobile responsive optimalizáció
+- ⬜ Mobile responsive optimalizáció (teljes audit)
 - ⬜ AI funkciók (prediktív karbantartás)

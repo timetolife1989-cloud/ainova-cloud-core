@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, RefreshCw, Search } from 'lucide-react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { AuditLogTable, type AuditLogEntry } from '@/components/admin/audit-log/AuditLogTable';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -31,21 +32,21 @@ const INITIAL_FILTERS: Filters = {
 };
 
 const EVENT_TYPE_OPTIONS = [
-  { value: '',              label: 'Minden esemény' },
-  { value: 'login_success', label: 'Belépés (sikeres)' },
-  { value: 'login_failed',  label: 'Belépés (sikertelen)' },
-  { value: 'logout',        label: 'Kilépés' },
-  { value: 'user_created',  label: 'Felhasználó létrehozva' },
-  { value: 'user_updated',  label: 'Felhasználó módosítva' },
-  { value: 'user_deleted',  label: 'Felhasználó törölve' },
-  { value: 'password_reset',label: 'Jelszó visszaállítás' },
-  { value: 'settings_updated', label: 'Beállítás módosítva' },
+  { value: '',              labelKey: 'audit.all_events' },
+  { value: 'login_success', labelKey: 'audit.login_success_label' },
+  { value: 'login_failed',  labelKey: 'audit.login_failed_label' },
+  { value: 'logout',        labelKey: 'audit.logout_label' },
+  { value: 'user_created',  labelKey: 'audit.user_created' },
+  { value: 'user_updated',  labelKey: 'audit.user_updated' },
+  { value: 'user_deleted',  labelKey: 'audit.user_deleted' },
+  { value: 'password_reset',labelKey: 'audit.password_reset' },
+  { value: 'settings_updated', labelKey: 'audit.settings_updated' },
 ];
 
 const SUCCESS_OPTIONS = [
-  { value: '',      label: 'Mindkettő' },
-  { value: 'true',  label: 'Sikeres' },
-  { value: 'false', label: 'Sikertelen' },
+  { value: '',      labelKey: 'audit.both' },
+  { value: 'true',  labelKey: 'audit.successful' },
+  { value: 'false', labelKey: 'audit.failed' },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -63,6 +64,7 @@ function buildUrl(filters: Filters, page: number): string {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function AuditLogPage() {
+  const { t } = useTranslation();
   const [filters, setFilters]   = useState<Filters>(INITIAL_FILTERS);
   const [page, setPage]         = useState(1);
   const [data, setData]         = useState<AuditLogResponse | null>(null);
@@ -113,8 +115,8 @@ export default function AuditLogPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <DashboardSectionHeader
-        title="Audit Napló"
-        subtitle="Bejelentkezések, admin műveletek és rendszeresemények"
+        title={t('audit.title')}
+        subtitle={t('audit.subtitle')}
       />
 
       {/* ── Filter bar ── */}
@@ -122,48 +124,48 @@ export default function AuditLogPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Event type */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Esemény típusa</label>
+            <label className="block text-xs text-gray-500 mb-1">{t('audit.event_type')}</label>
             <select
               value={pending.eventType}
               onChange={e => setPending(p => ({ ...p, eventType: e.target.value }))}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-600"
             >
               {EVENT_TYPE_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
+                <option key={o.value} value={o.value}>{t(o.labelKey)}</option>
               ))}
             </select>
           </div>
 
           {/* Username */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Felhasználónév</label>
+            <label className="block text-xs text-gray-500 mb-1">{t('audit.user')}</label>
             <input
               type="text"
               value={pending.username}
               onChange={e => setPending(p => ({ ...p, username: e.target.value }))}
               onKeyDown={e => e.key === 'Enter' && applyFilters()}
-              placeholder="Keresés…"
+              placeholder={t('common.search')}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-indigo-600"
             />
           </div>
 
           {/* Success */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Eredmény</label>
+            <label className="block text-xs text-gray-500 mb-1">{t('audit.result')}</label>
             <select
               value={pending.success}
               onChange={e => setPending(p => ({ ...p, success: e.target.value }))}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-600"
             >
               {SUCCESS_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
+                <option key={o.value} value={o.value}>{t(o.labelKey)}</option>
               ))}
             </select>
           </div>
 
           {/* Date from */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Dátumtól</label>
+            <label className="block text-xs text-gray-500 mb-1">{t('audit.date_from')}</label>
             <input
               type="date"
               value={pending.dateFrom}
@@ -176,7 +178,7 @@ export default function AuditLogPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Date to */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Dátumig</label>
+            <label className="block text-xs text-gray-500 mb-1">{t('audit.date_to')}</label>
             <input
               type="date"
               value={pending.dateTo}
@@ -195,13 +197,13 @@ export default function AuditLogPage() {
               className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors"
             >
               <Search className="w-4 h-4" />
-              Szűrés
+              {t('common.filter')}
             </button>
             <button
               onClick={resetFilters}
               className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm rounded-lg transition-colors border border-gray-700"
             >
-              Törlés
+              {t('common.delete')}
             </button>
           </div>
         </div>
@@ -211,13 +213,13 @@ export default function AuditLogPage() {
       <div className="flex items-center justify-between mb-3">
         <p className="text-sm text-gray-500">
           {data
-            ? `${data.total} találat — ${page}. oldal / ${totalPages}`
-            : 'Betöltés…'}
+            ? t('audit.results_count', { total: data.total, page, pages: totalPages })
+            : `${t('common.loading')}`}
         </p>
         <div className="flex items-center gap-3">
           {lastRefresh && (
             <span className="text-xs text-gray-600">
-              Frissítve: {lastRefresh.toLocaleTimeString('hu-HU')}
+              {t('audit.refreshed_at')}: {lastRefresh.toLocaleTimeString()}
             </span>
           )}
           <button
@@ -226,7 +228,7 @@ export default function AuditLogPage() {
             className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-200 transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            Frissítés
+            {t('common.refresh')}
           </button>
         </div>
       </div>
@@ -247,7 +249,7 @@ export default function AuditLogPage() {
             className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-sm text-gray-300 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
-            Előző
+            {t('audit.prev')}
           </button>
 
           <span className="px-4 py-2 text-sm text-gray-400">
@@ -259,7 +261,7 @@ export default function AuditLogPage() {
             disabled={page >= totalPages}
             className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-sm text-gray-300 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            Következő
+            {t('audit.next')}
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
