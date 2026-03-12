@@ -22,7 +22,7 @@ import '@/modules/performance/manifest';
 import '@/modules/scheduling/manifest';
 import '@/modules/delivery/manifest';
 import '@/modules/inventory/manifest';
-// import '@/modules/sap-import/manifest';
+import '@/modules/sap-import/manifest';
 
 // === ENTERPRISE csomag ===
 import '@/modules/oee/manifest';

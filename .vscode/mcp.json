@@ -1,0 +1,21 @@
+{
+  "servers": {
+    "github": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+      }
+    },
+    "postgres": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:%26HQ2CFk%25kB%2B%21N43@db.nfancsrufcvmulrxnfxx.supabase.co:5432/postgres"
+      ]
+    }
+  }
+}
