@@ -9,6 +9,15 @@
 import type { IDatabaseAdapter, QueryParam } from '../IDatabase';
 import pg from 'pg';
 
+// Override pg date/timestamp parser to return ISO strings instead of Date objects.
+// This ensures consistency: `String(value).split('T')[0]` works for date formatting.
+// Type OIDs: 1082=DATE, 1114=TIMESTAMP, 1184=TIMESTAMPTZ
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const pgTypes = (pg as any).types;
+pgTypes.setTypeParser(1082, (val: string) => val); // DATE → 'YYYY-MM-DD'
+pgTypes.setTypeParser(1114, (val: string) => val); // TIMESTAMP → ISO string
+pgTypes.setTypeParser(1184, (val: string) => val); // TIMESTAMPTZ → ISO string
+
 function getConfig() {
   const isCloud = (process.env.DEPLOYMENT_FLAVOR === 'cloud') ||
                   (process.env.DB_SERVER ?? '').includes('supabase.com');
@@ -71,6 +80,18 @@ function convertSqlSyntax(sqlStr: string): string {
   // SYSDATETIME() → NOW()
   s = s.replace(/SYSDATETIME\(\)/gi, 'NOW()');
 
+  // GETDATE() → NOW()
+  s = s.replace(/GETDATE\(\)/gi, 'NOW()');
+
+  // ISNULL(expr, default) → COALESCE(expr, default)
+  s = s.replace(/\bISNULL\s*\(/gi, 'COALESCE(');
+
+  // CONVERT(DATE, expr) → (expr)::DATE
+  s = s.replace(/CONVERT\s*\(\s*DATE\s*,\s*([^)]+)\)/gi, '($1)::DATE');
+
+  // CAST(expr AS DATE) — valid in both, but just in case of MSSQL-specific patterns
+  // No change needed — PostgreSQL supports CAST
+
   // DATEADD(MINUTE, -15, ...) → (... - INTERVAL '15 minutes')
   s = s.replace(/DATEADD\(\s*(\w+)\s*,\s*(-?\d+)\s*,\s*([^)]+)\s*\)/gi, (_match, unit, amount, field) => {
     const absAmount = Math.abs(parseInt(amount));
@@ -79,34 +100,83 @@ function convertSqlSyntax(sqlStr: string): string {
     return `(${field.trim()} ${sign} INTERVAL '${absAmount} ${pgUnit}')`;
   });
 
+  // DATEPART(YEAR, expr) → EXTRACT(YEAR FROM expr)
+  // DATEPART(ISO_WEEK, expr) → EXTRACT(WEEK FROM expr)
+  // DATEPART(dw, expr) → EXTRACT(ISODOW FROM expr)
+  // DATEPART(MONTH, expr) → EXTRACT(MONTH FROM expr)
+  // DATEPART(DAY, expr) → EXTRACT(DAY FROM expr)
+  s = s.replace(/DATEPART\s*\(\s*(\w+)\s*,\s*([^)]+)\)/gi, (_match, part, expr) => {
+    const partMap: Record<string, string> = {
+      year: 'YEAR', isoyear: 'ISOYEAR',
+      month: 'MONTH', day: 'DAY',
+      hour: 'HOUR', minute: 'MINUTE', second: 'SECOND',
+      iso_week: 'WEEK', week: 'WEEK',
+      dw: 'ISODOW', weekday: 'ISODOW',
+    };
+    const pgPart = partMap[part.toLowerCase()] ?? part.toUpperCase();
+    return `EXTRACT(${pgPart} FROM ${expr.trim()})`;
+  });
+
   // SELECT TOP N ... → SELECT ... LIMIT N
   s = s.replace(/SELECT\s+TOP\s+(\d+)\b/gi, (_match, n) => `SELECT /*TOP${n}*/`);
-  // After full query, append LIMIT (placed before final closing)
   if (/\/\*TOP\d+\*\//.test(s)) {
     const topMatch = s.match(/\/\*TOP(\d+)\*\//);
     if (topMatch) {
       const n = topMatch[1];
       s = s.replace(`/*TOP${n}*/`, '');
-      // Remove any existing LIMIT clause to avoid duplicates
       s = s.replace(/\bLIMIT\s+\d+\s*$/i, '');
       s = s.trimEnd() + ` LIMIT ${n}`;
     }
   }
 
+  // OFFSET x ROWS FETCH NEXT y ROWS ONLY → LIMIT y OFFSET x
+  s = s.replace(/OFFSET\s+(\d+)\s+ROWS\s+FETCH\s+NEXT\s+(\d+)\s+ROWS\s+ONLY/gi,
+    (_match, offset, limit) => `LIMIT ${limit} OFFSET ${offset}`);
+
   // OUTPUT INSERTED.id → RETURNING id
   s = s.replace(/OUTPUT\s+INSERTED\.(\w+)/gi, 'RETURNING $1');
 
+  // IF NOT EXISTS (SELECT 1 FROM table WHERE ...) INSERT INTO table (...) VALUES (...)
+  // → INSERT INTO table (...) VALUES (...) ON CONFLICT DO NOTHING
+  s = s.replace(
+    /IF\s+NOT\s+EXISTS\s*\(\s*SELECT\s+1\s+FROM\s+\w+\s+WHERE\s+[^)]+\)\s*(INSERT\s+INTO\s+[^;]+)/gi,
+    '$1 ON CONFLICT DO NOTHING'
+  );
+
   // BIT/BOOLEAN columns: = 1 → = true, = 0 → = false
-  // Matches patterns like: is_active = 1, first_login = 0, success = 0
-  s = s.replace(/\b(is_active|first_login|success|is_read|is_default)\s*=\s*1\b/gi, '$1 = true');
-  s = s.replace(/\b(is_active|first_login|success|is_read|is_default)\s*=\s*0\b/gi, '$1 = false');
+  s = s.replace(/\b(is_active|first_login|success|is_read|is_default|is_builtin)\s*=\s*1\b/gi, '$1 = true');
+  s = s.replace(/\b(is_active|first_login|success|is_read|is_default|is_builtin)\s*=\s*0\b/gi, '$1 = false');
   // CASE WHEN bool_col = 1 THEN 1 ELSE 0 END → bool_col::int
   s = s.replace(/CASE\s+WHEN\s+(\w+)\s*=\s*1\s+THEN\s+1\s+ELSE\s+0\s+END/gi, '$1::int');
   // SET first_login = 0 / SET first_login = 1 (in UPDATE statements)
   s = s.replace(/\b(first_login)\s*=\s*1\b/gi, '$1 = true');
   s = s.replace(/\b(first_login)\s*=\s*0\b/gi, '$1 = false');
 
-  // MERGE → handled by dialect helper, not auto-converted here
+  // MERGE → convert simple MERGE patterns to INSERT ... ON CONFLICT DO UPDATE
+  s = convertMerge(s);
+
+  return s;
+}
+
+/**
+ * Convert MSSQL MERGE to PostgreSQL INSERT ... ON CONFLICT DO UPDATE.
+ * Handles the common pattern: MERGE INTO target USING (SELECT ...) AS src ON ... WHEN MATCHED THEN UPDATE ... WHEN NOT MATCHED THEN INSERT ...
+ */
+function convertMerge(s: string): string {
+  // Only attempt if MERGE keyword is present
+  if (!/\bMERGE\b/i.test(s)) return s;
+
+  // Pattern: MERGE [INTO] table AS t USING (SELECT @vals AS cols) AS src ON (condition) WHEN MATCHED THEN UPDATE SET ... WHEN NOT MATCHED THEN INSERT (...) VALUES (...)
+  const mergeRegex = /MERGE\s+(?:INTO\s+)?(\w+)\s+AS\s+\w+\s+USING\s*\([^)]+\)\s*AS\s+\w+\s+ON\s*\(([^)]+)\)\s*WHEN\s+MATCHED\s+THEN\s+UPDATE\s+SET\s+([\s\S]+?)\s+WHEN\s+NOT\s+MATCHED\s+THEN\s+INSERT\s*\(([^)]+)\)\s*VALUES\s*\(([^)]+)\)/gi;
+
+  const match = mergeRegex.exec(s);
+  if (match) {
+    const [, table, onCondition, updateSet, insertCols, insertVals] = match;
+    // Extract the conflict column from ON condition (e.g. "t.key = src.key" → "key")
+    const conflictCol = onCondition.replace(/.*?\.(\w+)\s*=.*/i, '$1').trim();
+    const result = `INSERT INTO ${table} (${insertCols}) VALUES (${insertVals}) ON CONFLICT (${conflictCol}) DO UPDATE SET ${updateSet.replace(/\bt\.\w+\s*=\s*src\./gi, (m) => m.replace(/\bt\./, '').replace(/src\./, 'EXCLUDED.'))}`;
+    return s.replace(match[0], result);
+  }
 
   return s;
 }
