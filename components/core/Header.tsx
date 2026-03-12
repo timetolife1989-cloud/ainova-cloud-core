@@ -90,8 +90,10 @@ export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) 
         throw new Error(`Failed to save locale: ${res.status} ${errorText}`);
       }
       
-      // Force full page reload to pick up new locale from server
-      window.location.reload();
+      // Trigger RSC re-render so server re-reads locale from DB
+      router.refresh();
+      // Fallback: full reload after a short delay if RSC doesn't update
+      setTimeout(() => window.location.reload(), 600);
     } catch (err) {
       console.error('[Header] Locale change failed:', err);
       alert(`${t('common.lang_change_failed')}: ${err instanceof Error ? err.message : ''}`);

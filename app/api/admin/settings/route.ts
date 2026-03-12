@@ -1,4 +1,5 @@
 import { type NextRequest } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { checkCsrf } from '@/lib/api-utils';
 import { checkAuth } from '@/lib/rbac/middleware';
 import { getAllSettings, setSetting } from '@/lib/settings';
@@ -47,6 +48,7 @@ export async function PUT(request: NextRequest) {
 
   if (localeChanged) {
     clearTranslationCache();
+    revalidatePath('/dashboard', 'layout');
   }
 
   return Response.json({ ok: true });

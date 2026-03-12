@@ -7,6 +7,8 @@ import { LazyCommandPalette } from '@/components/core/LazyCommandPalette';
 import { I18nProvider } from '@/components/core/I18nProvider';
 import { InactivityGuard } from '@/components/core/InactivityGuard';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardLayout({
   children,
 }: {

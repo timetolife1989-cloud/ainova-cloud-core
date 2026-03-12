@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface SessionUser {
   userId: number;
@@ -13,6 +14,7 @@ interface SessionUser {
 
 export default function ChangePasswordPage() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [user, setUser] = useState<SessionUser | null>(null);
   const [isFirstLogin, setIsFirstLogin] = useState(false);
@@ -68,32 +70,30 @@ export default function ChangePasswordPage() {
   const validatePasswords = (): boolean => {
     const errors: string[] = [];
 
-    if (!currentPassword) errors.push('A jelenlegi jelszó megadása kötelező');
-    if (!newPassword) errors.push('Az új jelszó megadása kötelező');
-    if (!confirmPassword) errors.push('Az új jelszó megerősítése kötelező');
+    if (!currentPassword) errors.push(t('auth.cp_err_current_required'));
+    if (!newPassword) errors.push(t('auth.cp_err_new_required'));
+    if (!confirmPassword) errors.push(t('auth.cp_err_confirm_required'));
 
     if (newPassword && newPassword.length < 8)
-      errors.push('Az új jelszónak legalább 8 karakter hosszúnak kell lennie');
+      errors.push(t('auth.cp_err_min_length'));
 
     if (newPassword && !/[A-Z]/.test(newPassword))
-      errors.push('Az új jelszónak tartalmaznia kell legalább egy nagybetűt');
+      errors.push(t('auth.cp_err_uppercase'));
 
     if (newPassword && !/[a-z]/.test(newPassword))
-      errors.push('Az új jelszónak tartalmaznia kell legalább egy kisbetűt');
+      errors.push(t('auth.cp_err_lowercase'));
 
     if (
       newPassword &&
       !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(newPassword)
     )
-      errors.push(
-        'Az új jelszónak tartalmaznia kell legalább egy speciális karaktert (!@#$%...)'
-      );
+      errors.push(t('auth.cp_err_special'));
 
     if (newPassword && confirmPassword && newPassword !== confirmPassword)
-      errors.push('Az új jelszó és a megerősítés nem egyezik');
+      errors.push(t('auth.cp_err_mismatch'));
 
     if (currentPassword && newPassword && currentPassword === newPassword)
-      errors.push('Az új jelszó nem egyezhet a jelenlegivel');
+      errors.push(t('auth.cp_err_same'));
 
     setValidationErrors(errors);
     return errors.length === 0;
@@ -111,7 +111,7 @@ export default function ChangePasswordPage() {
 
     try {
       if (!csrfToken) {
-        throw new Error('CSRF token nem elérhető. Frissítsd az oldalt.');
+        throw new Error(t('auth.cp_csrf_missing'));
       }
 
       const res = await fetch('/api/auth/change-password', {
@@ -131,10 +131,10 @@ export default function ChangePasswordPage() {
       };
 
       if (!data.success) {
-        throw new Error(data.error ?? 'Jelszó módosítás sikertelen');
+        throw new Error(data.error ?? t('auth.error.unexpected'));
       }
 
-      setSuccess(data.message ?? 'Jelszó sikeresen módosítva!');
+      setSuccess(data.message ?? t('auth.cp_success_msg'));
 
       // Clear form
       setCurrentPassword('');
@@ -149,7 +149,7 @@ export default function ChangePasswordPage() {
 
       setTimeout(() => router.push('/dashboard'), 2000);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Váratlan hiba történt');
+      setError(err instanceof Error ? err.message : t('auth.error.unexpected'));
     } finally {
       setLoading(false);
     }
@@ -157,7 +157,7 @@ export default function ChangePasswordPage() {
 
   const handleBack = () => {
     if (isFirstLogin) {
-      setError('Első belépéskor kötelező a jelszó módosítása!');
+      setError(t('auth.cp_first_login_required'));
       return;
     }
     router.push('/dashboard');
@@ -171,7 +171,7 @@ export default function ChangePasswordPage() {
         {isFirstLogin && (
           <div className="p-3 bg-orange-900/20 border border-orange-700 rounded-lg">
             <p className="text-orange-400 text-sm font-medium">
-              ⚠️ Első bejelentkezés — kérjük, változtasd meg a jelszavadat
+              ⚠️ {t('auth.cp_first_login_warn')}
             </p>
           </div>
         )}
@@ -187,7 +187,7 @@ export default function ChangePasswordPage() {
         {validationErrors.length > 0 && (
           <div className="p-3 bg-yellow-900/20 border border-yellow-800 rounded-lg">
             <p className="text-yellow-400 text-sm font-medium mb-2">
-              Kérjük javítsd a következő hibákat:
+              {t('auth.cp_fix_errors')}
             </p>
             <ul className="text-yellow-500 text-xs space-y-1 list-disc list-inside">
               {validationErrors.map((err, idx) => (
@@ -202,7 +202,7 @@ export default function ChangePasswordPage() {
           <div className="p-3 bg-green-900/20 border border-green-800 rounded-lg">
             <p className="text-green-400 text-sm">{success}</p>
             <p className="text-green-500 text-xs mt-1">
-              Átirányítás a dashboard-ra...
+              {t('auth.cp_redirect')}
             </p>
           </div>
         )}
@@ -224,7 +224,7 @@ export default function ChangePasswordPage() {
                 onClick={handleBack}
                 className="text-xs text-gray-400 hover:text-gray-300 mb-4 transition-colors block"
               >
-                ← Vissza a dashboard-ra
+                {t('auth.cp_back')}
               </button>
             )}
 
@@ -232,11 +232,11 @@ export default function ChangePasswordPage() {
               {process.env.NEXT_PUBLIC_APP_NAME ?? 'AINOVA'}
             </p>
             <h1 className="text-2xl font-semibold text-white mb-1">
-              Jelszó módosítása
+              {t('auth.cp_title')}
             </h1>
             {user && (
               <p className="text-sm text-gray-400">
-                Bejelentkezve: @{user.username}
+                {t('auth.cp_logged_in', { username: user.username })}
               </p>
             )}
           </div>
@@ -245,7 +245,7 @@ export default function ChangePasswordPage() {
             {/* Current password */}
             <div className="space-y-1">
               <label className="text-xs font-medium text-gray-400 block">
-                Jelenlegi jelszó
+                {t('auth.cp_current_password')}
               </label>
               <input
                 type="password"
@@ -261,7 +261,7 @@ export default function ChangePasswordPage() {
             {/* New password */}
             <div className="space-y-1">
               <label className="text-xs font-medium text-gray-400 block">
-                Új jelszó
+                {t('auth.cp_new_password')}
               </label>
               <input
                 type="password"
@@ -273,14 +273,14 @@ export default function ChangePasswordPage() {
                 className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 transition-all"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Min. 8 karakter, nagybetű, kisbetű, speciális karakter
+                {t('auth.cp_hint')}
               </p>
             </div>
 
             {/* Confirm password */}
             <div className="space-y-1">
               <label className="text-xs font-medium text-gray-400 block">
-                Új jelszó megerősítése
+                {t('auth.cp_confirm_password')}
               </label>
               <input
                 type="password"
@@ -299,18 +299,17 @@ export default function ChangePasswordPage() {
               disabled={loading || !!success}
               className="w-full mt-2 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Módosítás...' : success ? '✓ Sikeres' : 'Jelszó módosítása'}
+              {loading ? t('auth.cp_submitting') : success ? t('auth.cp_success') : t('auth.cp_submit')}
             </button>
           </form>
 
           {/* Security info */}
           <div className="mt-6 p-3 bg-indigo-900/10 border border-indigo-800/30 rounded-lg">
             <p className="text-indigo-400 text-xs font-medium mb-1">
-              Biztonsági tájékoztató
+              {t('auth.cp_security_title')}
             </p>
             <p className="text-indigo-500 text-xs">
-              Jelszó módosítás után minden más eszközön újra be kell
-              jelentkezned.
+              {t('auth.cp_security_text')}
             </p>
           </div>
         </div>
