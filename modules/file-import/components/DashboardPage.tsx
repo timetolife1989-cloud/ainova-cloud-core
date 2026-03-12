@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { FileUp, Upload, Check, AlertTriangle, FileSpreadsheet, Clock, CheckCircle, XCircle } from 'lucide-react';
 
@@ -31,6 +32,7 @@ interface DetectResult {
 }
 
 export default function FileImportDashboardPage() {
+  const { t } = useTranslation();
   const [configs, setConfigs] = useState<ImportConfig[]>([]);
   const [logs, setLogs] = useState<ImportLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,7 +93,7 @@ export default function FileImportDashboardPage() {
       });
 
       const uploadJson = await uploadRes.json() as { ok?: boolean; filePath?: string; error?: string };
-      if (!uploadRes.ok) throw new Error(uploadJson.error ?? 'Feltöltési hiba');
+      if (!uploadRes.ok) throw new Error(uploadJson.error ?? t('import.upload_error'));
 
       setUploadedFile({ path: uploadJson.filePath!, name: file.name });
 
@@ -109,7 +111,7 @@ export default function FileImportDashboardPage() {
         setSelectedConfigId(detectJson.configId);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Hiba történt');
+      setError(e instanceof Error ? e.message : t('import.error_occurred'));
     } finally {
       setUploading(false);
     }
@@ -137,12 +139,12 @@ export default function FileImportDashboardPage() {
       });
 
       const json = await res.json() as { success?: boolean; totalRows?: number; insertedRows?: number; skippedRows?: number; errors?: string[]; error?: string };
-      if (!res.ok) throw new Error(json.error ?? 'Import hiba');
+      if (!res.ok) throw new Error(json.error ?? t('import.import_error'));
 
       if (json.success) {
-        setSuccess(`Import sikeres! ${json.insertedRows} sor beszúrva, ${json.skippedRows} kihagyva.`);
+        setSuccess(t('import.success').replace('{inserted}', String(json.insertedRows)).replace('{skipped}', String(json.skippedRows)));
       } else {
-        setError(`Import részlegesen sikeres. Hibák: ${json.errors?.slice(0, 3).join(', ')}`);
+        setError(`${t('import.partial_success')} ${json.errors?.slice(0, 3).join(', ')}`);
       }
 
       setUploadedFile(null);
@@ -150,7 +152,7 @@ export default function FileImportDashboardPage() {
       setSelectedConfigId(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Hiba történt');
+      setError(e instanceof Error ? e.message : t('import.error_occurred'));
     } finally {
       setProcessing(false);
     }
@@ -168,8 +170,7 @@ export default function FileImportDashboardPage() {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <DashboardSectionHeader title="Fájl Import" subtitle="Excel és CSV fájlok importálása" />
-        <div className="animate-pulse mt-6 h-64 bg-gray-800 rounded-xl" />
+        <DashboardSectionHeader title={t('import.title')} subtitle={t('import.subtitle')} />
       </div>
     );
   }
@@ -193,13 +194,13 @@ export default function FileImportDashboardPage() {
             {uploading ? (
               <>
                 <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mb-3" />
-                <p className="text-gray-400">Feltöltés...</p>
+                <p className="text-gray-400">{t('import.uploading')}</p>
               </>
             ) : (
               <>
                 <Upload className="w-12 h-12 text-gray-500 mb-3" />
-                <p className="text-gray-400">Húzd ide a fájlt vagy kattints a tallózáshoz</p>
-                <p className="text-xs text-gray-600 mt-1">Excel (.xlsx, .xls) vagy CSV fájlok</p>
+                <p className="text-gray-400">{t('import.drop_hint')}</p>
+                <p className="text-xs text-gray-600 mt-1">{t('import.file_types')}</p>
               </>
             )}
           </label>
@@ -212,23 +213,23 @@ export default function FileImportDashboardPage() {
                 <p className="text-white font-medium">{uploadedFile.name}</p>
                 {detectResult && (
                   <p className="text-xs text-gray-500">
-                    {detectResult.detectedColumns.length} oszlop • 
-                    {detectResult.configName ? ` Felismert: ${detectResult.configName} (${detectResult.confidence}%)` : ' Nincs felismert konfiguráció'}
+                    {detectResult.detectedColumns.length} {t('import.columns')} • 
+                    {detectResult.configName ? ` ${t('import.detected')}: ${detectResult.configName} (${detectResult.confidence}%)` : ` ${t('import.no_config_detected')}`}
                   </p>
                 )}
               </div>
-              <button onClick={reset} className="text-gray-500 hover:text-gray-300 text-sm">Mégse</button>
+              <button onClick={reset} className="text-gray-500 hover:text-gray-300 text-sm">{t('import.cancel')}</button>
             </div>
 
             {/* Config selection */}
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-2">Import konfiguráció</label>
+              <label className="block text-xs font-medium text-gray-400 mb-2">{t('import.config_label')}</label>
               <select
                 value={selectedConfigId ?? ''}
                 onChange={e => setSelectedConfigId(e.target.value ? parseInt(e.target.value) : null)}
                 className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100"
               >
-                <option value="">Válassz konfigurációt...</option>
+                <option value="">{t('import.select_config')}</option>
                 {configs.map(c => (
                   <option key={c.id} value={c.id}>
                     {c.configName} ({c.fileType.toUpperCase()} → {c.targetTable})
@@ -246,12 +247,12 @@ export default function FileImportDashboardPage() {
               {processing ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Import folyamatban...
+                  {t('import.in_progress')}
                 </>
               ) : (
                 <>
                   <FileUp className="w-5 h-5" />
-                  Import indítása
+                  {t('import.start')}
                 </>
               )}
             </button>
@@ -273,7 +274,7 @@ export default function FileImportDashboardPage() {
 
       {/* Available configs */}
       <div className="mt-6">
-        <h3 className="text-sm font-medium text-gray-400 mb-3">Elérhető import konfigurációk</h3>
+        <h3 className="text-sm font-medium text-gray-400 mb-3">{t('import.available_configs')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {configs.map(c => (
             <div key={c.id} className="bg-gray-900 border border-gray-800 rounded-lg p-3 flex items-center gap-3">
@@ -286,8 +287,8 @@ export default function FileImportDashboardPage() {
           ))}
           {configs.length === 0 && (
             <div className="col-span-2 bg-gray-900 border border-gray-800 rounded-lg p-6 text-center">
-              <p className="text-gray-500 text-sm">Nincs import konfiguráció</p>
-              <p className="text-xs text-gray-600 mt-1">Admin → Import konfigurációk menüben hozhatod létre</p>
+              <p className="text-gray-500 text-sm">{t('import.no_configs')}</p>
+              <p className="text-xs text-gray-600 mt-1">{t('import.no_configs_hint')}</p>
             </div>
           )}
         </div>

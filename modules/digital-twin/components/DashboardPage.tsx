@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Machine {
   id: number;
@@ -19,15 +20,16 @@ interface Layout {
   machines: Machine[];
 }
 
-const STATUS_COLORS: Record<string, { bg: string; border: string; label: string }> = {
-  running:     { bg: 'bg-green-900/50',  border: 'border-green-500', label: 'Fut' },
-  idle:        { bg: 'bg-gray-800/50',   border: 'border-gray-600',  label: 'Áll' },
-  warning:     { bg: 'bg-yellow-900/50', border: 'border-yellow-500', label: 'Figyelmeztetés' },
-  error:       { bg: 'bg-red-900/50',    border: 'border-red-500',    label: 'Hiba' },
-  maintenance: { bg: 'bg-blue-900/50',   border: 'border-blue-500',   label: 'Karbantartás' },
+const STATUS_COLORS: Record<string, { bg: string; border: string; labelKey: string }> = {
+  running:     { bg: 'bg-green-900/50',  border: 'border-green-500', labelKey: 'dt.status.running' },
+  idle:        { bg: 'bg-gray-800/50',   border: 'border-gray-600',  labelKey: 'dt.status.idle' },
+  warning:     { bg: 'bg-yellow-900/50', border: 'border-yellow-500', labelKey: 'dt.status.warning' },
+  error:       { bg: 'bg-red-900/50',    border: 'border-red-500',    labelKey: 'dt.status.error' },
+  maintenance: { bg: 'bg-blue-900/50',   border: 'border-blue-500',   labelKey: 'dt.status.maintenance' },
 };
 
 export default function DigitalTwinDashboardPage() {
+  const { t } = useTranslation();
   const [layout, setLayout] = useState<Layout | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
@@ -65,18 +67,18 @@ export default function DigitalTwinDashboardPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Digital Twin</h1>
-          <p className="text-gray-400 text-sm">Gyártósor vizualizáció — valós idejű gép állapotok</p>
+          <h1 className="text-2xl font-bold text-white">{t('dt.title')}</h1>
+          <p className="text-gray-400 text-sm">{t('dt.subtitle')}</p>
         </div>
       </div>
 
       {/* Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
-        {Object.entries(STATUS_COLORS).map(([status, { border, label }]) => {
+        {Object.entries(STATUS_COLORS).map(([status, { border, labelKey }]) => {
           const count = machines.filter(m => m.status === status).length;
           return (
             <div key={status} className={`bg-gray-900 border-l-4 ${border} rounded-lg p-3`}>
-              <p className="text-gray-500 text-xs">{label}</p>
+              <p className="text-gray-500 text-xs">{t(labelKey)}</p>
               <p className="text-xl font-bold text-white">{count}</p>
             </div>
           );
@@ -84,7 +86,7 @@ export default function DigitalTwinDashboardPage() {
       </div>
 
       {loading ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center text-gray-500 animate-pulse">Betöltés...</div>
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center text-gray-500 animate-pulse">{t('dt.loading')}</div>
       ) : (
         <>
           {/* Factory floor canvas */}
@@ -112,7 +114,7 @@ export default function DigitalTwinDashboardPage() {
                     }}
                   >
                     <span className="text-white text-sm font-semibold">{machine.name}</span>
-                    <span className="text-xs text-gray-400">{sc.label}</span>
+                    <span className="text-xs text-gray-400">{t(sc.labelKey)}</span>
                     {machine.status === 'running' && (
                       <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                     )}
@@ -135,21 +137,21 @@ export default function DigitalTwinDashboardPage() {
 
           {/* Legend */}
           <div className="flex flex-wrap gap-4 mb-4">
-            {Object.entries(STATUS_COLORS).map(([status, { bg, border, label }]) => (
+            {Object.entries(STATUS_COLORS).map(([status, { bg, border, labelKey }]) => (
               <div key={status} className="flex items-center gap-2">
                 <div className={`w-4 h-4 rounded ${bg} border ${border}`} />
-                <span className="text-xs text-gray-400">{label}</span>
+                <span className="text-xs text-gray-400">{t(labelKey)}</span>
               </div>
             ))}
           </div>
 
           {/* Stats bar */}
           <div className="bg-gray-900/60 border border-gray-800 rounded-lg p-3 flex items-center gap-6 text-sm text-gray-400">
-            <span>Összes gép: <strong className="text-white">{machines.length}</strong></span>
-            <span>Futó: <strong className="text-green-400">{running}</strong></span>
-            <span>Álló: <strong className="text-red-400">{stopped}</strong></span>
+            <span>{t('dt.total_machines')}: <strong className="text-white">{machines.length}</strong></span>
+            <span>{t('dt.running_count')}: <strong className="text-green-400">{running}</strong></span>
+            <span>{t('dt.stopped_count')}: <strong className="text-red-400">{stopped}</strong></span>
             <span className="ml-auto text-xs">
-              {!layout && '⚠️ Demo adatok — Hozd létre a layout-ot az admin panelen'}
+              {!layout && t('dt.demo_warning')}
             </span>
           </div>
         </>
@@ -161,13 +163,13 @@ export default function DigitalTwinDashboardPage() {
           <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
             <h2 className="text-lg font-bold text-white mb-4">{selectedMachine.name}</h2>
             <div className="space-y-2 text-sm">
-              <p className="text-gray-400">Típus: <span className="text-white">{selectedMachine.machineType}</span></p>
-              <p className="text-gray-400">Állapot: <span className={`font-semibold ${selectedMachine.status === 'running' ? 'text-green-400' : selectedMachine.status === 'error' ? 'text-red-400' : 'text-yellow-400'}`}>
-                {STATUS_COLORS[selectedMachine.status]?.label ?? selectedMachine.status}
+              <p className="text-gray-400">{t('dt.type')}: <span className="text-white">{selectedMachine.machineType}</span></p>
+              <p className="text-gray-400">{t('dt.status_label')}: <span className={`font-semibold ${selectedMachine.status === 'running' ? 'text-green-400' : selectedMachine.status === 'error' ? 'text-red-400' : 'text-yellow-400'}`}>
+                {STATUS_COLORS[selectedMachine.status]?.labelKey ? t(STATUS_COLORS[selectedMachine.status].labelKey) : selectedMachine.status}
               </span></p>
-              <p className="text-gray-400">Pozíció: <span className="text-white">{selectedMachine.posX}, {selectedMachine.posY}</span></p>
+              <p className="text-gray-400">{t('dt.position')}: <span className="text-white">{selectedMachine.posX}, {selectedMachine.posY}</span></p>
             </div>
-            <button onClick={() => setSelectedMachine(null)} className="mt-4 w-full px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-sm">Bezárás</button>
+            <button onClick={() => setSelectedMachine(null)} className="mt-4 w-full px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-sm">{t('dt.close')}</button>
           </div>
         </div>
       )}

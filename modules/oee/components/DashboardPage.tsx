@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { Gauge, Plus, X, Check, AlertTriangle } from 'lucide-react';
 
@@ -19,6 +20,7 @@ function getOeeColor(pct: number | null): string {
 }
 
 export default function OeeDashboardPage() {
+  const { t } = useTranslation();
   const [records, setRecords] = useState<OeeRecord[]>([]);
   const [machines, setMachines] = useState<Machine[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,43 +60,43 @@ export default function OeeDashboardPage() {
         body: JSON.stringify({ machineId: formMachine, recordDate: formDate, plannedTimeMin: formPlanned, runTimeMin: formRun, totalCount: formTotal, goodCount: formGood }),
       });
       const body = await res.json() as { ok?: boolean; error?: string };
-      if (!res.ok) throw new Error(body.error ?? 'Hiba');
+      if (!res.ok) throw new Error(body.error ?? t('dt.status.error'));
       setModalOpen(false);
       await fetchData();
-    } catch (e) { setError(e instanceof Error ? e.message : 'Hiba'); }
+    } catch (e) { setError(e instanceof Error ? e.message : t('dt.status.error')); }
     finally { setSaving(false); }
   };
 
   const avgOee = records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.oeePct ?? 0), 0) / records.filter(r => r.oeePct !== null).length) : 0;
 
   if (loading) {
-    return (<div className="max-w-7xl mx-auto px-4 py-8"><DashboardSectionHeader title="OEE Dashboard" subtitle="Overall Equipment Effectiveness" /><div className="animate-pulse mt-6 h-64 bg-gray-800 rounded-xl" /></div>);
+    return (<div className="max-w-7xl mx-auto px-4 py-8"><DashboardSectionHeader title={t('oee.title')} subtitle={t('oee.subtitle')} /><div className="animate-pulse mt-6 h-64 bg-gray-800 rounded-xl" /></div>);
   }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
-        <DashboardSectionHeader title="OEE Dashboard" subtitle="Overall Equipment Effectiveness" />
-        <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium"><Plus className="w-4 h-4" /> Új mérés</button>
+        <DashboardSectionHeader title={t('oee.title')} subtitle={t('oee.subtitle')} />
+        <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium"><Plus className="w-4 h-4" /> {t('oee.new_measurement')}</button>
       </div>
 
       {/* OEE summary gauge */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
           <Gauge className="w-8 h-8 mx-auto mb-2 text-red-400" />
-          <p className="text-xs text-gray-500">Átlag OEE</p>
+          <p className="text-xs text-gray-500">{t('oee.avg_oee')}</p>
           <p className={`text-3xl font-bold ${getOeeColor(avgOee)}`}>{avgOee}%</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
-          <p className="text-xs text-gray-500">Rendelkezésre állás</p>
+          <p className="text-xs text-gray-500">{t('oee.availability')}</p>
           <p className="text-2xl font-bold text-blue-400">{records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.availabilityPct ?? 0), 0) / records.length) : 0}%</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
-          <p className="text-xs text-gray-500">Teljesítmény</p>
+          <p className="text-xs text-gray-500">{t('oee.performance')}</p>
           <p className="text-2xl font-bold text-amber-400">{records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.performancePct ?? 0), 0) / records.filter(r => r.performancePct !== null).length || 0) : 0}%</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
-          <p className="text-xs text-gray-500">Minőség</p>
+          <p className="text-xs text-gray-500">{t('oee.quality')}</p>
           <p className="text-2xl font-bold text-green-400">{records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.qualityPct ?? 0), 0) / records.length) : 0}%</p>
         </div>
       </div>
@@ -103,7 +105,7 @@ export default function OeeDashboardPage() {
       <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-950 text-gray-400 text-xs uppercase">
-            <tr><th className="px-4 py-3 text-left">Dátum</th><th className="px-4 py-3 text-left">Gép</th><th className="px-4 py-3 text-right">A%</th><th className="px-4 py-3 text-right">P%</th><th className="px-4 py-3 text-right">Q%</th><th className="px-4 py-3 text-right">OEE%</th></tr>
+            <tr><th className="px-4 py-3 text-left">{t('oee.date')}</th><th className="px-4 py-3 text-left">{t('oee.machine')}</th><th className="px-4 py-3 text-right">A%</th><th className="px-4 py-3 text-right">P%</th><th className="px-4 py-3 text-right">Q%</th><th className="px-4 py-3 text-right">OEE%</th></tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
             {records.slice(0, 20).map(r => (
@@ -116,7 +118,7 @@ export default function OeeDashboardPage() {
                 <td className={`px-4 py-3 text-right font-bold ${getOeeColor(r.oeePct)}`}>{r.oeePct ?? '-'}%</td>
               </tr>
             ))}
-            {records.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-500">Nincs adat</td></tr>}
+            {records.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-500">{t('oee.no_data')}</td></tr>}
           </tbody>
         </table>
       </div>
@@ -125,27 +127,27 @@ export default function OeeDashboardPage() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-white">Új OEE mérés</h3>
+              <h3 className="text-lg font-medium text-white">{t('oee.new_oee_measurement')}</h3>
               <button onClick={() => setModalOpen(false)} className="p-1 hover:bg-gray-800 rounded"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-xs text-gray-400 mb-1">Gép</label><select value={formMachine} onChange={e => setFormMachine(parseInt(e.target.value))} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100">{machines.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}</select></div>
-                <div><label className="block text-xs text-gray-400 mb-1">Dátum</label><input type="date" value={formDate} onChange={e => setFormDate(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
+                <div><label className="block text-xs text-gray-400 mb-1">{t('oee.machine')}</label><select value={formMachine} onChange={e => setFormMachine(parseInt(e.target.value))} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100">{machines.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}</select></div>
+                <div><label className="block text-xs text-gray-400 mb-1">{t('oee.date')}</label><input type="date" value={formDate} onChange={e => setFormDate(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-xs text-gray-400 mb-1">Tervezett idő (perc)</label><input type="number" value={formPlanned} onChange={e => setFormPlanned(parseInt(e.target.value) || 0)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
-                <div><label className="block text-xs text-gray-400 mb-1">Futásidő (perc)</label><input type="number" value={formRun} onChange={e => setFormRun(parseInt(e.target.value) || 0)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
+                <div><label className="block text-xs text-gray-400 mb-1">{t('oee.planned_time')}</label><input type="number" value={formPlanned} onChange={e => setFormPlanned(parseInt(e.target.value) || 0)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
+                <div><label className="block text-xs text-gray-400 mb-1">{t('oee.run_time')}</label><input type="number" value={formRun} onChange={e => setFormRun(parseInt(e.target.value) || 0)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-xs text-gray-400 mb-1">Összes darab</label><input type="number" value={formTotal} onChange={e => setFormTotal(parseInt(e.target.value) || 0)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
-                <div><label className="block text-xs text-gray-400 mb-1">Jó darab</label><input type="number" value={formGood} onChange={e => setFormGood(parseInt(e.target.value) || 0)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
+                <div><label className="block text-xs text-gray-400 mb-1">{t('oee.total_count')}</label><input type="number" value={formTotal} onChange={e => setFormTotal(parseInt(e.target.value) || 0)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
+                <div><label className="block text-xs text-gray-400 mb-1">{t('oee.good_count')}</label><input type="number" value={formGood} onChange={e => setFormGood(parseInt(e.target.value) || 0)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
               </div>
             </div>
             {error && <div className="mt-4 p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-300 text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" /> {error}</div>}
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setModalOpen(false)} className="px-4 py-2 text-gray-400 text-sm">Mégse</button>
-              <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"><Check className="w-4 h-4" />{saving ? 'Mentés...' : 'Mentés'}</button>
+              <button onClick={() => setModalOpen(false)} className="px-4 py-2 text-gray-400 text-sm">{t('oee.cancel')}</button>
+              <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"><Check className="w-4 h-4" />{saving ? t('oee.saving') : t('oee.save')}</button>
             </div>
           </div>
         </div>

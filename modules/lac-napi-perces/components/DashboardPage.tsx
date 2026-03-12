@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import {
   NapiData,
@@ -18,6 +19,7 @@ import { Download } from 'lucide-react';
 const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 perc
 
 export default function NapiPercesPage() {
+  const { t } = useTranslation();
   // State
   const [activeKimutat, setActiveKimutat] = useState<KimutatType>('napi');
   const [offset, setOffset] = useState(0);
@@ -41,7 +43,7 @@ export default function NapiPercesPage() {
       });
 
       const response = await fetch(`/api/napi-perces?${params.toString()}`);
-      if (!response.ok) throw new Error('Hiba az adatok betöltésekor');
+      if (!response.ok) throw new Error(t('napi.fetch_error'));
 
       const result = await response.json() as { data?: NapiData[] };
       setData(result.data ?? []);
@@ -58,7 +60,7 @@ export default function NapiPercesPage() {
       }
     } catch (err) {
       if (!silent) {
-        setError(err instanceof Error ? err.message : 'Ismeretlen hiba');
+        setError(err instanceof Error ? err.message : t('napi.unknown_error'));
         setData([]);
       }
     } finally {
@@ -95,7 +97,7 @@ export default function NapiPercesPage() {
     setIsExporting(true);
     try {
       const response = await fetch(`/api/napi-perces/export?type=${activeKimutat}&offset=${offset}`);
-      if (!response.ok) throw new Error('Export hiba');
+      if (!response.ok) throw new Error(t('napi.export_error'));
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -110,7 +112,7 @@ export default function NapiPercesPage() {
       document.body.removeChild(a);
     } catch (err) {
       console.error('Export error:', err);
-      alert('Hiba az exportálás során');
+      alert(t('napi.export_error'));
     } finally {
       setIsExporting(false);
     }
@@ -119,8 +121,8 @@ export default function NapiPercesPage() {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6">
       <DashboardSectionHeader
-        title="Napi Perces"
-        subtitle="LAC gyártási teljesítmény — napi/heti/havi kimutatás"
+        title={t('napi.title')}
+        subtitle={t('napi.subtitle')}
       />
 
       {/* Export gomb */}
@@ -131,7 +133,7 @@ export default function NapiPercesPage() {
           className="flex items-center gap-2 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-xs transition-colors disabled:opacity-50"
         >
           <Download className="w-3 h-3" />
-          {isExporting ? 'Exportálás...' : 'Export'}
+          {isExporting ? t('napi.exporting') : t('napi.export')}
         </button>
       </div>
 
