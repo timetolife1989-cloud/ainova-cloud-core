@@ -2,10 +2,60 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
-import { Users, Plus, Calendar, TrendingUp, UserMinus, X, Check, AlertTriangle, Pencil, Trash2, Download, Filter } from 'lucide-react';
+import {
+  Users, Plus, Calendar, TrendingUp, UserMinus, X, Check,
+  AlertTriangle, Pencil, Trash2, Download, Filter, Clock,
+} from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import WorkforceCharts from './WorkforceCharts';
 
+// ── Shift Configuration ─────────────────────────────────────────────
+// Configurable shift definitions. Default: standard 3-shift factory pattern.
+// Supports 2/4-shift, 12h, 24h, or custom patterns (e.g. 2-on-2-off).
+// TODO: Load from admin settings (core_settings workforce_shift_definitions)
+interface ShiftDef {
+  id: string;
+  name: string;
+  startTime: string;
+  endTime: string;
+  color: string;
+}
+
+const SHIFT_DEFINITIONS: ShiftDef[] = [
+  { id: 'morning',   name: 'Reggeli',   startTime: '06:00', endTime: '14:00', color: '#8B5CF6' },
+  { id: 'afternoon', name: 'Délutáni',  startTime: '14:00', endTime: '22:00', color: '#3B82F6' },
+  { id: 'night',     name: 'Éjszakai',  startTime: '22:00', endTime: '06:00', color: '#1E40AF' },
+];
+
+/** Determine current shift + effective date (night shift → previous day after midnight) */
+function getEffectiveShift(): { date: string; shiftId: string } {
+  const now = new Date();
+  const cur = now.getHours() * 60 + now.getMinutes();
+  const today = now.toISOString().split('T')[0];
+  for (const s of SHIFT_DEFINITIONS) {
+    const [sh, sm] = s.startTime.split(':').map(Number);
+    const [eh, em] = s.endTime.split(':').map(Number);
+    const start = sh * 60 + sm, end = eh * 60 + em;
+    if (end > start) {
+      if (cur >= start && cur < end) return { date: today, shiftId: s.id };
+    } else {
+      // Overnight shift
+      if (cur >= start) return { date: today, shiftId: s.id };
+      if (cur < end) {
+        const y = new Date(now);
+        y.setDate(y.getDate() - 1);
+        return { date: y.toISOString().split('T')[0], shiftId: s.id };
+      }
+    }
+  }
+  return { date: today, shiftId: SHIFT_DEFINITIONS[0]?.id ?? '' };
+}
+
+// ── Toast ────────────────────────────────────────────────────────────
+interface ToastItem { id: number; type: 'success' | 'error' | 'warning'; message: string }
+let toastCounter = 0;
+
+// ── Types ────────────────────────────────────────────────────────────
 interface WorkforceDaily {
   id: number;
   recordDate: string;
@@ -28,16 +78,21 @@ interface FormState {
   notes: string;
 }
 
-const emptyForm = (): FormState => ({
-  date: new Date().toISOString().split('T')[0],
-  shift: '',
-  area: '',
-  planned: 0,
-  actual: 0,
-  absent: 0,
-  notes: '',
-});
+const emptyForm = (): FormState => {
+  const eff = getEffectiveShift();
+  const shift = SHIFT_DEFINITIONS.find(s => s.id === eff.shiftId);
+  return {
+    date: eff.date,
+    shift: shift?.name ?? '',
+    area: '',
+    planned: 0,
+    actual: 0,
+    absent: 0,
+    notes: '',
+  };
+};
 
+// ── Component ────────────────────────────────────────────────────────
 export default function WorkforceDashboardPage() {
   const { t } = useTranslation();
 
@@ -46,23 +101,42 @@ export default function WorkforceDashboardPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Modal / Edit / Delete state
+  // Modal / Edit / Delete
   const [modalOpen, setModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<WorkforceDaily | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
 
-  // Filter state
+  // Filters
   const [showFilters, setShowFilters] = useState(false);
   const [filterFrom, setFilterFrom] = useState('');
   const [filterTo, setFilterTo] = useState('');
   const [filterShift, setFilterShift] = useState('');
 
-  // Form state
+  // Form
   const [form, setForm] = useState<FormState>(emptyForm());
 
+  // Toast notifications
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
+
+  // Overwrite detection
+  const [showOverwrite, setShowOverwrite] = useState(false);
+  const [existingInfo, setExistingInfo] = useState<{ savedBy: string; savedAt: string } | null>(null);
+
+  // Report-required for old data (>1 day)
+  const [showReportRequired, setShowReportRequired] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+
+  // ── Helpers ──────────────────────────────────────────────────────
   const getCsrfToken = () =>
     document.cookie.split('; ').find(c => c.startsWith('csrf-token='))?.split('=')[1] ?? '';
 
+  const addToast = (type: ToastItem['type'], message: string) => {
+    const id = ++toastCounter;
+    setToasts(prev => [...prev.slice(-2), { id, type, message }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
+  };
+
+  // ── Data Fetching ───────────────────────────────────────────────
   const fetchData = useCallback(async () => {
     try {
       const params = new URLSearchParams();
@@ -81,6 +155,7 @@ export default function WorkforceDashboardPage() {
 
   useEffect(() => { void fetchData(); }, [fetchData]);
 
+  // ── CRUD ────────────────────────────────────────────────────────
   const openCreate = () => {
     setEditItem(null);
     setForm(emptyForm());
@@ -103,18 +178,21 @@ export default function WorkforceDashboardPage() {
     setModalOpen(true);
   };
 
-  const handleSave = async () => {
+  /** Execute the actual save (after validations pass) */
+  const performSave = async (reason?: string) => {
     setSaving(true);
     setError(null);
     try {
-      const payload = {
+      const payload: Record<string, unknown> = {
         recordDate: form.date,
         shiftName: form.shift || null,
         areaName: form.area || null,
         plannedCount: form.planned,
         actualCount: form.actual,
         absentCount: form.absent,
-        notes: form.notes || null,
+        notes: reason
+          ? `[RIPORT: ${reason}] ${form.notes || ''}`.trim()
+          : (form.notes || null),
       };
       const url = editItem
         ? `/api/modules/workforce/data/${editItem.id}`
@@ -127,13 +205,66 @@ export default function WorkforceDashboardPage() {
       });
       const json = await res.json() as { ok?: boolean; error?: string };
       if (!res.ok) throw new Error(json.error ?? t('common.error'));
+
       setModalOpen(false);
+      setShowOverwrite(false);
+      setShowReportRequired(false);
+      setReportReason('');
+      addToast('success', editItem ? 'Sikeresen módosítva!' : 'Sikeresen rögzítve!');
       await fetchData();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error'));
+      const msg = e instanceof Error ? e.message : t('common.error');
+      setError(msg);
+      addToast('error', msg);
     } finally {
       setSaving(false);
     }
+  };
+
+  /** Save with validations: future date, zero headcount, overwrite check, report-required */
+  const handleSave = async () => {
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+    const selectedDate = new Date(form.date + 'T00:00:00');
+
+    // Validation 1: Future date
+    if (selectedDate > todayDate) {
+      addToast('warning', 'Nem lehet jövőbeli dátumra rögzíteni!');
+      return;
+    }
+
+    // Validation 2: Zero headcount
+    if (form.planned === 0 && form.actual === 0 && form.absent === 0) {
+      addToast('warning', 'Adj meg legalább 1 főt (tervezett, tényleges vagy hiányzó)!');
+      return;
+    }
+
+    // Validation 3: Report-required (>1 day old, new entry only)
+    const daysDiff = Math.round((selectedDate.getTime() - todayDate.getTime()) / 86400000);
+    if (daysDiff < -1 && !editItem) {
+      setShowReportRequired(true);
+      return;
+    }
+
+    // Validation 4: Check existing records (new entry only)
+    if (!editItem && form.shift) {
+      try {
+        const res = await fetch(
+          `/api/modules/workforce/check?date=${form.date}&shift=${encodeURIComponent(form.shift)}`
+        );
+        const data = await res.json() as {
+          exists: boolean;
+          lastRecord?: { savedBy: string; savedAt: string };
+        };
+        if (data.exists && data.lastRecord) {
+          setExistingInfo(data.lastRecord);
+          setShowOverwrite(true);
+          return;
+        }
+      } catch { /* proceed if check fails */ }
+    }
+
+    await performSave();
   };
 
   const handleDelete = async (id: number) => {
@@ -147,9 +278,12 @@ export default function WorkforceDashboardPage() {
         throw new Error(json.error ?? t('common.error'));
       }
       setDeleteConfirmId(null);
+      addToast('success', 'Sikeresen törölve!');
       await fetchData();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error'));
+      const msg = e instanceof Error ? e.message : t('common.error');
+      setError(msg);
+      addToast('error', msg);
     }
   };
 
@@ -177,10 +311,12 @@ export default function WorkforceDashboardPage() {
     a.download = `workforce_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+    addToast('success', 'CSV exportálva!');
   };
 
-  const today = new Date().toISOString().split('T')[0];
-  const todayItems = items.filter(i => i.recordDate === today);
+  // ── Computed ────────────────────────────────────────────────────
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todayItems = items.filter(i => i.recordDate === todayStr);
   const totalPlanned = todayItems.reduce((s, i) => s + i.plannedCount, 0);
   const totalActual = todayItems.reduce((s, i) => s + i.actualCount, 0);
   const totalAbsent = todayItems.reduce((s, i) => s + i.absentCount, 0);
@@ -188,32 +324,67 @@ export default function WorkforceDashboardPage() {
 
   const uniqueShifts = [...new Set(items.map(i => i.shiftName).filter(Boolean))] as string[];
 
-  const inputCls = 'w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-indigo-600';
+  const inputCls = 'w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-colors';
 
+  // ── Loading ───────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <DashboardSectionHeader title={t('workforce.title')} subtitle={t('workforce.subtitle')} />
         <div className="animate-pulse space-y-4 mt-6">
           <div className="grid grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-gray-800 rounded-xl" />)}
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-28 bg-gray-800/50 rounded-xl" />)}
           </div>
-          <div className="h-64 bg-gray-800 rounded-xl" />
+          <div className="h-64 bg-gray-800/50 rounded-xl" />
         </div>
       </div>
     );
   }
 
+  // ── Render ────────────────────────────────────────────────────
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-      {/* Header */}
+      {/* ═══ Toast Notifications ═══ */}
+      {toasts.length > 0 && (
+        <div className="fixed top-20 right-6 z-[60] space-y-3">
+          {toasts.map(toast => (
+            <div
+              key={toast.id}
+              className={`flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl backdrop-blur-md border ${
+                toast.type === 'success'
+                  ? 'bg-emerald-600/95 border-emerald-400/30 text-white'
+                  : toast.type === 'error'
+                    ? 'bg-red-600/95 border-red-400/30 text-white'
+                    : 'bg-amber-600/95 border-amber-400/30 text-white'
+              }`}
+            >
+              <span className="text-xl">
+                {toast.type === 'success' ? '✅' : toast.type === 'error' ? '❌' : '⚠️'}
+              </span>
+              <span className="font-medium text-sm">{toast.message}</span>
+              <button
+                onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
+                className="ml-2 opacity-70 hover:opacity-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ═══ Header ═══ */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <DashboardSectionHeader title={t('workforce.title')} subtitle={t('workforce.subtitle')} />
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowFilters(f => !f)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm border transition-colors ${showFilters ? 'bg-indigo-900/40 border-indigo-700 text-indigo-300' : 'border-gray-700 text-gray-400 hover:text-gray-300'}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm border transition-colors ${
+              showFilters
+                ? 'bg-indigo-900/40 border-indigo-700 text-indigo-300'
+                : 'border-gray-700 text-gray-400 hover:text-gray-300'
+            }`}
           >
             <Filter className="w-4 h-4" /> {t('common.filter')}
           </button>
@@ -226,16 +397,16 @@ export default function WorkforceDashboardPage() {
           </button>
           <button
             onClick={openCreate}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-lg shadow-indigo-500/20 transition-all hover:shadow-indigo-500/30"
           >
             <Plus className="w-4 h-4" /> {t('workforce.new_entry')}
           </button>
         </div>
       </div>
 
-      {/* Filters */}
+      {/* ═══ Filters ═══ */}
       {showFilters && (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 mb-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-4 mb-4 grid grid-cols-1 sm:grid-cols-3 gap-4 backdrop-blur-sm">
           <div>
             <label className="block text-xs text-gray-500 mb-1">{t('workforce.date_from')}</label>
             <input type="date" value={filterFrom} onChange={e => setFilterFrom(e.target.value)} className={inputCls} />
@@ -254,27 +425,57 @@ export default function WorkforceDashboardPage() {
         </div>
       )}
 
-      {/* Summary cards */}
+      {/* ═══ Summary Cards ═══ */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
-          { label: t('workforce.planned_today'), value: totalPlanned, icon: <Calendar className="w-5 h-5 text-blue-400" />, bg: 'bg-blue-900/30', color: 'text-white' },
-          { label: t('workforce.actual_today'), value: totalActual, icon: <Users className="w-5 h-5 text-green-400" />, bg: 'bg-green-900/30', color: 'text-white' },
-          { label: t('workforce.absent_today'), value: totalAbsent, icon: <UserMinus className="w-5 h-5 text-red-400" />, bg: 'bg-red-900/30', color: totalAbsent > 0 ? 'text-red-400' : 'text-white' },
-          { label: t('workforce.attendance_rate'), value: `${attendanceRate}%`, icon: <TrendingUp className="w-5 h-5 text-purple-400" />, bg: 'bg-purple-900/30', color: attendanceRate >= 90 ? 'text-green-400' : attendanceRate >= 70 ? 'text-yellow-400' : 'text-red-400' },
+          {
+            label: t('workforce.planned_today'),
+            value: totalPlanned,
+            icon: <Calendar className="w-5 h-5 text-blue-400" />,
+            gradient: 'from-blue-950/80 to-blue-900/30',
+            border: 'border-blue-800/40',
+            valueColor: 'text-white',
+          },
+          {
+            label: t('workforce.actual_today'),
+            value: totalActual,
+            icon: <Users className="w-5 h-5 text-emerald-400" />,
+            gradient: 'from-emerald-950/80 to-emerald-900/30',
+            border: 'border-emerald-800/40',
+            valueColor: 'text-white',
+          },
+          {
+            label: t('workforce.absent_today'),
+            value: totalAbsent,
+            icon: <UserMinus className="w-5 h-5 text-red-400" />,
+            gradient: 'from-red-950/80 to-red-900/30',
+            border: 'border-red-800/40',
+            valueColor: totalAbsent > 0 ? 'text-red-400' : 'text-white',
+          },
+          {
+            label: t('workforce.attendance_rate'),
+            value: `${attendanceRate}%`,
+            icon: <TrendingUp className="w-5 h-5 text-purple-400" />,
+            gradient: 'from-purple-950/80 to-purple-900/30',
+            border: 'border-purple-800/40',
+            valueColor: attendanceRate >= 90
+              ? 'text-emerald-400'
+              : attendanceRate >= 70 ? 'text-yellow-400' : 'text-red-400',
+          },
         ].map(card => (
-          <div key={card.label} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <div key={card.label} className={`bg-gradient-to-br ${card.gradient} border ${card.border} rounded-xl p-5 shadow-lg`}>
             <div className="flex items-center gap-3">
-              <div className={`p-2 ${card.bg} rounded-lg`}>{card.icon}</div>
+              <div className="p-2.5 bg-white/5 rounded-lg backdrop-blur-sm">{card.icon}</div>
               <div>
-                <p className="text-xs text-gray-500">{card.label}</p>
-                <p className={`text-2xl font-bold ${card.color}`}>{card.value}</p>
+                <p className="text-xs text-gray-400 font-medium">{card.label}</p>
+                <p className={`text-2xl font-bold ${card.valueColor} mt-0.5`}>{card.value}</p>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Global error banner */}
+      {/* ═══ Error Banner ═══ */}
       {error && !modalOpen && (
         <div className="mb-4 p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-300 text-sm flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 flex-shrink-0" />
@@ -283,14 +484,14 @@ export default function WorkforceDashboardPage() {
         </div>
       )}
 
-      {/* Data table */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+      {/* ═══ Data Table ═══ */}
+      <div className="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden backdrop-blur-sm">
         <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-2">
           <span className="text-xs text-gray-500">{items.length} {t('workforce.records')}</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-950 text-gray-400 text-xs uppercase">
+            <thead className="bg-gray-950/60 text-gray-400 text-xs uppercase">
               <tr>
                 <th className="px-4 py-3 text-left">{t('workforce.date')}</th>
                 <th className="px-4 py-3 text-left">{t('workforce.shift')}</th>
@@ -303,16 +504,30 @@ export default function WorkforceDashboardPage() {
                 <th className="px-4 py-3 text-center w-20">{t('common.actions')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800">
+            <tbody className="divide-y divide-gray-800/60">
               {items.map(item => {
                 const rate = item.plannedCount > 0
                   ? Math.round((item.actualCount / item.plannedCount) * 100)
                   : 0;
                 const isDeleting = deleteConfirmId === item.id;
+                const shiftDef = SHIFT_DEFINITIONS.find(s => s.name === item.shiftName);
+
                 return (
                   <tr key={item.id} className={`transition-colors ${isDeleting ? 'bg-red-950/20' : 'hover:bg-gray-800/40'}`}>
                     <td className="px-4 py-3 text-gray-300 font-mono text-xs">{item.recordDate}</td>
-                    <td className="px-4 py-3 text-gray-300">{item.shiftName ?? <span className="text-gray-600">—</span>}</td>
+                    <td className="px-4 py-3">
+                      {item.shiftName ? (
+                        <span className="inline-flex items-center gap-1.5 text-sm text-gray-300">
+                          <span
+                            className="w-2 h-2 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: shiftDef?.color ?? '#6B7280' }}
+                          />
+                          {item.shiftName}
+                        </span>
+                      ) : (
+                        <span className="text-gray-600">—</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-gray-300">{item.areaName ?? <span className="text-gray-600">—</span>}</td>
                     <td className="px-4 py-3 text-center text-gray-300">{item.plannedCount}</td>
                     <td className="px-4 py-3 text-center text-gray-300">{item.actualCount}</td>
@@ -323,7 +538,7 @@ export default function WorkforceDashboardPage() {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                        rate >= 90 ? 'bg-green-900/40 text-green-400'
+                        rate >= 90 ? 'bg-emerald-900/40 text-emerald-400'
                         : rate >= 70 ? 'bg-yellow-900/40 text-yellow-400'
                         : 'bg-red-900/40 text-red-400'
                       }`}>
@@ -384,25 +599,26 @@ export default function WorkforceDashboardPage() {
         </div>
       </div>
 
-      {/* Charts Section */}
+      {/* ═══ Charts ═══ */}
       <WorkforceCharts items={items} t={t} />
 
-      {/* Create / Edit Modal */}
+      {/* ═══ Create / Edit Modal ═══ */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-white">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-lg font-semibold text-white">
                 {editItem ? t('workforce.edit_entry') : t('workforce.new_entry')}
               </h3>
-              <button onClick={() => setModalOpen(false)} className="p-1 hover:bg-gray-800 rounded">
+              <button onClick={() => setModalOpen(false)} className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors">
                 <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
+              {/* Date */}
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">{t('workforce.date')}</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">{t('workforce.date')}</label>
                 <input
                   type="date"
                   value={form.date}
@@ -410,62 +626,71 @@ export default function WorkforceDashboardPage() {
                   className={inputCls}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">{t('workforce.shift')}</label>
-                  <input
-                    type="text"
-                    value={form.shift}
-                    onChange={e => setForm(f => ({ ...f, shift: e.target.value }))}
-                    placeholder={t('workforce.shift_placeholder')}
-                    className={inputCls}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">{t('workforce.area')}</label>
-                  <input
-                    type="text"
-                    value={form.area}
-                    onChange={e => setForm(f => ({ ...f, area: e.target.value }))}
-                    placeholder={t('workforce.area_placeholder')}
-                    className={inputCls}
-                  />
+
+              {/* Shift Selector — Visual Buttons */}
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-2">{t('workforce.shift')}</label>
+                <div className="flex flex-wrap gap-2">
+                  {SHIFT_DEFINITIONS.map(s => {
+                    const isSelected = form.shift === s.name;
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => setForm(f => ({ ...f, shift: s.name }))}
+                        className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all border ${
+                          isSelected
+                            ? 'text-white shadow-lg scale-[1.02]'
+                            : 'bg-gray-800/60 text-gray-300 border-gray-700 hover:border-gray-500 hover:bg-gray-700/60'
+                        }`}
+                        style={isSelected ? {
+                          backgroundColor: s.color,
+                          borderColor: s.color,
+                          boxShadow: `0 4px 20px ${s.color}40`,
+                        } : {}}
+                      >
+                        <span className="block">{s.name}</span>
+                        <span className="block text-[10px] opacity-75 mt-0.5">
+                          <Clock className="w-3 h-3 inline mr-0.5 -mt-0.5" />
+                          {s.startTime}–{s.endTime}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
+
+              {/* Area */}
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">{t('workforce.area')}</label>
+                <input
+                  type="text"
+                  value={form.area}
+                  onChange={e => setForm(f => ({ ...f, area: e.target.value }))}
+                  placeholder={t('workforce.area_placeholder')}
+                  className={inputCls}
+                />
+              </div>
+
+              {/* Numbers */}
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">{t('workforce.planned')}</label>
-                  <input
-                    type="number"
-                    value={form.planned}
-                    min={0}
-                    onChange={e => setForm(f => ({ ...f, planned: parseInt(e.target.value) || 0 }))}
-                    className={inputCls}
-                  />
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">{t('workforce.planned')}</label>
+                  <input type="number" value={form.planned} min={0} onChange={e => setForm(f => ({ ...f, planned: parseInt(e.target.value) || 0 }))} className={inputCls} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">{t('workforce.actual')}</label>
-                  <input
-                    type="number"
-                    value={form.actual}
-                    min={0}
-                    onChange={e => setForm(f => ({ ...f, actual: parseInt(e.target.value) || 0 }))}
-                    className={inputCls}
-                  />
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">{t('workforce.actual')}</label>
+                  <input type="number" value={form.actual} min={0} onChange={e => setForm(f => ({ ...f, actual: parseInt(e.target.value) || 0 }))} className={inputCls} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">{t('workforce.absent')}</label>
-                  <input
-                    type="number"
-                    value={form.absent}
-                    min={0}
-                    onChange={e => setForm(f => ({ ...f, absent: parseInt(e.target.value) || 0 }))}
-                    className={inputCls}
-                  />
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">{t('workforce.absent')}</label>
+                  <input type="number" value={form.absent} min={0} onChange={e => setForm(f => ({ ...f, absent: parseInt(e.target.value) || 0 }))} className={inputCls} />
                 </div>
               </div>
+
+              {/* Notes */}
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">{t('workforce.notes')}</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">{t('workforce.notes')}</label>
                 <textarea
                   value={form.notes}
                   onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
@@ -484,17 +709,120 @@ export default function WorkforceDashboardPage() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setModalOpen(false)}
-                className="px-4 py-2 text-gray-400 hover:text-gray-300 text-sm"
+                className="px-4 py-2 text-gray-400 hover:text-gray-300 text-sm transition-colors"
               >
                 {t('common.cancel')}
               </button>
               <button
                 onClick={() => void handleSave()}
                 disabled={saving}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                className="group relative flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium disabled:opacity-50 shadow-lg shadow-indigo-500/20 transition-all overflow-hidden"
               >
-                <Check className="w-4 h-4" />
-                {saving ? t('common.loading') : t('common.save')}
+                {/* Shimmer effect */}
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="relative flex items-center gap-2">
+                  {saving ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      {t('common.loading')}
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4" />
+                      {t('common.save')}
+                    </>
+                  )}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ Overwrite Confirmation Modal ═══ */}
+      {showOverwrite && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[55] p-4">
+          <div className="bg-gray-900 border border-amber-500/50 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
+            <h3 className="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">
+              <span className="text-2xl">⚠️</span>
+              Már létező adat
+            </h3>
+            <p className="text-gray-300 mb-3">
+              Erre a napra és műszakra (<strong className="text-amber-200">{form.date}</strong> — {form.shift}) már van rögzített adat!
+            </p>
+            {existingInfo && (
+              <div className="p-3 rounded-xl bg-gray-800/80 border border-amber-500/20 mb-4 text-sm">
+                <div className="flex items-center gap-2 text-gray-300">
+                  <Users className="w-4 h-4 text-amber-400" />
+                  <span>Rögzítette: <strong className="text-amber-200">{existingInfo.savedBy}</strong></span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-400 mt-1.5">
+                  <Clock className="w-4 h-4" />
+                  <span>{existingInfo.savedAt}</span>
+                </div>
+              </div>
+            )}
+            <p className="text-gray-400 text-sm mb-5">Szeretnéd felülírni a korábbi adatokat?</p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowOverwrite(false)}
+                className="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm font-medium transition-colors"
+              >
+                Mégsem
+              </button>
+              <button
+                onClick={() => void performSave()}
+                className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium transition-colors"
+              >
+                Igen, felülírom
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ Report-Required Modal ═══ */}
+      {showReportRequired && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[55] p-4">
+          <div className="bg-gray-900 border border-orange-500/50 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
+            <h3 className="text-lg font-bold text-orange-400 mb-3 flex items-center gap-2">
+              <span className="text-2xl">📋</span>
+              Riport köteles módosítás
+            </h3>
+            <p className="text-gray-300 mb-2">
+              A kiválasztott dátum <strong className="text-orange-300">{form.date}</strong> több mint 1 nappal régebbi.
+            </p>
+            <p className="text-gray-400 text-sm mb-4">
+              Az utólagos rögzítéshez kötelező indoklást megadni. Az admin értesítést kap.
+            </p>
+            <div className="mb-5">
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                Indoklás <span className="text-red-400">*</span>
+              </label>
+              <textarea
+                value={reportReason}
+                onChange={e => setReportReason(e.target.value)}
+                rows={3}
+                placeholder="Miért szükséges az utólagos rögzítés?"
+                className={inputCls}
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => { setShowReportRequired(false); setReportReason(''); }}
+                className="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm font-medium transition-colors"
+              >
+                Mégsem
+              </button>
+              <button
+                onClick={() => void performSave(reportReason)}
+                disabled={!reportReason.trim() || saving}
+                className="px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                {saving ? 'Mentés...' : 'Mentés indoklással'}
               </button>
             </div>
           </div>

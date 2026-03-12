@@ -5,6 +5,7 @@ import { getLocale, getTranslationsForLocale } from '@/lib/i18n';
 import { Header } from '@/components/core/Header';
 import { CommandPalette } from '@/components/core/CommandPalette';
 import { I18nProvider } from '@/components/core/I18nProvider';
+import { InactivityGuard } from '@/components/core/InactivityGuard';
 
 export default async function DashboardLayout({
   children,
@@ -39,6 +40,7 @@ export default async function DashboardLayout({
           {children}
         </main>
         <CommandPalette />
+        <InactivityGuard />
       </div>
     </I18nProvider>
   );

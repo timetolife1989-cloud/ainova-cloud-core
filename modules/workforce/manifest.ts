@@ -20,7 +20,7 @@ export const manifest: ModuleDefinition = {
     { key: 'workforce_unit', label: 'Létszám mértékegysége', type: 'unit_select', default: 'pieces' },
     { key: 'workforce_track_absences', label: 'Hiányzások nyomon követése', type: 'boolean', default: 'true' },
   ],
-  migrations: ['001_workforce.sql'],
+  migrations: ['001_workforce.sql', '002_workforce_overtime.sql'],
 };
 
 registerModule(manifest);
