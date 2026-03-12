@@ -19,13 +19,13 @@
 
 ### P2 — Funkció bővítés
 - [ ] Backend: Csapat összesítő endpoint (csapat szintű avg hatékonyság)
-- [ ] Backend: Target vs. tényleges comparison endpoint
+- [x] Backend: Target vs. tényleges comparison endpoint
 - [ ] Backend: Excel export endpoint
-- [ ] Frontend: Csapat összesítő nézet
+- [ ] Frontend: Csapat összegő nézet
 - [ ] Frontend: Hatékonyság trend chart (Recharts LineChart, 30 napos)
 - [ ] Frontend: Target vs. tényleges bar chart
 - [ ] Frontend: Top/Bottom dolgozó rangsor
-- [ ] Logic: Norma idő konfigurálhatóság (admin settings integráció)
+- [x] Logic: Norma idő konfigurálhatóság (admin settings integráció)
 
 ### P3 — Tesztek
 - [ ] Backend: Unit teszt — hatékonyság számítás (norm_time / actual_time × 100)

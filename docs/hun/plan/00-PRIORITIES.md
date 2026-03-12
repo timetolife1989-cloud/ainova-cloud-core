@@ -29,20 +29,20 @@
 - ✅ Header i18n (logout, hét, nyelvváltás hiba)
 - ✅ Landing page i18n (50+ kulcs hu/en/de, marketing layout + I18nProvider)
 - ✅ Audit napló oldal i18n (szűrők, gombok, paginálás — 23 kulcs hu/en/de)
-- ⬜ Lassú mobilon ÉS PC-n is → ✅ Teljesítmény optimalizálás (useMemo 6 modulban, staleTime 5min, refetchOnWindowFocus kikapcsolva, MenuTile CSS-only, CommandPalette lazy load, dead Inter import törölve)
-- ⬜ Egyes modulokban nincs adat → ✅ Demo seed bővítés (reports 8 mentett definíció, PLC connector 4 eszköz, quality 8D 4 riport)
+- ✅ Teljesítmény optimalizálás (useMemo 6 modulban, staleTime 5min, refetchOnWindowFocus kikapcsolva, MenuTile CSS-only, CommandPalette lazy load, dead Inter import törölve)
+- ✅ Demo seed bővítés (reports 8 mentett definíció, PLC connector 4 eszköz, quality 8D 4 riport)
 
-## P2 — FONTOS (ezen a héten)
+## P2 — FONTOS (javítva, push-olva)
 
-- ⬜ Dashboard nyelvváltó (nem frissül rendesen Vercel-en) → ✅ force-dynamic + revalidatePath + router.refresh
-- ⬜ Password change oldal tesztelése → ✅ i18n (27 kulcs hu/en/de), layout + I18nProvider
+- ✅ Dashboard nyelvváltó (force-dynamic + revalidatePath + router.refresh)
+- ✅ Password change oldal i18n (27 kulcs hu/en/de, layout + I18nProvider)
 
-## P3 — KÖZEPES (jövő hét)
+## P3 — KÖZEPES (javítva, push-olva)
 
-- ⬜ Reports modul: riport motor implementálás (jelenleg SKELETON)
-- ⬜ Maintenance: "kész" jelölés + napló UI
-- ⬜ Quality: 8D riport UI
-- ⬜ Performance: célérték beállító UI
+- ✅ Reports modul: riport motor implementálás (query API, viewer, editor, delete — commit 92f6da0)
+- ✅ Maintenance: "kész" jelölés + napló UI (complete API, log API, tab UI — commit 10cfac1)
+- ✅ Quality: 8D riport UI (CRUD API, wizard D1-D8, viewer modal, i18n — commit 5433b6d)
+- ✅ Performance: célérték beállító UI (targets CRUD API, tab UI, modal — commit e13b520)
 - ⬜ Excel/PDF export javítás minden modulban
 
 ## P4 — NICE TO HAVE (később)

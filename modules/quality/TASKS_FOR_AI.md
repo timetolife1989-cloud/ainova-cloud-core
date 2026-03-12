@@ -19,11 +19,11 @@
 - [ ] Frontend: Form label-ek i18n kulcsokra cserélése
 
 ### P2 — Funkció bővítés
-- [ ] Backend: 8D riport CRUD endpoint (`/api/modules/quality/8d`)
+- [x] Backend: 8D riport CRUD endpoint (`/api/modules/quality/8d`)
 - [ ] Backend: Hibakód katalógus CRUD endpoint
 - [ ] Backend: Selejt arány trend endpoint (időszak × termék aggregáció)
 - [ ] Backend: Excel export endpoint
-- [ ] Frontend: 8D riport wizard (D1→D8 lépések formlap)
+- [x] Frontend: 8D riport wizard (D1→D8 lépések formlap)
 - [ ] Frontend: Hibakód katalógus kezelő UI
 - [ ] Frontend: Selejt arány trend chart (Recharts LineChart)
 - [ ] Frontend: Pareto chart (leggyakoribb hibakódok)
