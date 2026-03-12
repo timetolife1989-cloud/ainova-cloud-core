@@ -15,7 +15,7 @@ let pg: any = null;
 async function getPg(): Promise<any> {
   if (!pg) {
     try {
-      pg = await import(/* webpackIgnore: true */ 'pg');
+      pg = await import('pg');
     } catch {
       throw new Error(
         'PostgreSQL adapter requires the "pg" package. Install it: npm install pg @types/pg'
