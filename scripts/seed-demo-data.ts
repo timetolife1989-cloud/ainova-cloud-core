@@ -506,6 +506,7 @@ async function createTablesIfNeeded(db: IDatabaseAdapter) {
 // ─────────────────────────────────────────────────────────────────────
 async function cleanup(db: IDatabaseAdapter) {
   const tables = [
+    'mod_dt_machines','mod_dt_layouts',
     'scheduling_allocations','scheduling_capacity',
     'shift_assignments','shift_definitions',
     'delivery_shipments',
@@ -1148,6 +1149,49 @@ async function seedDelivery(db: IDatabaseAdapter) {
   }
 }
 
+async function seedDigitalTwin(db: IDatabaseAdapter) {
+  await db.execute(
+    `INSERT INTO mod_dt_layouts (name, site_id, layout_json, is_active, created_by) VALUES (@p0, @p1, @p2, 1, 1)`,
+    [
+      { name: 'p0', type: 'nvarchar', value: 'Fő gyártósor' },
+      { name: 'p1', type: 'int', value: 1 },
+      { name: 'p2', type: 'nvarchar', value: '{"nodes":[],"edges":[]}' },
+    ]
+  );
+  track('mod_dt_layouts', 1);
+
+  const rows = await db.query<{id:number}>(`SELECT id FROM mod_dt_layouts ORDER BY id DESC`, []);
+  const layoutId = rows[0]?.id ?? 1;
+
+  const machines: [string, string, number, number, number, number, string][] = [
+    ['CNC-01',       'cnc',      50,  50,  120, 80, 'running'],
+    ['CNC-02',       'cnc',      200, 50,  120, 80, 'running'],
+    ['Présgép-01',   'press',    50,  170, 120, 80, 'warning'],
+    ['Hegesztő-01',  'welder',   200, 170, 120, 80, 'idle'],
+    ['Festő sor',    'paint',    350, 50,  150, 200, 'running'],
+    ['Összeszerelés', 'assembly', 530, 50,  150, 100, 'error'],
+    ['Csomagoló',    'packing',  530, 170, 150, 80,  'maintenance'],
+  ];
+
+  for (const [name, type, x, y, w, h, status] of machines) {
+    await db.execute(
+      `INSERT INTO mod_dt_machines (layout_id, name, machine_type, pos_x, pos_y, width, height, status)
+       VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7)`,
+      [
+        { name: 'p0', type: 'int', value: layoutId },
+        { name: 'p1', type: 'nvarchar', value: name },
+        { name: 'p2', type: 'nvarchar', value: type },
+        { name: 'p3', type: 'float', value: x },
+        { name: 'p4', type: 'float', value: y },
+        { name: 'p5', type: 'float', value: w },
+        { name: 'p6', type: 'float', value: h },
+        { name: 'p7', type: 'nvarchar', value: status },
+      ]
+    );
+  }
+  track('mod_dt_machines', machines.length);
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // MAIN
 // ─────────────────────────────────────────────────────────────────────
@@ -1181,6 +1225,7 @@ async function seed() {
     ['Reports (8 saved definitions)',                    () => seedReports(db)],
     ['PLC Connector (4 demo devices)',                   () => seedPlcConnector(db)],
     ['Quality 8D reports (4 reports)',                   () => seedQuality8D(db)],
+    ['Digital Twin (1 layout, 7 machines)',              () => seedDigitalTwin(db)],
   ];
 
   for (const [label, fn] of steps) {

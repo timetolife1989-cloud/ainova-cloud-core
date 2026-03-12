@@ -346,7 +346,7 @@ export default function WorkforceDashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <DashboardSectionHeader title={t('workforce.title')} subtitle={t('workforce.subtitle')} />
         <div className="animate-pulse space-y-4 mt-6">
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map(i => <div key={i} className="h-28 bg-gray-800/50 rounded-xl" />)}
           </div>
           <div className="h-64 bg-gray-800/50 rounded-xl" />

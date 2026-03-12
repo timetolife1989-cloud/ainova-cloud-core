@@ -172,7 +172,7 @@ export default function FleetDashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <DashboardSectionHeader title={t('fleet.title')} subtitle={t('fleet.subtitle')} />
         <div className="animate-pulse space-y-4 mt-6">
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-gray-800 rounded-xl" />)}
           </div>
         </div>

@@ -45,11 +45,11 @@
 - ✅ Performance: célérték beállító UI (targets CRUD API, tab UI, modal — commit e13b520)
 - ✅ Excel/PDF export javítás minden modulban (SQL injection fix, ExportButton 9 modulba, i18n)
 
-## P4 — NICE TO HAVE (később)
+## P4 — NICE TO HAVE (javítva, push-olva)
 
-- ⬜ Digital Twin: valós API endpoint (jelenleg hardcoded demo)
-- ⬜ PLC Connector: S7/Modbus/MQTT driverek
-- ⬜ SAP import modul
-- ⬜ Demo környezet auto-reset
-- ⬜ Mobile responsive optimalizáció (teljes audit)
-- ⬜ AI funkciók (prediktív karbantartás)
+- ✅ Digital Twin: valós API endpoint (CRUD, seed 7 gép, layout DB)
+- ⬜ PLC Connector: S7/Modbus/MQTT driverek (hardver-függő)
+- ⬜ SAP import modul (SAP RFC hozzáférés szükséges)
+- ✅ Demo környezet auto-reset (Vercel Cron 03:00 UTC, CRON_SECRET)
+- ✅ Mobile responsive optimalizáció (5 loading grid + audit)
+- ⬜ AI funkciók (prediktív karbantartás — ML modell szükséges)

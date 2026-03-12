@@ -100,7 +100,7 @@ export default function DeliveryDashboardPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <DashboardSectionHeader title={t('delivery.title')} subtitle={t('delivery.subtitle')} />
-        <div className="animate-pulse mt-6 grid grid-cols-4 gap-4">
+        <div className="animate-pulse mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-gray-800 rounded-xl" />)}
         </div>
       </div>
