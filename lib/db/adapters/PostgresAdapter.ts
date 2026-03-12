@@ -7,23 +7,7 @@
  */
 
 import type { IDatabaseAdapter, QueryParam } from '../IDatabase';
-
-// pg types — conditionally imported (no compile-time dependency)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let pg: any = null;
-
-async function getPg(): Promise<any> {
-  if (!pg) {
-    try {
-      pg = await import('pg');
-    } catch {
-      throw new Error(
-        'PostgreSQL adapter requires the "pg" package. Install it: npm install pg @types/pg'
-      );
-    }
-  }
-  return pg;
-}
+import pg from 'pg';
 
 function getConfig() {
   const isCloud = (process.env.DEPLOYMENT_FLAVOR === 'cloud') ||
@@ -121,8 +105,7 @@ export class PostgresAdapter implements IDatabaseAdapter {
   private async getPool() {
     if (this.pool) return this.pool;
 
-    const pgModule = await getPg();
-    this.pool = new pgModule.Pool(getConfig());
+    this.pool = new pg.Pool(getConfig());
 
     this.pool.on('connect', () => { this.connected = true; });
     this.pool.on('error', (err: Error) => {
