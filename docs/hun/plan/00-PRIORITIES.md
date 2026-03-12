@@ -34,8 +34,8 @@
 
 ## P2 — FONTOS (ezen a héten)
 
-- ⬜ Dashboard nyelvváltó (nem frissül rendesen Vercel-en)
-- ⬜ Password change oldal tesztelése
+- ⬜ Dashboard nyelvváltó (nem frissül rendesen Vercel-en) → ✅ force-dynamic + revalidatePath + router.refresh
+- ⬜ Password change oldal tesztelése → ✅ i18n (27 kulcs hu/en/de), layout + I18nProvider
 
 ## P3 — KÖZEPES (jövő hét)
 
