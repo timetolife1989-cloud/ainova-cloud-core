@@ -91,11 +91,30 @@ echo "$(date '+%H:%M') | Waiting for model..." > $LOG
 WAITED=0
 while [ $WAITED -lt 1800 ]; do
     if curl -s http://localhost:8000/health > /dev/null 2>&1; then
-        echo "$(date '+%H:%M') | MODEL READY — starting drones" >> $LOG
-        python run.py >> $LOG 2>&1
-        echo "$(date '+%H:%M') | Drones finished — all results saved" >> $LOG
-        # Keep container alive so you can inspect results
-        echo "$(date '+%H:%M') | DONE. Pod stays alive for inspection. Stop it manually to save cost." >> $LOG
+        echo "$(date '+%H:%M') | MODEL READY — starting ALL drones" >> $LOG
+
+        # Run all 3 drones sequentially
+        echo "$(date '+%H:%M') | === DRONE 1/3: tech_scout ===" >> $LOG
+        python run.py --drone tech_scout >> $LOG 2>&1
+
+        echo "$(date '+%H:%M') | === DRONE 2/3: industry_scout ===" >> $LOG
+        python run.py --drone industry_scout >> $LOG 2>&1
+
+        echo "$(date '+%H:%M') | === DRONE 3/3: competitor_scout ===" >> $LOG
+        python run.py --drone competitor_scout >> $LOG 2>&1
+
+        echo "" >> $LOG
+        echo "$(date '+%H:%M') | ============================================" >> $LOG
+        echo "$(date '+%H:%M') | ALL DRONES FINISHED" >> $LOG
+        echo "$(date '+%H:%M') | Results: output/ folder + Supabase" >> $LOG
+        echo "$(date '+%H:%M') | ============================================" >> $LOG
+        echo "" >> $LOG
+        echo "$(date '+%H:%M') | Pod stays alive. You can:" >> $LOG
+        echo "  - SSH in and run more: python run.py --drone tech_scout" >> $LOG
+        echo "  - Check results: ls output/" >> $LOG
+        echo "  - Stop pod when done to save credit" >> $LOG
+
+        # Keep alive for manual interaction
         sleep infinity
         exit 0
     fi
@@ -105,15 +124,7 @@ while [ $WAITED -lt 1800 ]; do
 done
 echo "$(date '+%H:%M') | ERROR: model did not start in 30 minutes" >> $LOG
 echo "Check: cat /workspace/ainova-cloud-core/drones/vllm.log" >> $LOG
-# Keep alive for debugging
 sleep infinity
-    fi
-    sleep 15
-    WAITED=$((WAITED + 15))
-    echo "$(date '+%H:%M') | Loading model... (${WAITED}s)" >> $LOG
-done
-echo "$(date '+%H:%M') | ERROR: model did not start in 30 minutes" >> $LOG
-echo "Check: cat /workspace/ainova-cloud-core/drones/vllm.log" >> $LOG
 RUNEOF
 
 chmod +x /workspace/_drone_runner.sh

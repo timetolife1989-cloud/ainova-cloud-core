@@ -26,12 +26,21 @@ Analyze competing manufacturing software products to identify:
 - **Current Modules:** workforce, tracking, fleet, file-import, reports, performance, scheduling, delivery, inventory, sap-import, oee, plc-connector, shift-management, quality, maintenance, digital-twin
 
 ## Competitors to Analyze
-Primary:
+Primary (Western):
 - Katana MRP (katana.com)
 - MRPeasy (mrpeasy.com)
 - Odoo Manufacturing (odoo.com)
 - Prodsmart / Autodesk Fusion Operations
 - SFactrix (sfactrix.com)
+
+Eastern / Rapidly Growing:
+- Supcon (China — expanding into Europe)
+- Aegis Software / FactoryLogix (global MES)
+- Doruk MES (Turkey — strong CEE presence)
+
+CEE Direct Competitors:
+- Aimtec DCIx (Czech Republic — automotive focused)
+- ANT Solutions MES (Poland — smart factory)
 
 Secondary:
 - SAP Business One (for comparison)
@@ -43,6 +52,8 @@ Secondary:
 Also look for:
 - Hungarian/CEE specific MES/MOM solutions
 - Newer startups in this space
+- Chinese MES companies entering European market
+- Indian low-cost MES alternatives
 
 ## Analysis Framework
 

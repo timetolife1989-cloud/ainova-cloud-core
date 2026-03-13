@@ -94,6 +94,58 @@ RESEARCH_TASKS = [
             "NASA turbofan predictive maintenance dataset approach",
         ],
     },
+    # === Additional: Eastern Market & CEE Industry ===
+    {
+        "category": "cee_manufacturing_landscape",
+        "title": "Central-Eastern Europe manufacturing industry landscape",
+        "queries": [
+            "Hungary manufacturing industry overview statistics 2024 2025",
+            "CEE automotive manufacturing suppliers Hungary Poland Czech",
+            "Central Eastern Europe Industry 4.0 adoption rate statistics",
+            "Hungarian German automotive supply chain manufacturing",
+            "smart factory investment Hungary EU funds digitalization",
+        ],
+    },
+    {
+        "category": "eu_grants_digitalization",
+        "title": "EU grants and funding for manufacturing digitalization",
+        "queries": [
+            "EU Horizon Europe manufacturing digitalization funding 2025",
+            "Ipar 4.0 pályázat Magyarország gyártás digitalizálás",
+            "Digital Europe Programme manufacturing SME funding",
+            "GINOP VEKOP manufacturing technology investment Hungary",
+        ],
+    },
+    {
+        "category": "esg_compliance_manufacturing",
+        "title": "ESG and sustainability regulations for manufacturing",
+        "queries": [
+            "EU CSRD sustainability reporting manufacturing requirements",
+            "carbon border adjustment mechanism CBAM manufacturing impact",
+            "ESG KPIs manufacturing energy waste emissions",
+            "sustainability reporting software manufacturing features needed",
+        ],
+    },
+    {
+        "category": "access_control_manufacturing",
+        "title": "Physical access control systems in manufacturing",
+        "queries": [
+            "manufacturing access control system types RFID NFC biometric",
+            "time and attendance system manufacturing shift tracking hardware",
+            "access control badge reader integration ERP MES system",
+            "factory gate access turnstile reader system brands protocols",
+        ],
+    },
+    {
+        "category": "automotive_iatf_requirements",
+        "title": "Automotive industry specific requirements for MES",
+        "queries": [
+            "IATF 16949 traceability requirements MES software",
+            "automotive PPAP APQP FMEA software features requirements",
+            "automotive supply chain tier 1 2 manufacturing software needs",
+            "VDA 6.3 process audit requirements manufacturing system",
+        ],
+    },
 ]
 
 

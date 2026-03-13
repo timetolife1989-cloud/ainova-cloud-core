@@ -18,6 +18,7 @@ with open(PROMPT_PATH, "r", encoding="utf-8") as f:
 
 
 COMPETITORS = [
+    # === WESTERN MES/MOM ===
     {
         "name": "Katana MRP",
         "website": "katana.com",
@@ -70,6 +71,63 @@ COMPETITORS = [
             "Prodsmart MES shop floor tracking IoT architecture",
         ],
     },
+    # === EASTERN / ASIAN COMPETITORS (rapidly growing) ===
+    {
+        "name": "Supcon MES (China)",
+        "website": "supcon.com",
+        "queries": [
+            "Supcon MES manufacturing execution system China features",
+            "Chinese MES software market growth Europe expansion",
+            "Supcon industrial automation software capabilities",
+        ],
+    },
+    {
+        "name": "Aegis Software (now global)",
+        "website": "aiscorp.com",
+        "queries": [
+            "Aegis FactoryLogix MES features smart manufacturing",
+            "Aegis software factory logistics traceability IIoT",
+            "Aegis MES competitor analysis cloud vs on-premise",
+        ],
+    },
+    {
+        "name": "Doruk MES (Turkey)",
+        "website": "doruk.com",
+        "queries": [
+            "Doruk MES Turkey manufacturing software features",
+            "Turkish MES software manufacturers Eastern Europe",
+            "Doruk ProManage MES OEE production tracking",
+        ],
+    },
+    # === CEE DIRECT COMPETITORS ===
+    {
+        "name": "Aimtec (Czech Republic)",
+        "website": "aimtec.cz",
+        "queries": [
+            "Aimtec DCIx MES manufacturing software Czech Republic",
+            "Aimtec automotive supply chain manufacturing solution",
+            "Czech manufacturing software companies MES ERP",
+        ],
+    },
+    {
+        "name": "ANT Solutions (Poland)",
+        "website": "antsolutions.eu",
+        "queries": [
+            "ANT Solutions MES Poland smart factory features",
+            "Polish MES software manufacturing OEE monitoring",
+            "ANT MES system architecture cloud on-premise",
+        ],
+    },
+    {
+        "name": "Productivist / CEE MES Market",
+        "website": "",
+        "queries": [
+            "Central Eastern Europe MES software market size growth",
+            "Hungarian manufacturing digitalization Ipar 4.0 software",
+            "Romania Poland Czech manufacturing software adoption",
+            "CEE manufacturing Industry 4.0 investment trends 2025",
+        ],
+    },
 ]
 
 MARKET_ANALYSIS_QUERIES = [
@@ -79,6 +137,19 @@ MARKET_ANALYSIS_QUERIES = [
     "best manufacturing software features small medium business 2025",
     "manufacturing SaaS technology stack architecture patterns",
     "MES software UI UX design trends modern manufacturing",
+    # Eastern market growth
+    "Chinese manufacturing software companies expanding Europe 2025",
+    "Asian MES software market disruption pricing strategy",
+    "Industry 4.0 software adoption Eastern Europe CEE 2025",
+    # New revenue models
+    "manufacturing software pricing model flat rate vs per user comparison",
+    "SaaS manufacturing vertical software revenue models",
+    # Access control & physical integration
+    "manufacturing access control RFID NFC badge reader software integration",
+    "employee time tracking badge reader manufacturing system",
+    # ESG & energy
+    "manufacturing ESG reporting software energy monitoring requirements EU",
+    "carbon footprint tracking manufacturing software features 2025",
 ]
 
 
@@ -248,17 +319,20 @@ class CompetitorScout:
                         "Based on your knowledge of manufacturing MES/MOM software, "
                         "create a comprehensive FEATURE COMPARISON MATRIX.\n\n"
                         "Compare these products: Katana MRP, MRPeasy, Odoo Manufacturing, "
-                        "Tulip, SFactrix, Prodsmart, and ACI (Ainova Cloud Intelligence).\n\n"
+                        "Tulip, SFactrix, Prodsmart, Aegis FactoryLogix, Doruk MES, "
+                        "Aimtec DCIx, ANT Solutions MES, and ACI (Ainova Cloud Intelligence).\n\n"
                         "ACI features: production planning, inventory, quality, maintenance, OEE, "
                         "PLC/IoT connector, AI assistant, reporting, SAP integration, digital twin, "
                         "shift management, workforce tracking, fleet management, multi-language (HU/EN/DE), "
-                        "on-premise + cloud, modular licensing.\n\n"
+                        "on-premise + cloud, modular licensing, flat-rate pricing (not per-user).\n\n"
                         "Produce a JSON with:\n"
                         "1. 'matrix' — array of products with feature booleans\n"
                         "2. 'aci_advantages' — features ACI has that others lack\n"
                         "3. 'aci_missing' — critical features ACI should add\n"
                         "4. 'must_have_features' — features ALL competitors have (table stakes)\n"
-                        "5. 'differentiator_features' — features almost nobody has (opportunity)"
+                        "5. 'differentiator_features' — features almost nobody has (opportunity)\n"
+                        "6. 'cee_market_specific' — features specifically important for Central-Eastern Europe\n"
+                        "7. 'eastern_threat_assessment' — how Chinese/Turkish/Asian competitors threaten the CEE market"
                     ),
                 },
             ],

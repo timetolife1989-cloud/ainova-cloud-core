@@ -281,6 +281,62 @@ RESEARCH_TASKS = [
             "leaflet mapbox react fleet tracking dashboard",
         ],
     },
+    # === ROUND 11: Access Control & Physical Integration ===
+    {
+        "category": "access_control_badge",
+        "title": "Badge reader / RFID / NFC access control integration",
+        "queries": [
+            "RFID NFC badge reader web application integration",
+            "employee access control system API REST integration",
+            "time attendance system badge reader node.js",
+            "HID Global RFID reader SDK web integration",
+            "manufacturing employee badge tracking real-time web",
+        ],
+    },
+    {
+        "category": "vehicle_telematics",
+        "title": "Vehicle telematics and OBD-II integration",
+        "queries": [
+            "OBD-II vehicle data collection node.js web application",
+            "fleet GPS telematics API integration react dashboard",
+            "vehicle fuel consumption tracking CAN bus web",
+            "company car tracking mileage reporting automated system",
+        ],
+    },
+    # === ROUND 12: ESG & Energy Monitoring ===
+    {
+        "category": "esg_energy_monitoring",
+        "title": "ESG reporting and energy monitoring for manufacturing",
+        "queries": [
+            "manufacturing ESG reporting software implementation",
+            "energy consumption monitoring manufacturing plant web dashboard",
+            "carbon footprint calculation manufacturing software",
+            "EU CSRD sustainability reporting manufacturing requirements 2025",
+            "electricity gas water metering integration IoT manufacturing",
+        ],
+    },
+    # === ROUND 13: Multi-language & CEE Expansion ===
+    {
+        "category": "cee_localization",
+        "title": "Multi-language SaaS for Central-Eastern Europe",
+        "queries": [
+            "i18n SaaS application Polish Czech Slovak Romanian localization",
+            "manufacturing software localization strategy CEE market",
+            "number date currency formatting Central Eastern Europe countries",
+            "react i18n pluralization rules Slavic languages",
+        ],
+    },
+    # === ROUND 14: Notification & Alert System ===
+    {
+        "category": "notification_system",
+        "title": "Real-time notification and alert system for manufacturing",
+        "queries": [
+            "manufacturing alert notification system email SMS push architecture",
+            "web push notification service worker react implementation",
+            "threshold based alerting system manufacturing KPI node.js",
+            "escalation workflow notification manufacturing critical events",
+        ],
+    },
 ]
 
 
