@@ -18,7 +18,7 @@ export async function checkAuth(
       return {
         valid: false,
         response: NextResponse.json(
-          { error: 'Nincs jogosultságod ehhez a művelethez.' },
+          { error: 'You do not have permission to perform this action.' },
           { status: 403 }
         ),
       };

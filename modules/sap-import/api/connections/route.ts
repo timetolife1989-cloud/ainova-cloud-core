@@ -1,5 +1,5 @@
 /**
- * SAP Kapcsolat konfigurációk CRUD
+ * SAP Connection configuration CRUD
  * GET /api/modules/sap-import/connections
  * POST /api/modules/sap-import/connections
  * DELETE /api/modules/sap-import/connections?id=X
@@ -21,7 +21,7 @@ const CreateConnectionSchema = z.object({
   sysnr: z.string().max(5).optional().default('00'),
   client: z.string().max(5).optional().default('100'),
   sapUser: z.string().max(100).optional().default(''),
-  passwordRef: z.string().max(200).optional().default(''), // env kulcs hivatkozás, NEM a jelszó
+  passwordRef: z.string().max(200).optional().default(''), // env key reference, NOT the password
   language: z.string().max(5).optional().default('HU'),
   // OData params
   baseUrl: z.string().max(500).optional().default(''),
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const action = searchParams.get('action');
 
-  // Kapcsolat tesztelése
+  // Test connection
   if (action === 'test') {
     const auth = await checkAuth(request, 'sap-import.edit');
     if (!auth.valid) return auth.response;

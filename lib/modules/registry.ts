@@ -69,7 +69,7 @@ export function registerModule(mod: ModuleDefinition): void {
     ALL_MODULES.push(mod);
   }
 
-  // Auto-regisztráció: modul permission-ök (best-effort, non-blocking)
+  // Auto-register module permissions (best-effort, non-blocking)
   if (mod.permissions && mod.permissions.length > 0) {
     ensurePermissionsExist(mod.id, mod.permissions).catch(() => {});
   }
@@ -126,7 +126,7 @@ export function validateModuleToggle(
   currentlyActive: string[]
 ): string | null {
   const mod = ALL_MODULES.find(m => m.id === moduleId);
-  if (!mod) return `Ismeretlen modul: ${moduleId}`;
+  if (!mod) return `Unknown module: ${moduleId}`;
 
   if (enabling) {
     // Check all dependencies are active
@@ -137,7 +137,7 @@ export function validateModuleToggle(
       const depNames = missingDeps
         .map(id => ALL_MODULES.find(m => m.id === id)?.name ?? id)
         .join(', ');
-      return `Ez a modul a következőket igényli: ${depNames}`;
+      return `This module requires: ${depNames}`;
     }
   } else {
     // Check no active module depends on this one
@@ -146,7 +146,7 @@ export function validateModuleToggle(
     );
     if (dependents.length > 0) {
       const depNames = dependents.map(m => m.name).join(', ');
-      return `A következő aktív modulok függenek ettől: ${depNames}`;
+      return `The following active modules depend on this: ${depNames}`;
     }
   }
 
@@ -167,7 +167,7 @@ export async function getActiveModules(role: string): Promise<ModuleDefinition[]
     activeIds = [];
   }
 
-  // Szűrés: csak licencben engedélyezett ÉS admin által aktivált modulok
+  // Filter: only modules allowed by license AND activated by admin
   const licenseChecks = await Promise.all(
     ALL_MODULES
       .filter(m => activeIds.includes(m.id))

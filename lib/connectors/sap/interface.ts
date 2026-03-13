@@ -1,34 +1,34 @@
 /**
  * SAP Connector Interface — Ainova Cloud Intelligence
  *
- * Ez a fájl definiálja az SAP-kapcsolat interfészét.
- * Jelenlegi állapot: ELŐKÉSZÍTVE — Stub implementációk.
- * Éles használathoz szükséges:
- *   - RFC: node-rfc csomag (SAP NW RFC SDK natív wrapper)
+ * Defines the SAP connection interface.
+ * Current state: PREPARED — Stub implementations.
+ * For production use:
+ *   - RFC: node-rfc package (SAP NW RFC SDK native wrapper)
  *   - OData: fetch() + @sap-cloud-sdk/connectivity
- *   - File: meglévő lac-napi-perces Excel import logika
+ *   - File: existing Excel import logic
  */
 
 export type SapConnectionType = 'rfc' | 'odata' | 'file';
 
-/** Egy SAP-rendszer kapcsolati paraméterei */
+/** SAP system connection parameters */
 export interface SapConnectionConfig {
   id: number;
   name: string;
   connectionType: SapConnectionType;
   // RFC (klasszikus SAP GUI logon — ECC, S/4HANA on-premise)
   host?: string;
-  sysnr?: string;        // Rendszerszám: '00', '01', stb.
-  client?: string;       // Mandant: '100', '200', '300'
+  sysnr?: string;        // System number: '00', '01', etc.
+  client?: string;       // Client: '100', '200', '300'
   sapUser?: string;
-  passwordRef?: string;  // Vault/env kulcs — SOHA nem plaintext!
+  passwordRef?: string;  // Vault/env key — NEVER plaintext!
   language?: string;     // 'HU', 'DE', 'EN'
   // OData / REST (S/4HANA Cloud, SAP BTP API Hub)
   baseUrl?: string;
   apiPath?: string;
 }
 
-/** RFC hívás eredménye */
+/** RFC call result */
 export interface SapRfcResult {
   success: boolean;
   data?: Record<string, unknown>[];
@@ -37,18 +37,18 @@ export interface SapRfcResult {
   executionMs?: number;
 }
 
-/** Szinkronizálás kérés */
+/** Sync request */
 export interface SapSyncRequest {
   connectionId: number;
   sapObject: string;       // pl. 'MARA', 'VBAK'
   aciTable: string;        // pl. 'mod_inventory'
   syncType: 'full' | 'incremental';
-  filters?: Record<string, string>; // SELECT WHERE feltételek: { WERKS: '1000' }
+  filters?: Record<string, string>; // SELECT WHERE conditions: { WERKS: '1000' }
   maxRows?: number;
   triggeredBy?: string;
 }
 
-/** Szinkronizálás eredmény */
+/** Sync result */
 export interface SapSyncResult {
   success: boolean;
   recordsRead: number;
@@ -60,40 +60,40 @@ export interface SapSyncResult {
 }
 
 /**
- * SAP Connector absztrakt interfész.
- * Minden protokoll (RFC, OData, File) implementálja ezt.
+ * Abstract SAP Connector interface.
+ * All protocols (RFC, OData, File) implement this.
  */
 export interface ISapConnector {
-  /** Kapcsolat tesztelése */
+  /** Test connection */
   testConnection(): Promise<{ ok: boolean; message: string }>;
-  /** Generikus táblaolvasás (RFC_READ_TABLE vagy OData equivalent) */
+  /** Generic table read (RFC_READ_TABLE or OData equivalent) */
   readTable(
     tableName: string,
     fields?: string[],
     filters?: string,
     maxRows?: number
   ): Promise<SapRfcResult>;
-  /** BAPI hívás */
+  /** BAPI call */
   callBapi(
     bapiName: string,
     params: Record<string, unknown>
   ): Promise<SapRfcResult>;
-  /** Teljes szinkronizálás futtatása */
+  /** Execute full sync */
   syncTable(request: SapSyncRequest): Promise<SapSyncResult>;
 }
 
 /**
- * RFC Connector — Siemens SAP RFC kapcsolat
+ * RFC Connector — SAP RFC connection
  *
- * Függőség: npm install node-rfc
- * node-rfc: SAP NetWeaver RFC SDK C-könyvtár Node.js wrapper
- * SAP NW RFC SDK letöltés: support.sap.com (SCN bejelentkezés szükséges)
+ * Dependency: npm install node-rfc
+ * node-rfc: SAP NetWeaver RFC SDK C-library Node.js wrapper
+ * SAP NW RFC SDK download: support.sap.com (SCN login required)
  */
 export class SapRfcConnector implements ISapConnector {
   constructor(private readonly config: SapConnectionConfig) {}
 
   async testConnection(): Promise<{ ok: boolean; message: string }> {
-    // TODO: node-rfc inicializálás
+    // TODO: node-rfc initialization
     // const { Client } = await import('node-rfc');
     // const client = new Client({ ashost: config.host, sysnr: config.sysnr, client: config.client, user: config.sapUser, passwd: resolvePassword(config.passwordRef) });
     // await client.open();
@@ -110,7 +110,7 @@ export class SapRfcConnector implements ISapConnector {
     filters = '',
     maxRows = 1000
   ): Promise<SapRfcResult> {
-    // TODO: RFC_READ_TABLE BAPI hívás
+    // TODO: RFC_READ_TABLE BAPI call
     // const result = await client.call('RFC_READ_TABLE', {
     //   QUERY_TABLE: tableName,
     //   FIELDS: fields.map(f => ({ FIELDNAME: f })),
@@ -121,12 +121,12 @@ export class SapRfcConnector implements ISapConnector {
   }
 
   async callBapi(bapiName: string, params: Record<string, unknown>): Promise<SapRfcResult> {
-    // TODO: generikus BAPI hívás
+    // TODO: generic BAPI call
     return { success: false, error: 'RFC not yet activated' };
   }
 
   async syncTable(request: SapSyncRequest): Promise<SapSyncResult> {
-    // TODO: RFC_READ_TABLE → field mapping → INSERT/UPSERT ACI táblába
+    // TODO: RFC_READ_TABLE → field mapping → INSERT/UPSERT into ACI table
     return {
       success: false,
       recordsRead: 0,
@@ -141,11 +141,11 @@ export class SapRfcConnector implements ISapConnector {
 /**
  * OData Connector — SAP Netweaver Gateway / S/4HANA Cloud OData
  *
- * Használat: SAP BTP API Hub OData v2/v4 végpontok
- * Pl.: /sap/opu/odata/sap/API_MATERIAL_SRV
- *      /sap/opu/odata/sap/API_SALESORDER_SRV
+ * Usage: SAP BTP API Hub OData v2/v4 endpoints
+ * E.g.: /sap/opu/odata/sap/API_MATERIAL_SRV
+ *       /sap/opu/odata/sap/API_SALESORDER_SRV
  *
- * Nincs extra csomag — natív fetch() elég.
+ * No extra packages needed — native fetch() is sufficient.
  */
 export class SapODataConnector implements ISapConnector {
   constructor(private readonly config: SapConnectionConfig) {}
@@ -182,7 +182,7 @@ export class SapODataConnector implements ISapConnector {
     };
   }
 
-  // OData authentikáció fejléc (Basic auth ideiglenesen, prod-ban OAuth)
+  // OData authentication header (Basic auth temporary, OAuth in production)
   private buildHeaders(): HeadersInit {
     return {
       Accept: 'application/json',
@@ -192,7 +192,7 @@ export class SapODataConnector implements ISapConnector {
   }
 }
 
-/** Connector gyár — típus alapján adja vissza a megfelelő implementációt */
+/** Connector factory — returns the appropriate implementation based on type */
 export function createSapConnector(config: SapConnectionConfig): ISapConnector {
   switch (config.connectionType) {
     case 'rfc':
@@ -200,7 +200,7 @@ export function createSapConnector(config: SapConnectionConfig): ISapConnector {
     case 'odata':
       return new SapODataConnector(config);
     case 'file':
-      // Fájl alapú import: lásd modules/lac-napi-perces már meglévő megoldása
+      // File-based import: handled by the file-import module
       throw new Error('File import is handled in the file-import module');
     default:
       throw new Error(`Unknown SAP connection type: ${(config as SapConnectionConfig).connectionType}`);

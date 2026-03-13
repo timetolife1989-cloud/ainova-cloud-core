@@ -52,11 +52,11 @@ export default function DigitalTwinDashboardPage() {
   const demoMachines: Machine[] = [
     { id: 1, name: 'CNC-01', machineType: 'cnc', posX: 50, posY: 50, width: 120, height: 80, status: 'running' },
     { id: 2, name: 'CNC-02', machineType: 'cnc', posX: 200, posY: 50, width: 120, height: 80, status: 'running' },
-    { id: 3, name: 'Présgép-01', machineType: 'press', posX: 50, posY: 170, width: 120, height: 80, status: 'warning' },
-    { id: 4, name: 'Hegesztő-01', machineType: 'welder', posX: 200, posY: 170, width: 120, height: 80, status: 'idle' },
-    { id: 5, name: 'Festő sor', machineType: 'paint', posX: 350, posY: 50, width: 150, height: 200, status: 'running' },
-    { id: 6, name: 'Összeszerelés', machineType: 'assembly', posX: 530, posY: 50, width: 150, height: 100, status: 'error' },
-    { id: 7, name: 'Csomagoló', machineType: 'packing', posX: 530, posY: 170, width: 150, height: 80, status: 'maintenance' },
+    { id: 3, name: 'Press-01', machineType: 'press', posX: 50, posY: 170, width: 120, height: 80, status: 'warning' },
+    { id: 4, name: 'Welder-01', machineType: 'welder', posX: 200, posY: 170, width: 120, height: 80, status: 'idle' },
+    { id: 5, name: 'Paint Line', machineType: 'paint', posX: 350, posY: 50, width: 150, height: 200, status: 'running' },
+    { id: 6, name: 'Assembly', machineType: 'assembly', posX: 530, posY: 50, width: 150, height: 100, status: 'error' },
+    { id: 7, name: 'Packing', machineType: 'packing', posX: 530, posY: 170, width: 150, height: 80, status: 'maintenance' },
   ];
 
   const machines = layout?.machines ?? demoMachines;

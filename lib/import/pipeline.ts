@@ -167,7 +167,7 @@ export async function processImport(
       updatedRows: 0,
       skippedRows: 0,
       durationMs: 0,
-      errors: ['Import konfiguráció nem található'],
+      errors: ['Import configuration not found'],
     };
   }
 

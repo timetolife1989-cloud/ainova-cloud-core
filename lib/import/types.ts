@@ -1,9 +1,9 @@
 export interface ColumnMapping {
-  source: string;       // Excel/CSV oszlopnév
-  target: string;       // DB oszlopnév
+  source: string;       // Excel/CSV column name
+  target: string;       // DB column name
   type: 'string' | 'number' | 'date' | 'boolean' | 'float';
   required?: boolean;
-  transform?: string;   // Opcionális transzformáció: 'trim', 'uppercase', 'date_parse'
+  transform?: string;   // Optional transform: 'trim', 'uppercase', 'date_parse'
 }
 
 export interface ImportFilter {
@@ -43,12 +43,12 @@ export interface DetectResult {
 }
 
 export interface IImportAdapter {
-  /** Fejléc kiolvasása a fájlból (első N sor) */
+  /** Read headers from file (first N rows) */
   readHeaders(filePath: string): Promise<string[]>;
 
-  /** Fájl típus felismerés a fejléc alapján */
+  /** Detect file type based on headers */
   detect(filePath: string, configs: ImportConfig[]): Promise<DetectResult>;
 
-  /** Import végrehajtás */
+  /** Execute import */
   process(filePath: string, config: ImportConfig, username: string): Promise<ImportResult>;
 }

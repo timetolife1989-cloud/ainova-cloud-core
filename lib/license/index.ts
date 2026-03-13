@@ -5,10 +5,10 @@ export type LicenseTier = 'basic' | 'professional' | 'enterprise' | 'dev';
 export interface LicenseInfo {
   tier: LicenseTier;
   customerName: string | null;
-  modulesAllowed: string[];     // modul ID-k, ['*'] = mind
-  featuresAllowed: string[];    // feature flag-ek, ['*'] = mind
+  modulesAllowed: string[];     // module IDs, ['*'] = all
+  featuresAllowed: string[];    // feature flags, ['*'] = all
   maxUsers: number;
-  expiresAt: Date | null;       // null = nem jár le
+  expiresAt: Date | null;       // null = does not expire
   isExpired: boolean;
   isActive: boolean;
 }
@@ -25,12 +25,12 @@ interface LicenseRow {
 
 let _cached: LicenseInfo | null = null;
 let _cachedAt = 0;
-const CACHE_TTL = 5 * 60 * 1000; // 5 perc
+const CACHE_TTL = 5 * 60 * 1000; // 5 min
 
 /**
- * Visszaadja az aktív licenc adatait.
- * 5 percig cache-eli.
- * Ha nincs licenc a DB-ben, 'basic' tier-t ad vissza üres modul listával.
+ * Returns the active license data.
+ * Cached for 5 minutes.
+ * If no license exists in DB, returns 'basic' tier with empty module list.
  */
 export async function getLicense(): Promise<LicenseInfo> {
   const now = Date.now();
@@ -76,7 +76,7 @@ export async function getLicense(): Promise<LicenseInfo> {
   }
 }
 
-/** Ellenőrzi, hogy egy adott modul engedélyezett-e a licencben. */
+/** Checks if a specific module is allowed by the license. */
 export async function isModuleAllowed(moduleId: string): Promise<boolean> {
   const license = await getLicense();
   if (!license.isActive) return false;
@@ -84,7 +84,7 @@ export async function isModuleAllowed(moduleId: string): Promise<boolean> {
   return license.modulesAllowed.includes(moduleId);
 }
 
-/** Ellenőrzi, hogy egy adott feature engedélyezett-e. */
+/** Checks if a specific feature is allowed. */
 export async function isFeatureAllowed(featureId: string): Promise<boolean> {
   const license = await getLicense();
   if (!license.isActive) return false;
@@ -92,11 +92,11 @@ export async function isFeatureAllowed(featureId: string): Promise<boolean> {
   return license.featuresAllowed.includes(featureId);
 }
 
-/** Ellenőrzi, hogy létrehozható-e még új felhasználó. */
+/** Checks if a new user can still be created. */
 export async function canCreateUser(): Promise<boolean> {
   const license = await getLicense();
   if (!license.isActive) return false;
-  if (license.maxUsers <= 0) return true; // 0 = korlátlan
+  if (license.maxUsers <= 0) return true; // 0 = unlimited
   try {
     const rows = await getDb().query<{ total: number }>(
       'SELECT COUNT(*) AS total FROM core_users WHERE is_active = 1'
@@ -107,7 +107,7 @@ export async function canCreateUser(): Promise<boolean> {
   }
 }
 
-/** Cache ürítése (licenc kulcs változtatás után hívandó) */
+/** Clear cache (call after license key change) */
 export function clearLicenseCache(): void {
   _cached = null;
   _cachedAt = 0;

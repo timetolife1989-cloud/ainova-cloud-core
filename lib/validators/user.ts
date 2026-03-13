@@ -3,11 +3,11 @@ import { PASSWORD_MIN_LENGTH, USERNAME_MIN_LENGTH } from '@/lib/constants';
 
 export const FALLBACK_ROLES = ['admin', 'manager', 'user'] as const;
 
-// Fallback konstansok — a DB-ből töltött role adatok felülírják ezeket
+// Fallback constants — DB-loaded role data overrides these
 export const ROLE_LABELS: Record<string, string> = {
   admin:   'Admin',
   manager: 'Manager',
-  user:    'Felhasználó',
+  user:    'User',
 };
 
 export const ROLE_COLORS: Record<string, string> = {

@@ -152,7 +152,7 @@ export async function getSyncStatusSummary(): Promise<SyncStatusSummary> {
     return {
       health: 'unknown',
       lastEventAt: null,
-      lastError: 'Nem sikerült lekérni a szinkronizáció státuszát',
+      lastError: 'Failed to retrieve sync status',
       errorCount24h: 0,
       successCount24h: 0,
       modules: [],

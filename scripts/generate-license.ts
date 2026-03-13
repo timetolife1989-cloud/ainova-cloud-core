@@ -1,9 +1,9 @@
 #!/usr/bin/env npx tsx
 /**
- * Licenc generáló script
+ * License generator script
  * 
- * Használat:
- * npx tsx scripts/generate-license.ts --tier professional --customer "Cég Kft." --email "admin@ceg.hu" --max-users 50 --expires "2027-12-31" --modules "workforce,tracking,fleet"
+ * Usage:
+ * npx tsx scripts/generate-license.ts --tier professional --customer "Company Ltd." --email "admin@company.com" --max-users 50 --expires "2027-12-31" --modules "workforce,tracking,fleet"
  */
 
 import { createHash, randomBytes } from 'crypto';
@@ -56,11 +56,11 @@ function parseArgs(): LicenseOptions {
   }
 
   if (!options.tier) {
-    console.error('Hiba: --tier kötelező (basic | professional | enterprise)');
+    console.error('Error: --tier is required (basic | professional | enterprise)');
     process.exit(1);
   }
   if (!options.customer) {
-    console.error('Hiba: --customer kötelező');
+    console.error('Error: --customer is required');
     process.exit(1);
   }
 
@@ -91,24 +91,24 @@ function main() {
   const signature = generateSignature(signatureData, 'ainova-secret-key');
 
   console.log('\n========================================');
-  console.log('       Ainova Cloud Intelligence LICENC');
+  console.log('       Ainova Cloud Intelligence LICENSE');
   console.log('========================================\n');
   
-  console.log('Licenc kulcs:', licenseKey);
-  console.log('Csomag:', options.tier.toUpperCase());
-  console.log('Ügyfél:', options.customer);
+  console.log('License key:', licenseKey);
+  console.log('Package:', options.tier.toUpperCase());
+  console.log('Customer:', options.customer);
   if (options.email) console.log('Email:', options.email);
-  console.log('Max felhasználók:', maxUsers);
-  console.log('Lejárat:', expiresAt);
-  console.log('Modulok:', modules.join(', '));
+  console.log('Max users:', maxUsers);
+  console.log('Expiry:', expiresAt);
+  console.log('Modules:', modules.join(', '));
   console.log('Signature:', signature);
   
   console.log('\n----------------------------------------');
-  console.log('SQL INSERT (futtasd a vevő DB-jében):');
+  console.log('SQL INSERT (run in the customer DB):');
   console.log('----------------------------------------\n');
   
   const sql = `
--- Licenc beszúrása
+-- License insert
 INSERT INTO core_license (license_key, tier, customer_name, customer_email, max_users, allowed_modules, expires_at, signature)
 VALUES (
   '${licenseKey}',
@@ -125,7 +125,7 @@ VALUES (
   console.log(sql);
   
   console.log('\n----------------------------------------');
-  console.log('Vagy admin panelen megadható kulcs:');
+  console.log('Or use this key in the admin panel:');
   console.log('----------------------------------------\n');
   
   // Encode license data for admin panel input

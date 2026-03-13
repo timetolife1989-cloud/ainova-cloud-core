@@ -74,7 +74,7 @@ export class ExcelImportAdapter implements IImportAdapter {
           updatedRows: 0,
           skippedRows: 0,
           durationMs: Date.now() - startTime,
-          errors: ['Nem található munkalap a fájlban'],
+          errors: ['No worksheet found in file'],
         };
       }
 
@@ -151,12 +151,12 @@ export class ExcelImportAdapter implements IImportAdapter {
 
           // Queue for batch insert (simplified: immediate insert)
           db.query(sql, params).catch(err => {
-            errors.push(`Sor ${rowNumber}: ${(err as Error).message}`);
+            errors.push(`Row ${rowNumber}: ${(err as Error).message}`);
           });
 
           insertedRows++;
         } catch (err) {
-          errors.push(`Sor ${rowNumber}: ${(err as Error).message}`);
+          errors.push(`Row ${rowNumber}: ${(err as Error).message}`);
           skippedRows++;
         }
       });

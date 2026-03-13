@@ -75,7 +75,7 @@ export class CsvImportAdapter implements IImportAdapter {
           updatedRows: 0,
           skippedRows: 0,
           durationMs: Date.now() - startTime,
-          errors: ['A fájl üres vagy csak fejlécet tartalmaz'],
+          errors: ['File is empty or contains only headers'],
         };
       }
 
@@ -147,7 +147,7 @@ export class CsvImportAdapter implements IImportAdapter {
           await db.query(sql, params);
           insertedRows++;
         } catch (err) {
-          errors.push(`Sor ${i + 1}: ${(err as Error).message}`);
+          errors.push(`Row ${i + 1}: ${(err as Error).message}`);
           skippedRows++;
         }
       }

@@ -1,27 +1,27 @@
 /**
  * PLC Driver Interface — Ainova Cloud Intelligence
  *
- * Protokoll-független illesztőprogram interfész.
- * Minden driver (S7, Modbus, MQTT, OPC-UA) implementálja ezt.
+ * Protocol-agnostic driver interface.
+ * All drivers (S7, Modbus, MQTT, OPC-UA) implement this.
  */
 
 export type PlcProtocol = 's7' | 'modbus_tcp' | 'modbus_rtu' | 'mqtt' | 'opcua';
 
-/** Egy PLC regiszter / tag */
+/** A PLC register / tag */
 export interface PlcTag {
   id: number;
   name: string;
   address: string;      // S7: DB1,W0 | Modbus: 40001 | OPC-UA: ns=2;s=Temperature
   dataType: PlcDataType;
-  scaleFactor?: number; // lineáris skálázás: rawValue * scaleFactor + scaleOffset
+  scaleFactor?: number; // linear scaling: rawValue * scaleFactor + scaleOffset
   scaleOffset?: number;
-  unit?: string;        // °C, bar, rpm, stb.
+  unit?: string;        // °C, bar, rpm, etc.
 }
 
 export type PlcDataType =
   | 'bool' | 'byte' | 'word' | 'dword' | 'int' | 'dint' | 'real' | 'string';
 
-/** Regiszter beolvasás eredménye */
+/** Register read result */
 export interface PlcReadResult {
   tagId: number;
   tagName: string;
@@ -32,7 +32,7 @@ export interface PlcReadResult {
   errorMessage?: string;
 }
 
-/** Regiszter írás eredménye */
+/** Register write result */
 export interface PlcWriteResult {
   tagId: number;
   tagName: string;
@@ -40,7 +40,7 @@ export interface PlcWriteResult {
   errorMessage?: string;
 }
 
-/** PLC kapcsolat állapot */
+/** PLC connection status */
 export interface PlcConnectionStatus {
   deviceId: number;
   connected: boolean;
@@ -51,28 +51,28 @@ export interface PlcConnectionStatus {
 }
 
 /**
- * Absztrakt PLC Driver interfész.
- * Minden protokoll implementálja ezt.
+ * Abstract PLC Driver interface.
+ * All protocols implement this.
  */
 export interface IPlcDriver {
   readonly protocol: PlcProtocol;
   readonly deviceId: number;
 
-  /** Kapcsolat felépítése */
+  /** Establish connection */
   connect(): Promise<boolean>;
-  /** Kapcsolat lezárása */
+  /** Close connection */
   disconnect(): Promise<void>;
-  /** Kapcsolat tesztelése (ping) */
+  /** Test connection (ping) */
   testConnection(): Promise<PlcConnectionStatus>;
-  /** Egy vagy több tag beolvasása */
+  /** Read one or more tags */
   readTags(tags: PlcTag[]): Promise<PlcReadResult[]>;
-  /** Egy tag értékének írása */
+  /** Write a tag value */
   writeTag(tag: PlcTag, value: number | boolean | string): Promise<PlcWriteResult>;
-  /** Kapcsolat állapot lekérése */
+  /** Get connection status */
   isConnected(): boolean;
 }
 
-/** Driver gyár */
+/** Driver factory */
 export async function createPlcDriver(
   protocol: PlcProtocol,
   deviceId: number,

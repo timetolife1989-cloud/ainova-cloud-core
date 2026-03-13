@@ -102,11 +102,11 @@ export default function SapImportDashboardPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Filterek
+  // Filters
   const [catalogCategory, setCatalogCategory] = useState('');
   const [catalogSearch, setCatalogSearch] = useState('');
 
-  // Új kapcsolat form
+  // New connection form
   const [showConnForm, setShowConnForm] = useState(false);
   const [connForm, setConnForm] = useState({
     name: '', description: '', connectionType: 'rfc' as ConnectionType,
@@ -217,7 +217,7 @@ export default function SapImportDashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Fejléc */}
+      {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-1">
           <span className="text-3xl">🔗</span>
@@ -234,7 +234,7 @@ export default function SapImportDashboardPage() {
         </p>
       </div>
 
-      {/* Info sáv */}
+      {/* Info bar */}
       <div className="bg-blue-950/30 border border-blue-800/40 rounded-xl p-4 mb-6 flex gap-3">
         <span className="text-blue-400 text-xl mt-0.5">ℹ️</span>
         <div className="text-sm text-blue-300">
@@ -248,7 +248,7 @@ export default function SapImportDashboardPage() {
         </div>
       </div>
 
-      {/* Fül navigáció */}
+      {/* Tab navigation */}
       <div className="flex gap-1 mb-6 border-b border-gray-800 overflow-x-auto">
         {TABS.map(t => (
           <button
@@ -271,7 +271,7 @@ export default function SapImportDashboardPage() {
         </div>
       )}
 
-      {/* ═══════════ KAPCSOLATOK FÜL ═══════════ */}
+      {/* ═══════════ CONNECTIONS TAB ═══════════ */}
       {tab === 'connections' && (
         <div>
           <div className="flex justify-between items-center mb-4">
@@ -284,7 +284,7 @@ export default function SapImportDashboardPage() {
             </button>
           </div>
 
-          {/* Új kapcsolat form */}
+          {/* New connection form */}
           {showConnForm && (
             <div className="bg-gray-900 border border-blue-800/40 rounded-xl p-6 mb-6">
               <h3 className="text-white font-semibold mb-4">{t('sap.new_connection_heading')}</h3>
@@ -416,14 +416,14 @@ export default function SapImportDashboardPage() {
                       </div>
                     )}
 
-                    {/* Teszt eredmény */}
+                    {/* Test result */}
                     {testResult && (
                       <div className={`text-xs p-2 rounded mb-3 ${testResult.ok ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
                         {testResult.ok ? '✅' : '❌'} {testResult.message}
                       </div>
                     )}
 
-                    {/* Utolsó teszt */}
+                    {/* Last test */}
                     {conn.lastTestedAt && (
                       <p className="text-gray-600 text-xs mb-2">
                         {t('sap.last_test')}: {new Date(conn.lastTestedAt).toLocaleString()} — {conn.lastTestOk ? '✅ OK' : '❌ ' + t('common.error')}
@@ -453,7 +453,7 @@ export default function SapImportDashboardPage() {
         </div>
       )}
 
-      {/* ═══════════ KATALÓGUS FÜL ═══════════ */}
+      {/* ═══════════ CATALOG TAB ═══════════ */}
       {tab === 'catalog' && (
         <div>
           <div className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -517,7 +517,7 @@ export default function SapImportDashboardPage() {
         </div>
       )}
 
-      {/* ═══════════ MAPPINGEK FÜL ═══════════ */}
+      {/* ═══════════ MAPPINGS TAB ═══════════ */}
       {tab === 'mappings' && (
         <div>
           <div className="flex justify-between items-center mb-4">
@@ -573,7 +573,7 @@ export default function SapImportDashboardPage() {
         </div>
       )}
 
-      {/* ═══════════ NAPLÓ FÜL ═══════════ */}
+      {/* ═══════════ LOG TAB ═══════════ */}
       {tab === 'log' && (
         <div>
           <div className="flex justify-between items-center mb-4">

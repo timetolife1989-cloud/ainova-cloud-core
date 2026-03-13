@@ -97,15 +97,15 @@ export async function sendAlertEmail(
 <div style="max-width:600px;margin:20px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.1);">
   <div style="background:linear-gradient(135deg,#1e40af,#3b82f6);padding:24px 32px;color:white;">
     <h1 style="margin:0;font-size:20px;">${companyName}</h1>
-    <p style="margin:4px 0 0;opacity:0.8;font-size:13px;">Rendszer értesítés</p>
+    <p style="margin:4px 0 0;opacity:0.8;font-size:13px;">System Notification</p>
   </div>
   <div style="padding:32px;">
     <div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:16px;border-radius:0 8px 8px 0;margin-bottom:20px;">
       <h2 style="margin:0 0 8px;color:#92400e;font-size:16px;">⚠️ ${alertTitle}</h2>
       <p style="margin:0;color:#78350f;font-size:14px;">${alertMessage}</p>
     </div>
-    ${moduleName ? `<p style="color:#64748b;font-size:13px;">Modul: <strong>${moduleName}</strong></p>` : ''}
-    <p style="color:#94a3b8;font-size:12px;margin-top:24px;">Ez egy automatikus értesítés az ${companyName} rendszerből.</p>
+    ${moduleName ? `<p style="color:#64748b;font-size:13px;">Module: <strong>${moduleName}</strong></p>` : ''}
+    <p style="color:#94a3b8;font-size:12px;margin-top:24px;">This is an automatic notification from the ${companyName} system.</p>
   </div>
 </div>
 </body>
@@ -141,7 +141,7 @@ export async function sendReportEmail(
   </div>
   <div style="padding:32px;">
     ${summaryHtml}
-    <p style="color:#94a3b8;font-size:12px;margin-top:24px;">Generálva: ${new Date().toLocaleString('hu-HU')}</p>
+    <p style="color:#94a3b8;font-size:12px;margin-top:24px;">Generated: ${new Date().toISOString()}</p>
   </div>
 </div>
 </body>

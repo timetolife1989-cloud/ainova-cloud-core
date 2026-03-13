@@ -81,7 +81,7 @@ export default function LicensePage() {
       <DashboardSectionHeader title={t('admin.license.title')} subtitle={t('admin.license.subtitle')} />
 
       <div className="mt-6 space-y-6">
-        {/* Tier + Status kártya */}
+        {/* Tier + Status card */}
         <div className={`bg-gray-900 border ${tierCfg.border} rounded-xl p-6`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -118,7 +118,7 @@ export default function LicensePage() {
           </div>
         </div>
 
-        {/* Info kártyák */}
+        {/* Info cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
             <div className="flex items-center gap-3 mb-3">
@@ -139,7 +139,7 @@ export default function LicensePage() {
           </div>
         </div>
 
-        {/* Engedélyezett modulok */}
+        {/* Allowed modules */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-5 h-5 text-blue-400" />
@@ -157,7 +157,7 @@ export default function LicensePage() {
           </div>
         </div>
 
-        {/* Engedélyezett feature-ök */}
+        {/* Allowed features */}
         {featuresDisplay.length > 0 && (
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
             <div className="flex items-center gap-3 mb-4">

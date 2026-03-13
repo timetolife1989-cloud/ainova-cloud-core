@@ -1,10 +1,10 @@
 /**
  * Migration runner
  * Usage:
- *   npx tsx scripts/run-migration.ts 001              -- prefix, keres database/core/-ban
- *   npx tsx scripts/run-migration.ts all:core         -- összes core migráció
- *   npx tsx scripts/run-migration.ts all:lac          -- összes lac migráció
- *   npx tsx scripts/run-migration.ts database/lac/001_lac_sap_visszajelentes.sql  -- konkrét fájl
+ *   npx tsx scripts/run-migration.ts 001              -- prefix, searches in database/core/
+ *   npx tsx scripts/run-migration.ts all:core         -- all core migrations
+ *   npx tsx scripts/run-migration.ts all:lac          -- all lac migrations
+ *   npx tsx scripts/run-migration.ts database/lac/001_lac_sap_visszajelentes.sql  -- specific file
  */
 import sql from 'mssql';
 import * as dotenv from 'dotenv';
@@ -63,7 +63,7 @@ async function runFile(pool: sql.ConnectionPool, filePath: string): Promise<void
       const err = e as Error & { number?: number };
       console.error(`  ❌ Batch ${idx} FAILED: ${err.message}`);
       if (err.number) console.error(`     SQL Error #${err.number}`);
-      console.error(`     SQL kezdete: ${batch.slice(0, 200)}`);
+      console.error(`     SQL start: ${batch.slice(0, 200)}`);
       throw err;
     }
   }
@@ -72,8 +72,8 @@ async function runFile(pool: sql.ConnectionPool, filePath: string): Promise<void
 async function main(): Promise<void> {
   const arg = process.argv[2];
   if (!arg) {
-    console.error('Használat: npx tsx scripts/run-migration.ts <prefix|all:core|all:lac|fájl.sql>');
-    console.error('Példák:');
+    console.error('Usage: npx tsx scripts/run-migration.ts <prefix|all:core|all:lac|file.sql>');
+    console.error('Examples:');
     console.error('  npx tsx scripts/run-migration.ts 001');
     console.error('  npx tsx scripts/run-migration.ts all:core');
     console.error('  npx tsx scripts/run-migration.ts all:lac');
@@ -90,22 +90,22 @@ async function main(): Promise<void> {
       .filter((f: string) => f.endsWith('.sql'))
       .sort()
       .map((f: string) => path.join(dir, f));
-    console.log(`\n🗂  ${files.length} migráció a database/${folder}/ könyvtárban`);
+    console.log(`\n🗂  ${files.length} migrations in database/${folder}/`);
   } else if (arg.endsWith('.sql')) {
     const full = path.isAbsolute(arg) ? arg : path.join(process.cwd(), arg);
     if (!fs.existsSync(full)) {
-      console.error(`Fájl nem található: ${full}`);
+      console.error(`File not found: ${full}`);
       process.exit(1);
     }
     files = [full];
   } else {
-    // prefix — keres database/core/-ban
+    // prefix — search in database/core/
     const dir = path.join(process.cwd(), 'database', 'core');
     const found = fs.readdirSync(dir)
       .filter((f: string) => f.startsWith(arg) && f.endsWith('.sql'))
       .sort();
     if (found.length === 0) {
-      console.error(`Nem találtam "${arg}*.sql" fájlt a database/core/ könyvtárban`);
+      console.error(`No "${arg}*.sql" file found in database/core/`);
       process.exit(1);
     }
     files = [path.join(dir, found[0])];
@@ -122,7 +122,7 @@ async function main(): Promise<void> {
   }
 
   await pool.close();
-  console.log('\n✅ Minden migráció kész!\n');
+  console.log('\n✅ All migrations complete!\n');
 }
 
 main().catch((e: unknown) => {

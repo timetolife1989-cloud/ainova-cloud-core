@@ -1,9 +1,9 @@
 /**
- * Futtatja az összes core migrációt sorban.
- * Biztonságos: minden migráció idempotens (IF NOT EXISTS).
- * Használat: npx tsx scripts/migrate-all.ts
+ * Runs all core migrations in sequence.
+ * Safe: all migrations are idempotent (IF NOT EXISTS).
+ * Usage: npx tsx scripts/migrate-all.ts
  * 
- * Támogatott adapterek: mssql, sqlite
+ * Supported adapters: mssql, sqlite, postgres
  */
 import sql from 'mssql';
 import * as dotenv from 'dotenv';
@@ -36,18 +36,18 @@ async function runMssqlMigrations(): Promise<void> {
   async function waitForDb(retries = 20, delayMs = 3000): Promise<sql.ConnectionPool> {
     for (let i = 1; i <= retries; i++) {
       try {
-        console.log(`[migrate] MSSQL kapcsolódás... (${i}/${retries})`);
+        console.log(`[migrate] MSSQL connecting... (${i}/${retries})`);
         const pool = await sql.connect(cfg);
-        console.log('[migrate] MSSQL kapcsolódva.');
+        console.log('[migrate] MSSQL connected.');
         return pool;
       } catch (e: unknown) {
         const msg = (e as Error).message;
         if (i === retries) throw e;
-        console.log(`[migrate] Még nem elérhető: ${msg} — várok ${delayMs}ms...`);
+        console.log(`[migrate] Not yet available: ${msg} — waiting ${delayMs}ms...`);
         await new Promise(r => setTimeout(r, delayMs));
       }
     }
-    throw new Error('DB nem érhető el');
+    throw new Error('DB not reachable');
   }
 
   async function runFile(pool: sql.ConnectionPool, filePath: string): Promise<void> {
@@ -75,7 +75,7 @@ async function runMssqlMigrations(): Promise<void> {
   const folders = ['core'];
   const pool = await waitForDb();
 
-  // Core migrációk
+  // Core migrations
   for (const folder of folders) {
     const dir = path.join(process.cwd(), 'database', folder);
     if (!fs.existsSync(dir)) continue;
@@ -85,13 +85,13 @@ async function runMssqlMigrations(): Promise<void> {
       .sort()
       .map((f: string) => path.join(dir, f));
 
-    console.log(`[migrate] ${folder}: ${files.length} migráció`);
+    console.log(`[migrate] ${folder}: ${files.length} migrations`);
     for (const f of files) {
       await runFile(pool, f);
     }
   }
 
-  // Modul migrációk
+  // Module migrations
   const modulesDir = path.join(process.cwd(), 'modules');
   if (fs.existsSync(modulesDir)) {
     const moduleDirs = fs.readdirSync(modulesDir)
@@ -107,7 +107,7 @@ async function runMssqlMigrations(): Promise<void> {
         .map((f: string) => path.join(migDir, f));
 
       if (files.length > 0) {
-        console.log(`[migrate] module/${moduleId}: ${files.length} migráció`);
+        console.log(`[migrate] module/${moduleId}: ${files.length} migrations`);
         for (const f of files) {
           await runFile(pool, f);
         }
@@ -128,20 +128,20 @@ async function runSqliteMigrations(): Promise<void> {
   const dbPath = process.env.DB_SQLITE_PATH ?? './data/ainova.db';
   const dbDir = path.dirname(dbPath);
   if (!fs.existsSync(dbDir)) {
-    console.log(`[migrate] SQLite adatmappa létrehozása: ${dbDir}`);
+    console.log(`[migrate] SQLite data directory created: ${dbDir}`);
     fs.mkdirSync(dbDir, { recursive: true });
   }
 
-  console.log(`[migrate] SQLite kapcsolódás: ${dbPath}`);
+  console.log(`[migrate] SQLite connecting: ${dbPath}`);
   const db = getDb();
 
   // Warm-up: force the lazy SQLite connection to open
   try {
     await db.query(`SELECT 1 AS ping`);
   } catch (e) {
-    throw new Error(`SQLite kapcsolat sikertelen: ${(e as Error).message}`);
+    throw new Error(`SQLite connection failed: ${(e as Error).message}`);
   }
-  console.log('[migrate] SQLite kapcsolódva.');
+  console.log('[migrate] SQLite connected.');
 
   async function runFile(filePath: string): Promise<void> {
     console.log(`[migrate] ▶ ${path.basename(filePath)}`);
@@ -174,7 +174,7 @@ async function runSqliteMigrations(): Promise<void> {
 
   const folders = ['core'];
 
-  // Core migrációk
+  // Core migrations
   for (const folder of folders) {
     const dir = path.join(process.cwd(), 'database', folder);
     if (!fs.existsSync(dir)) continue;
@@ -184,13 +184,13 @@ async function runSqliteMigrations(): Promise<void> {
       .sort()
       .map((f: string) => path.join(dir, f));
 
-    console.log(`[migrate] ${folder}: ${files.length} migráció`);
+    console.log(`[migrate] ${folder}: ${files.length} migrations`);
     for (const f of files) {
       await runFile(f);
     }
   }
 
-  // Modul migrációk
+  // Module migrations
   const modulesDir = path.join(process.cwd(), 'modules');
   if (fs.existsSync(modulesDir)) {
     const moduleDirs = fs.readdirSync(modulesDir)
@@ -206,7 +206,7 @@ async function runSqliteMigrations(): Promise<void> {
         .map((f: string) => path.join(migDir, f));
 
       if (files.length > 0) {
-        console.log(`[migrate] module/${moduleId}: ${files.length} migráció`);
+        console.log(`[migrate] module/${moduleId}: ${files.length} migrations`);
         for (const f of files) {
           await runFile(f);
         }
@@ -454,20 +454,20 @@ async function runPostgresMigrations(): Promise<void> {
   async function waitForDb(retries = 10, delayMs = 3000) {
     for (let i = 1; i <= retries; i++) {
       try {
-        console.log(`[migrate] PostgreSQL kapcsolódás... (${i}/${retries})`);
+        console.log(`[migrate] PostgreSQL connecting... (${i}/${retries})`);
         const pool = new pgModule.Pool(config);
         const client = await pool.connect();
         client.release();
-        console.log('[migrate] PostgreSQL kapcsolódva.');
+        console.log('[migrate] PostgreSQL connected.');
         return pool;
       } catch (e: unknown) {
         const msg = (e as Error).message;
         if (i === retries) throw e;
-        console.log(`[migrate] Még nem elérhető: ${msg} — várok ${delayMs}ms...`);
+        console.log(`[migrate] Not yet available: ${msg} — waiting ${delayMs}ms...`);
         await new Promise(r => setTimeout(r, delayMs));
       }
     }
-    throw new Error('DB nem érhető el');
+    throw new Error('DB not reachable');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -514,7 +514,7 @@ async function runPostgresMigrations(): Promise<void> {
 
   const pool = await waitForDb();
 
-  // Core migrációk
+  // Core migrations
   const coreDir = path.join(process.cwd(), 'database', 'core');
   if (fs.existsSync(coreDir)) {
     const files = fs.readdirSync(coreDir)
@@ -522,13 +522,13 @@ async function runPostgresMigrations(): Promise<void> {
       .sort()
       .map((f: string) => path.join(coreDir, f));
 
-    console.log(`[migrate] core: ${files.length} migráció`);
+    console.log(`[migrate] core: ${files.length} migrations`);
     for (const f of files) {
       await runFile(pool, f);
     }
   }
 
-  // Modul migrációk
+  // Module migrations
   const modulesDir = path.join(process.cwd(), 'modules');
   if (fs.existsSync(modulesDir)) {
     const moduleDirs = fs.readdirSync(modulesDir)
@@ -544,7 +544,7 @@ async function runPostgresMigrations(): Promise<void> {
         .map((f: string) => path.join(migDir, f));
 
       if (files.length > 0) {
-        console.log(`[migrate] module/${moduleId}: ${files.length} migráció`);
+        console.log(`[migrate] module/${moduleId}: ${files.length} migrations`);
         for (const f of files) {
           await runFile(pool, f);
         }
@@ -571,10 +571,10 @@ async function main(): Promise<void> {
     throw new Error(`Unsupported DB_ADAPTER: ${DB_ADAPTER}. Use 'mssql', 'postgres', or 'sqlite'.`);
   }
   
-  console.log('[migrate] Minden migráció kész. ✅');
+  console.log('[migrate] All migrations complete. ✅');
 }
 
 main().catch((e: unknown) => {
-  console.error('[migrate] HIBA:', (e as Error).message);
+  console.error('[migrate] ERROR:', (e as Error).message);
   process.exit(1);
 });
