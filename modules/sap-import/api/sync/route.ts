@@ -1,11 +1,11 @@
 /**
- * SAP Szinkronizálás API
- * POST /api/modules/sap-import/sync  — szinkronizálás indítása (stub)
- * GET  /api/modules/sap-import/sync  — szinkronizálás napló lekérése
+ * SAP Synchronization API
+ * POST /api/modules/sap-import/sync  — start sync (stub)
+ * GET  /api/modules/sap-import/sync  — get sync log
  *
- * Jelenlegi állapot: ELŐKÉSZÍTVE
- * Az éles szinkronizálóshoz RFC/OData connector aktiválása szükséges.
- * Az API már fogadja a kéréseket, naplózza és visszaküldi az állapotot.
+ * Current state: PREPARED
+ * Live sync requires RFC/OData connector activation.
+ * The API already accepts requests, logs them, and returns status.
  */
 import { NextRequest } from 'next/server';
 import { checkAuth } from '@/lib/rbac/middleware';
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
 
   const d = parsed.data;
 
-  // Napló bejegyzés létrehozása
+  // Create log entry
   const logResult = await getDb().query(
     `INSERT INTO mod_sap_sync_log
        (connection_id, sync_type, sap_object, aci_table, status, triggered_by)
@@ -106,14 +106,14 @@ export async function POST(request: NextRequest) {
 
   const logId = (logResult[0] as Record<string, number>)?.id;
 
-  // TODO: Éles szinkronizálás
-  // 1. Kapcsolat config betöltése: mod_sap_connections WHERE id = connectionId
-  // 2. Connector példányosítása: createSapConnector(config)
-  // 3. Mező mappingek betöltése: mod_sap_field_mappings WHERE connection_id AND sap_object
+  // TODO: Live synchronization
+  // 1. Load connection config: mod_sap_connections WHERE id = connectionId
+  // 2. Instantiate connector: createSapConnector(config)
+  // 3. Load field mappings: mod_sap_field_mappings WHERE connection_id AND sap_object
   // 4. connector.syncTable({ connectionId, sapObject, aciTable, syncType, filters, maxRows })
-  // 5. Napló frissítése eredménnyel
+  // 5. Update log with result
 
-  // Napló lezárása (stub státuszsal)
+  // Close log entry (stub status)
   await getDb().query(
     `UPDATE mod_sap_sync_log SET
        status = 'error',

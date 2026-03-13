@@ -1,13 +1,13 @@
 /**
  * OPC-UA Driver — Ainova Cloud Intelligence
  *
- * OPC Unified Architecture — ipari szabvány kliens implementáció.
- * Siemens, Beckhoff, Rockwell és legtöbb modern PLC plc támogatja OPC-UA-t.
- * Előnye: egységes cím tér, biztonságos kapcsolat (S/None/Basic256), typedefs.
+ * OPC Unified Architecture — industrial standard client implementation.
+ * Siemens, Beckhoff, Rockwell and most modern PLCs support OPC-UA.
+ * Advantages: unified address space, secure connection (S/None/Basic256), typedefs.
  *
- * ELŐKÉSZÍTVE — Aktiváláshoz szükséges:
+ * PREPARED — Activation requires:
  *   npm install node-opcua
- *   (nem szükséges natív wrapper — tiszta JavaScript/TypeScript)
+ *   (no native wrapper required — pure JavaScript/TypeScript)
  */
 import type { IPlcDriver, PlcProtocol, PlcTag, PlcReadResult, PlcWriteResult, PlcConnectionStatus } from '../interface';
 
@@ -26,7 +26,7 @@ export class OpcUaDriver implements IPlcDriver {
   }
 
   async connect(): Promise<boolean> {
-    // TODO: node-opcua aktiválás:
+    // TODO: node-opcua activation:
     // import { OPCUAClient, MessageSecurityMode, SecurityPolicy } from 'node-opcua';
     //
     // const securityMode = MessageSecurityMode.None; // prod: SignAndEncrypt
@@ -57,7 +57,7 @@ export class OpcUaDriver implements IPlcDriver {
   }
 
   async readTags(tags: PlcTag[]): Promise<PlcReadResult[]> {
-    // OPC-UA cím formátum: ns=2;s=Temperature.PV | ns=2;i=1001
+    // OPC-UA address format: ns=2;s=Temperature.PV | ns=2;i=1001
     // await this.session.readVariableValue(tag.address)
     // result.value.value = a nyers érték, result.statusCode = status
     return tags.map(tag => ({

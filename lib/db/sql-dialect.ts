@@ -1,8 +1,8 @@
 /**
  * SQL Dialect Abstraction Layer
  * =============================
- * Adapter-specifikus SQL kifejezések generálása.
- * Minden DB adapter a saját dialektusát implementálja.
+ * Generates adapter-specific SQL expressions.
+ * Each DB adapter implements its own dialect.
  */
 
 export interface SqlDialect {

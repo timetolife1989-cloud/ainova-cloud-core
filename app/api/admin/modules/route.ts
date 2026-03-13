@@ -50,7 +50,7 @@ export async function PUT(request: NextRequest) {
 
   const { moduleId, enable } = parsed.data;
 
-  // Licenc ellenőrzés
+  // License check
   if (enable) {
     const allowed = await isModuleAllowed(moduleId);
     if (!allowed) {

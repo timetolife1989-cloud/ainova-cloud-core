@@ -1,12 +1,12 @@
 /**
  * Siemens S7 PLC Driver — Ainova Cloud Intelligence
  *
- * Támogatott modellek: S7-300, S7-400, S7-1200, S7-1500, LOGO!
- * Protokoll: S7 Communication (ISO over TCP, port 102)
+ * Supported models: S7-300, S7-400, S7-1200, S7-1500, LOGO!
+ * Protocol: S7 Communication (ISO over TCP, port 102)
  *
- * ELŐKÉSZÍTVE — Aktiváláshoz szükséges:
+ * PREPARED — Activation requires:
  *   npm install node-snap7
- *   (node-snap7 = Node.js wrapper a Settimo Mastrogiovanni snap7 C++ könyvtárhoz)
+ *   (node-snap7 = Node.js wrapper for the Settimo Mastrogiovanni snap7 C++ library)
  */
 import type { IPlcDriver, PlcProtocol, PlcTag, PlcReadResult, PlcWriteResult, PlcConnectionStatus } from '../interface';
 
@@ -16,7 +16,7 @@ export class S7Driver implements IPlcDriver {
   private config: Record<string, unknown>;
   private _connected = false;
 
-  // node-snap7 kliens — lazy import az aktiválás után
+  // node-snap7 client — lazy import after activation
   // private client: S7Client | null = null;
 
   constructor(deviceId: number, config: Record<string, unknown>) {
@@ -25,7 +25,7 @@ export class S7Driver implements IPlcDriver {
   }
 
   async connect(): Promise<boolean> {
-    // TODO: node-snap7 aktiválás után:
+    // TODO: after node-snap7 activation:
     // const snap7 = await import('node-snap7');
     // this.client = new snap7.S7Client();
     // const rack = (this.config.rack as number) ?? 0;
@@ -53,7 +53,7 @@ export class S7Driver implements IPlcDriver {
 
   async readTags(tags: PlcTag[]): Promise<PlcReadResult[]> {
     // TODO: S7 read multivar
-    // S7 cím formátum: DB1,BYTE0 | DB2,INT4 | M0.0 | I0.1 | Q0.0
+    // S7 address format: DB1,BYTE0 | DB2,INT4 | M0.0 | I0.1 | Q0.0
     // this.client.ReadMultiVars(vars)
     return tags.map(tag => ({
       tagId: tag.id,

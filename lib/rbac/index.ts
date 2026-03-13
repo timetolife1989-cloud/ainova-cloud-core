@@ -47,11 +47,11 @@ interface RolePermRow {
 
 // Cache: role_code → permission_code[]
 const _permCache = new Map<string, { perms: string[]; at: number }>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 perc
+const CACHE_TTL = 5 * 60 * 1000; // 5 min
 
 /**
- * Visszaadja egy adott role jogosultságait.
- * 5 percig cache-eli.
+ * Returns permissions for a given role.
+ * Cached for 5 minutes.
  */
 export async function getPermissionsForRole(roleCode: string): Promise<string[]> {
   const now = Date.now();
@@ -79,7 +79,7 @@ export async function getPermissionsForRole(roleCode: string): Promise<string[]>
 }
 
 /**
- * Ellenőrzi, hogy egy role rendelkezik-e egy adott jogosultsággal.
+ * Checks whether a role has a given permission.
  */
 export async function hasPermission(roleCode: string, permissionCode: string): Promise<boolean> {
   // Admin role always has all permissions as fallback
@@ -91,7 +91,7 @@ export async function hasPermission(roleCode: string, permissionCode: string): P
 }
 
 /**
- * Összes role lekérése (admin UI-hoz).
+ * Get all roles (for admin UI).
  */
 export async function getAllRoles(): Promise<RoleInfo[]> {
   try {
@@ -124,7 +124,7 @@ export async function getAllRoles(): Promise<RoleInfo[]> {
 }
 
 /**
- * Összes permission lekérése (admin UI-hoz).
+ * Get all permissions (for admin UI).
  */
 export async function getAllPermissions(): Promise<PermissionInfo[]> {
   try {
@@ -146,7 +146,7 @@ export async function getAllPermissions(): Promise<PermissionInfo[]> {
 }
 
 /**
- * Cache ürítés (role/permission módosítás után hívandó).
+ * Clear cache (call after role/permission changes).
  */
 export function clearPermissionCache(): void {
   _permCache.clear();

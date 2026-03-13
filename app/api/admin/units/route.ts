@@ -5,7 +5,7 @@ import { getAllUnitsAdmin, clearUnitCache } from '@/lib/units';
 import { getDb } from '@/lib/db';
 import { z } from 'zod';
 
-// GET /api/admin/units — összes unit (aktív + inaktív)
+// GET /api/admin/units — all units (active + inactive)
 export async function GET(request: NextRequest) {
   const auth = await checkAuth(request, 'settings.view');
   if (!auth.valid) return auth.response;
@@ -22,7 +22,7 @@ const CreateUnitSchema = z.object({
   decimals: z.number().int().min(0).max(6).optional(),
 });
 
-// POST /api/admin/units — új unit
+// POST /api/admin/units — create new unit
 export async function POST(request: NextRequest) {
   const auth = await checkAuth(request, 'settings.edit');
   if (!auth.valid) return auth.response;
@@ -68,7 +68,7 @@ const UpdateUnitSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-// PUT /api/admin/units — unit módosítás
+// PUT /api/admin/units — update unit
 export async function PUT(request: NextRequest) {
   const auth = await checkAuth(request, 'settings.edit');
   if (!auth.valid) return auth.response;
@@ -131,7 +131,7 @@ const DeleteUnitSchema = z.object({
   id: z.number().int().positive(),
 });
 
-// DELETE /api/admin/units — unit törlés
+// DELETE /api/admin/units — delete unit
 export async function DELETE(request: NextRequest) {
   const auth = await checkAuth(request, 'settings.edit');
   if (!auth.valid) return auth.response;

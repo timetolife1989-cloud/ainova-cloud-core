@@ -43,7 +43,7 @@ async function handleModuleRequest(
     );
   }
 
-  // Aktív modul check
+  // Active module check
   const activeIds = await getActiveModuleIds();
   if (!activeIds.includes(moduleId)) {
     return NextResponse.json(
@@ -52,7 +52,7 @@ async function handleModuleRequest(
     );
   }
 
-  // Dinamikus handler betöltés — multiple resolution strategies
+  // Dynamic handler loading — multiple resolution strategies
   const subPath = path.join('/');
   let handler: Record<string, unknown> | null = null;
   let routeParams: Record<string, string> = {};

@@ -1,5 +1,5 @@
 /**
- * SAP Mező-mapping szabályok CRUD
+ * SAP Field Mapping Rules CRUD
  * GET /api/modules/sap-import/mappings?connectionId=X
  * POST /api/modules/sap-import/mappings
  * PUT /api/modules/sap-import/mappings?id=X

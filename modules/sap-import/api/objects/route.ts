@@ -1,9 +1,9 @@
 /**
- * SAP Objektum katalógus API
+ * SAP Object Catalog API
  * GET /api/modules/sap-import/objects?category=MM&search=MAR
  *
- * Az ACI beépített SAP tudástár — MARA, VBAK, AUFK stb. lekérése.
- * Szűrés kategóriára (MM/SD/PP/PM/HR/FI), típusra (TABLE/BAPI) és keresőszóra.
+ * ACI built-in SAP knowledge base — MARA, VBAK, AUFK, etc.
+ * Filter by category (MM/SD/PP/PM/HR/FI), type (TABLE/BAPI), and search term.
  */
 import { NextRequest } from 'next/server';
 import { checkAuth } from '@/lib/rbac/middleware';
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     params
   );
 
-  // Kategória összefoglaló számlálók
+  // Category summary counters
   const countRows = await getDb().query(
     'SELECT category, COUNT(*) AS cnt FROM mod_sap_objects GROUP BY category',
     []

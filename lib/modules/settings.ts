@@ -6,7 +6,7 @@ interface ModuleSettingRow {
 }
 
 /**
- * Egy modul beállítás lekérése.
+ * Get a single module setting.
  */
 export async function getModuleSetting(moduleId: string, key: string): Promise<string | null> {
   try {
@@ -25,7 +25,7 @@ export async function getModuleSetting(moduleId: string, key: string): Promise<s
 }
 
 /**
- * Egy modul beállítás mentése (upsert).
+ * Save a module setting (upsert).
  */
 export async function setModuleSetting(
   moduleId: string,
@@ -57,7 +57,7 @@ export async function setModuleSetting(
 }
 
 /**
- * Egy modul összes beállításának lekérése.
+ * Get all settings for a module.
  */
 export async function getAllModuleSettings(moduleId: string): Promise<Record<string, string>> {
   try {

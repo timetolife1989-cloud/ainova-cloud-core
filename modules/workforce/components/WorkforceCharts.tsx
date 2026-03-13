@@ -204,7 +204,7 @@ export default function WorkforceCharts({ items, t }: Props) {
         </div>
       </div>
 
-      {/* ── Chart 1: Létszám Összehasonlítás (Bar) ────────────────── */}
+      {/* ── Chart 1: Headcount Comparison (Bar) ──────────────────── */}
       <div className="bg-gray-900/60 backdrop-blur-sm border border-gray-800 rounded-2xl p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -291,7 +291,7 @@ export default function WorkforceCharts({ items, t }: Props) {
         </ResponsiveContainer>
       </div>
 
-      {/* ── Chart 2: Jelenlét Arány Trend (Area) ──────────────────── */}
+      {/* ── Chart 2: Attendance Rate Trend (Area) ────────────────── */}
       <div className="bg-gray-900/60 backdrop-blur-sm border border-gray-800 rounded-2xl p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -367,7 +367,7 @@ export default function WorkforceCharts({ items, t }: Props) {
         </div>
       </div>
 
-      {/* ── Chart 3: Területi Bontás (Horizontal Bar) ─────────────── */}
+      {/* ── Chart 3: Area Breakdown (Horizontal Bar) ───────────── */}
       {items.some(i => i.areaName) && (
         <AreaBreakdown items={items} t={t} />
       )}

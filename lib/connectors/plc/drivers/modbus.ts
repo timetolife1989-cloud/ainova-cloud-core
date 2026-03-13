@@ -1,10 +1,10 @@
 /**
  * Modbus TCP / RTU Driver — Ainova Cloud Intelligence
  *
- * Protokoll: Modbus TCP (port 502) / Modbus RTU (soros port)
- * Támogatott funkciókódok: FC01/FC02 (coils/discrete inputs), FC03/FC04 (holding/input registers)
+ * Protocol: Modbus TCP (port 502) / Modbus RTU (serial port)
+ * Supported function codes: FC01/FC02 (coils/discrete inputs), FC03/FC04 (holding/input registers)
  *
- * ELŐKÉSZÍTVE — Aktiváláshoz szükséges:
+ * PREPARED — Activation requires:
  *   npm install jsmodbus  (Modbus TCP)
  *   npm install modbus-serial  (RTU + TCP)
  */
@@ -23,7 +23,7 @@ export class ModbusDriver implements IPlcDriver {
   }
 
   async connect(): Promise<boolean> {
-    // TODO: modbus-serial aktiválás:
+    // TODO: modbus-serial activation:
     // const ModbusRTU = (await import('modbus-serial')).default;
     // this.client = new ModbusRTU();
     // if (this.protocol === 'modbus_tcp') {
@@ -52,12 +52,12 @@ export class ModbusDriver implements IPlcDriver {
   }
 
   async readTags(tags: PlcTag[]): Promise<PlcReadResult[]> {
-    // TODO: Modbus cím formátum:
+    // TODO: Modbus address format:
     //  1x = discrete inputs (FC02)
     //  0x = coils (FC01)
     //  3x = input registers (FC04)
     //  4x = holding registers (FC03)
-    //  Pl: "40001" = holding register 1
+    //  E.g.: "40001" = holding register 1
     //
     // await this.client.readHoldingRegisters(registerAddr, count)
     // Endianness: config.modbusBigEndian ? bigEndian : littleEndian

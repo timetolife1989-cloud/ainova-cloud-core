@@ -51,7 +51,7 @@ const MovementSchema = z.object({
   notes: z.string().max(500).optional(),
 });
 
-// POST — add movement (bevét/kiadás) & update current_qty
+// POST — add movement (in/out) & update current_qty
 export async function POST(request: NextRequest, context: RouteContext) {
   const auth = await checkAuth(request, 'inventory.edit');
   if (!auth.valid) return auth.response;

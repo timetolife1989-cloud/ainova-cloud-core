@@ -21,13 +21,13 @@ export default async function ModuleDashboardPage({ params }: Props) {
   const session = await getAuth().validateSession(sessionId);
   if (!session) notFound();
 
-  // Ellenőrzés: modul aktív-e
+  // Check: is module active?
   const activeModules = await getActiveModules(session.role);
   const mod = activeModules.find(m => m.id === moduleId);
   if (!mod) notFound();
 
-  // Dinamikus komponens betöltés
-  // A modul dashboard komponensét a modules/<moduleId>/components/DashboardPage.tsx-ből tölti
+  // Dynamic component loading
+  // Loads the module dashboard component from modules/<moduleId>/components/DashboardPage.tsx
   try {
     const ModuleComponent = (await import(`@/modules/${moduleId}/components/DashboardPage`)).default;
     return <ModuleComponent />;

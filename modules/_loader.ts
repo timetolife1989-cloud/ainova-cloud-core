@@ -1,13 +1,13 @@
 /**
  * Module Loader
  * =============
- * Betölti az összes modul manifest-jét.
- * Minden manifest a registerModule()-t hívja, ami a registry-be teszi a modult.
+ * Loads all module manifests.
+ * Each manifest calls registerModule(), which adds the module to the registry.
  *
- * ÚJ MODUL HOZZÁADÁSAKOR: adj hozzá egy import sort ide.
+ * WHEN ADDING A NEW MODULE: add an import line here.
  */
 
-// LAC (referencia implementáció) — demo módban kikapcsolva
+// LAC (reference implementation) — disabled in demo mode
 // import '@/modules/lac-napi-perces/manifest';
 
 // === BASIC csomag ===

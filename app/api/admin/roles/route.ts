@@ -4,7 +4,7 @@ import { getAllRoles, getAllPermissions, clearPermissionCache } from '@/lib/rbac
 import { getDb, type QueryParam } from '@/lib/db';
 import { z } from 'zod';
 
-// GET /api/admin/roles — összes role + permission-jeik
+// GET /api/admin/roles — all roles + their permissions
 export async function GET(request: NextRequest) {
   const auth = await checkAuth(request, 'admin.access');
   if (!auth.valid) return auth.response;
@@ -27,7 +27,7 @@ const CreateRoleSchema = z.object({
   permissions: z.array(z.string()).optional(),
 });
 
-// POST /api/admin/roles — új role létrehozás
+// POST /api/admin/roles — create new role
 export async function POST(request: NextRequest) {
   const auth = await checkAuth(request, 'admin.access');
   if (!auth.valid) return auth.response;
@@ -91,7 +91,7 @@ const UpdateRoleSchema = z.object({
   permissions: z.array(z.string()).optional(),
 });
 
-// PUT /api/admin/roles — role módosítás
+// PUT /api/admin/roles — update role
 export async function PUT(request: NextRequest) {
   const auth = await checkAuth(request, 'admin.access');
   if (!auth.valid) return auth.response;
@@ -178,7 +178,7 @@ const DeleteRoleSchema = z.object({
   id: z.number().int().positive(),
 });
 
-// DELETE /api/admin/roles — role törlés
+// DELETE /api/admin/roles — delete role
 export async function DELETE(request: NextRequest) {
   const auth = await checkAuth(request, 'admin.access');
   if (!auth.valid) return auth.response;

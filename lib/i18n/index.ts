@@ -24,10 +24,10 @@ interface TranslationRow {
 // Cache: locale → translations
 const _cache = new Map<string, TranslationMap>();
 let _cacheAt = 0;
-const CACHE_TTL = 10 * 60 * 1000; // 10 perc
+const CACHE_TTL = 10 * 60 * 1000; // 10 min
 
 /**
- * Aktuális locale lekérése a settings-ből.
+ * Get the current locale from settings.
  */
 export async function getLocale(): Promise<SupportedLocale> {
   try {
@@ -42,7 +42,7 @@ export async function getLocale(): Promise<SupportedLocale> {
 }
 
 /**
- * Fordítások lekérése egy adott locale-hoz (DB + fallback merge).
+ * Get translations for a given locale (DB + fallback merge).
  */
 export async function getTranslationsForLocale(locale: string): Promise<TranslationMap> {
   const now = Date.now();
@@ -77,8 +77,8 @@ export async function getTranslationsForLocale(locale: string): Promise<Translat
 }
 
 /**
- * Fordítás lekérése kulcs alapján.
- * Paraméter behelyettesítés: {name} → érték
+ * Get translation by key.
+ * Parameter interpolation: {name} → value
  */
 export async function t(key: string, params?: Record<string, string | number>): Promise<string> {
   const locale = await getLocale();
@@ -86,7 +86,7 @@ export async function t(key: string, params?: Record<string, string | number>): 
 
   let value = translations[key];
 
-  // Ha nincs az aktuális locale-ban, próbáljuk a magyar fallback-et
+  // If missing in current locale, try Hungarian fallback
   if (!value && locale !== 'hu') {
     const huTranslations = await getTranslationsForLocale('hu');
     value = huTranslations[key];
@@ -97,7 +97,7 @@ export async function t(key: string, params?: Record<string, string | number>): 
     return key;
   }
 
-  // Paraméter behelyettesítés
+  // Parameter interpolation
   if (params) {
     for (const [k, v] of Object.entries(params)) {
       value = value.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v));
@@ -108,7 +108,7 @@ export async function t(key: string, params?: Record<string, string | number>): 
 }
 
 /**
- * Cache ürítése (locale váltás után hívandó).
+ * Clear cache (call after locale change).
  */
 export function clearTranslationCache(): void {
   _cache.clear();
@@ -116,7 +116,7 @@ export function clearTranslationCache(): void {
 }
 
 /**
- * Támogatott locale-ok listája.
+ * List of supported locales.
  */
 export function getSupportedLocales(): readonly SupportedLocale[] {
   return SUPPORTED_LOCALES;

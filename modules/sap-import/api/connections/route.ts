@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     const result = await connector.testConnection();
 
-    // Eredmény mentése
+    // Save result
     await getDb().query(
       `UPDATE mod_sap_connections
        SET last_tested_at = SYSDATETIME(), last_test_ok = @p0, last_error = @p1
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     return Response.json({ ok: result.ok, message: result.message });
   }
 
-  // Új kapcsolat létrehozása
+  // Create new connection
   const auth = await checkAuth(request, 'sap-import.edit');
   if (!auth.valid) return auth.response;
   const csrf = checkCsrf(request);

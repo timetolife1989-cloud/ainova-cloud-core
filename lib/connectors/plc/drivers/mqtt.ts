@@ -1,12 +1,12 @@
 /**
  * MQTT Driver — Ainova Cloud Intelligence
  *
- * IIoT edge eszközök + PLC gateway-ek MQTT üzenetein keresztül.
- * Tipikus használat: MQTT broker (Mosquitto / HiveMQ / AWS IoT Core)
- *   → PLC/érzékelő adatok JSON publish-ok formájában
- *   → ACI feliratkozik, parse-ol, mentés DB-be
+ * IIoT edge devices + PLC gateways via MQTT messages.
+ * Typical usage: MQTT broker (Mosquitto / HiveMQ / AWS IoT Core)
+ *   → PLC/sensor data as JSON publishes
+ *   → ACI subscribes, parses, saves to DB
  *
- * ELŐKÉSZÍTVE — Aktiváláshoz szükséges:
+ * PREPARED — Activation requires:
  *   npm install mqtt
  */
 import type { IPlcDriver, PlcProtocol, PlcTag, PlcReadResult, PlcWriteResult, PlcConnectionStatus } from '../interface';
@@ -57,7 +57,7 @@ export class MqttDriver implements IPlcDriver {
   //     for (const [key, val] of Object.entries(data)) {
   //       this.tagValueCache.set(`${topic}/${key}`, { value: val, ts: new Date() });
   //     }
-  //   } catch { /* nem JSON — string értékként kezeljük */ }
+  //   } catch { /* not JSON — treat as string value */ }
   // }
 
   async disconnect(): Promise<void> {
@@ -76,7 +76,7 @@ export class MqttDriver implements IPlcDriver {
   }
 
   async readTags(tags: PlcTag[]): Promise<PlcReadResult[]> {
-    // MQTT aszinkron — a driver a cache-ből olvassa a legutóbbi értéket
+    // MQTT is async — the driver reads the latest value from cache
     // tag.address = MQTT topic + JSON mező: "sensors/machine1/temperature"
     return tags.map(tag => ({
       tagId: tag.id,

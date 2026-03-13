@@ -24,11 +24,11 @@ interface UnitRow {
 
 let _cache: UnitInfo[] | null = null;
 let _cacheAt = 0;
-const CACHE_TTL = 5 * 60 * 1000; // 5 perc
+const CACHE_TTL = 5 * 60 * 1000; // 5 min
 
 /**
- * Összes aktív unit lekérése.
- * 5 percig cache-eli.
+ * Get all active units.
+ * Cached for 5 minutes.
  */
 export async function getAllUnits(): Promise<UnitInfo[]> {
   const now = Date.now();
@@ -59,7 +59,7 @@ export async function getAllUnits(): Promise<UnitInfo[]> {
 }
 
 /**
- * Összes unit lekérése (aktív + inaktív, admin számára).
+ * Get all units (active + inactive, for admin).
  */
 export async function getAllUnitsAdmin(): Promise<UnitInfo[]> {
   try {
@@ -85,7 +85,7 @@ export async function getAllUnitsAdmin(): Promise<UnitInfo[]> {
 }
 
 /**
- * Egy unit lekérése kód alapján.
+ * Get a unit by its code.
  */
 export async function getUnitByCode(code: string): Promise<UnitInfo | null> {
   const units = await getAllUnits();
@@ -93,7 +93,7 @@ export async function getUnitByCode(code: string): Promise<UnitInfo | null> {
 }
 
 /**
- * Érték formázása a megfelelő mértékegységgel.
+ * Format a value with the appropriate unit of measurement.
  */
 export async function formatUnitValue(value: number, unitCode: string): Promise<string> {
   const unit = await getUnitByCode(unitCode);
@@ -108,7 +108,7 @@ export async function formatUnitValue(value: number, unitCode: string): Promise<
 }
 
 /**
- * Cache ürítése (unit módosítás után hívandó).
+ * Clear cache (call after unit changes).
  */
 export function clearUnitCache(): void {
   _cache = null;
