@@ -1,10 +1,12 @@
 """
 Ainova Drone System — Translation Scout Agent
-Searches GitHub for i18n JSON files in manufacturing/SaaS repos.
-Extracts and analyzes translations to improve ACI's multi-language support.
+Crawls into ACI's own repo, compares hu/en/de i18n JSON files,
+finds missing/broken translations, and generates fixes via LLM.
 """
 
+import json
 import os
+import httpx
 from rich.console import Console
 
 from core.llm_client import LLMClient
@@ -18,293 +20,311 @@ PROMPT_PATH = os.path.join(os.path.dirname(__file__), "..", "prompts", "translat
 with open(PROMPT_PATH, "r", encoding="utf-8") as f:
     SYSTEM_PROMPT = f.read()
 
+# ACI repo — raw file URLs for i18n JSONs
+GITHUB_RAW_BASE = "https://raw.githubusercontent.com/timetolife1989-cloud/ainova-cloud-core/main"
+I18N_FILES = {
+    "hu": f"{GITHUB_RAW_BASE}/lib/i18n/fallback/hu.json",
+    "en": f"{GITHUB_RAW_BASE}/lib/i18n/fallback/en.json",
+    "de": f"{GITHUB_RAW_BASE}/lib/i18n/fallback/de.json",
+}
 
-# GitHub search queries to find i18n files in relevant repos
-RESEARCH_TASKS = [
-    # === ROUND 1: Manufacturing / MES i18n files ===
-    {
-        "category": "mes_translations",
-        "title": "MES / Manufacturing Execution System translations",
-        "queries": [
-            "github MES manufacturing execution system i18n JSON translations",
-            "site:github.com MES locales de.json manufacturing",
-            "open source MES software multilingual German Hungarian translations",
-            "manufacturing execution system open source i18n locale files",
-        ],
-    },
-    {
-        "category": "oee_quality_translations",
-        "title": "OEE and quality management translations",
-        "queries": [
-            "github OEE overall equipment effectiveness i18n translations",
-            "quality management SPC FMEA software localization files",
-            "site:github.com quality control software locale json de hu",
-            "manufacturing quality assurance open source translations German",
-        ],
-    },
-    {
-        "category": "cmms_maintenance_translations",
-        "title": "CMMS / maintenance management translations",
-        "queries": [
-            "github CMMS maintenance management i18n locale JSON",
-            "preventive maintenance software open source translations de en",
-            "asset management system open source localization files",
-            "TPM total productive maintenance software i18n translations",
-        ],
-    },
-    # === ROUND 2: ERP / SAP related ===
-    {
-        "category": "erp_translations",
-        "title": "ERP system translations (SAP, production, inventory)",
-        "queries": [
-            "open source ERP system i18n translations JSON German Hungarian",
-            "github ERPNext locale translation manufacturing de hu",
-            "site:github.com ERP locales production order material management",
-            "odoo manufacturing module translations German Hungarian JSON",
-        ],
-    },
-    {
-        "category": "inventory_warehouse_translations",
-        "title": "Inventory and warehouse management translations",
-        "queries": [
-            "warehouse management system WMS open source i18n JSON",
-            "inventory management software locale translations de en",
-            "supply chain management open source translations German",
-            "stock management barcode scanning software localization",
-        ],
-    },
-    # === ROUND 3: Enterprise SaaS UI patterns ===
-    {
-        "category": "saas_admin_ui_translations",
-        "title": "Enterprise SaaS admin/dashboard UI translations",
-        "queries": [
-            "react admin dashboard i18n translations JSON de en hu",
-            "github enterprise SaaS admin panel localization files",
-            "site:github.com admin dashboard locale de.json en.json",
-            "open source admin template multilingual German English JSON",
-        ],
-    },
-    {
-        "category": "rbac_auth_translations",
-        "title": "RBAC, authentication, and user management translations",
-        "queries": [
-            "role based access control UI translations i18n JSON",
-            "authentication login register form translations German",
-            "user management admin panel locale files open source",
-            "permissions roles users groups i18n translations de en",
-        ],
-    },
-    {
-        "category": "form_validation_error_translations",
-        "title": "Form validation and error message translations",
-        "queries": [
-            "form validation error messages i18n German Hungarian JSON",
-            "zod yup validation messages i18n locale translations",
-            "common UI error messages translations de en multilingual",
-            "react form validation localization patterns",
-        ],
-    },
-    # === ROUND 4: Production & scheduling ===
-    {
-        "category": "production_planning_translations",
-        "title": "Production planning and scheduling translations",
-        "queries": [
-            "production planning scheduling software i18n translations",
-            "manufacturing planning open source locale de en JSON",
-            "shift management workforce scheduling i18n translations",
-            "capacity planning production order translations German",
-        ],
-    },
-    {
-        "category": "fleet_logistics_translations",
-        "title": "Fleet management and logistics translations",
-        "queries": [
-            "fleet management open source software translations de en",
-            "logistics tracking delivery management i18n JSON locale",
-            "vehicle fleet tracking software localization German",
-            "transport management system TMS i18n translations",
-        ],
-    },
-    # === ROUND 5: CEE / Eastern European languages ===
-    {
-        "category": "polish_industrial_translations",
-        "title": "Polish (pl) manufacturing and industrial translations",
-        "queries": [
-            "github open source software Polish pl.json manufacturing",
-            "site:github.com locale pl.json production management",
-            "Polish language industrial software i18n translations JSON",
-            "MES ERP software Polish localization open source",
-        ],
-    },
-    {
-        "category": "czech_slovak_translations",
-        "title": "Czech (cs) and Slovak (sk) industrial translations",
-        "queries": [
-            "github Czech cs.json manufacturing software translations",
-            "Slovak sk.json industrial management open source locale",
-            "Czech language ERP MES software i18n translations",
-            "site:github.com locale cs.json sk.json enterprise SaaS",
-        ],
-    },
-    {
-        "category": "romanian_translations",
-        "title": "Romanian (ro) industrial and enterprise translations",
-        "queries": [
-            "github Romanian ro.json manufacturing software translations",
-            "Romanian language enterprise SaaS i18n locale JSON",
-            "site:github.com locale ro.json production management",
-            "open source software Romanian localization manufacturing",
-        ],
-    },
-    # === ROUND 6: German industrial-specific ===
-    {
-        "category": "german_industrial_specific",
-        "title": "German Industrie 4.0 and manufacturing terminology",
-        "queries": [
-            "Industrie 4.0 software i18n Deutsch Lokalisierung JSON",
-            "Produktionsplanung Software Übersetzung i18n open source",
-            "Fertigungssteuerung MES deutsche Übersetzungen locale",
-            "Qualitätsmanagement Software i18n de.json open source",
-        ],
-    },
-    # === ROUND 7: Reports and analytics ===
-    {
-        "category": "reporting_analytics_translations",
-        "title": "Reporting, analytics, and KPI dashboard translations",
-        "queries": [
-            "reporting analytics dashboard i18n translations de en JSON",
-            "KPI metrics dashboard open source locale translations",
-            "data visualization chart analytics i18n German",
-            "business intelligence dashboard translations multilingual",
-        ],
-    },
-    # === ROUND 8: ESG and compliance ===
-    {
-        "category": "esg_compliance_translations",
-        "title": "ESG, sustainability, and compliance translations",
-        "queries": [
-            "ESG sustainability reporting software i18n translations",
-            "environmental compliance management translations de en",
-            "carbon footprint energy monitoring i18n locale JSON",
-            "CSRD sustainability reporting translations German",
-        ],
-    },
-]
+# Process keys in batches to stay within LLM token limits
+BATCH_SIZE = 80
 
 
 class TranslationScout:
-    """Searches GitHub for i18n translation files relevant to ACI."""
+    """Crawls ACI's own i18n files, finds gaps, generates translations via LLM."""
 
     def __init__(self, llm: LLMClient, scraper: WebScraper, storage: Storage):
         self.llm = llm
-        self.scraper = scraper
+        self.scraper = scraper  # not used — direct HTTP fetch
         self.storage = storage
         self.results_count = 0
 
     async def run(self) -> int:
-        """Execute all research tasks. Returns number of results saved."""
-        console.print(f"[bold cyan]Translation Scout starting — {len(RESEARCH_TASKS)} tasks[/bold cyan]")
+        """Execute translation audit + generation. Returns number of results saved."""
+        console.print("[bold cyan]Translation Scout starting — fetching ACI i18n files[/bold cyan]")
 
-        for i, task in enumerate(RESEARCH_TASKS):
-            console.print(f"\n[bold]Task {i+1}/{len(RESEARCH_TASKS)}: {task['title']}[/bold]")
-            try:
-                await self._research_task(task)
-            except Exception as e:
-                console.print(f"[red]Task failed: {e}[/red]")
+        # Step 1: Fetch all JSON files from repo
+        translations = await self._fetch_i18n_files()
+        if not translations:
+            console.print("[red]Could not fetch i18n files. Aborting.[/red]")
+            return 0
+
+        hu_keys = set(translations.get("hu", {}).keys())
+        en_keys = set(translations.get("en", {}).keys())
+        de_keys = set(translations.get("de", {}).keys())
+        all_keys = hu_keys | en_keys | de_keys
+
+        console.print(f"  HU: {len(hu_keys)} keys | EN: {len(en_keys)} keys | DE: {len(de_keys)} keys")
+        console.print(f"  Total unique keys: {len(all_keys)}")
+
+        # Step 2: Find missing keys per language
+        missing = {
+            "hu": sorted(all_keys - hu_keys),
+            "en": sorted(all_keys - en_keys),
+            "de": sorted(all_keys - de_keys),
+        }
+        total_missing = sum(len(v) for v in missing.values())
+        console.print(f"  Missing — HU: {len(missing['hu'])} | EN: {len(missing['en'])} | DE: {len(missing['de'])}")
+
+        if total_missing == 0:
+            console.print("[bold green]All translations are complete! Running quality check only...[/bold green]")
+
+        # Step 3: Generate missing translations in batches
+        generated_translations: dict[str, dict[str, str]] = {"hu": {}, "en": {}, "de": {}}
+
+        for lang, missing_keys in missing.items():
+            if not missing_keys:
                 continue
 
-        # Generate summary report
-        self._generate_report()
+            console.print(f"\n[bold]Generating {len(missing_keys)} missing {lang.upper()} translations...[/bold]")
 
-        console.print(f"\n[bold green]Translation Scout finished — {self.results_count} results[/bold green]")
-        return self.results_count
+            for batch_start in range(0, len(missing_keys), BATCH_SIZE):
+                batch_keys = missing_keys[batch_start:batch_start + BATCH_SIZE]
+                batch_num = (batch_start // BATCH_SIZE) + 1
+                total_batches = (len(missing_keys) + BATCH_SIZE - 1) // BATCH_SIZE
+                console.print(f"  Batch {batch_num}/{total_batches} ({len(batch_keys)} keys)...")
 
-    async def _research_task(self, task: dict):
-        """Research a single task: search GitHub, extract i18n files, analyze with LLM."""
-        all_content = []
+                # Build context: show each missing key with its values in other languages
+                context_lines = []
+                for key in batch_keys:
+                    existing = {}
+                    for other_lang in ["hu", "en", "de"]:
+                        if other_lang != lang and key in translations.get(other_lang, {}):
+                            existing[other_lang] = translations[other_lang][key]
+                    context_lines.append(f"  \"{key}\": existing={json.dumps(existing, ensure_ascii=False)}")
 
-        # Step 1: Search for repos with i18n files
-        for query in task["queries"]:
-            results = await self.scraper.search_and_extract(query, max_pages=3)
-            for r in results:
-                if r.get("content"):
-                    all_content.append({
-                        "query": query,
-                        "title": r["title"],
-                        "url": r["url"],
-                        "content": r["content"][:4000],  # More content for translation extraction
-                    })
+                context_text = "\n".join(context_lines)
 
-        if not all_content:
-            console.print(f"  [yellow]No content found for {task['category']}[/yellow]")
-            return
+                result = self.llm.chat_json(
+                    messages=[
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {
+                            "role": "user",
+                            "content": (
+                                f"Generate {lang.upper()} translations for these missing keys.\n"
+                                f"Each key has its values in other languages shown for context.\n\n"
+                                f"Missing keys for {lang.upper()}:\n{context_text}\n\n"
+                                f"Return a JSON object with ONLY the key-value pairs:\n"
+                                f'{{"key.name": "translation", "key.name2": "translation2"}}\n\n'
+                                f"Rules:\n"
+                                f"- Use proper manufacturing/industrial B2B terminology\n"
+                                f"- Preserve placeholders like {{count}}, {{name}}, @{{username}} exactly\n"
+                                f"- Match the register and style of existing ACI translations"
+                            ),
+                        },
+                    ],
+                    max_tokens=4096,
+                )
 
-        # Step 2: Have the LLM analyze and extract useful translations
-        console.print(f"  Analyzing {len(all_content)} sources with LLM...")
+                if isinstance(result, dict):
+                    generated_translations[lang].update(result)
+                    console.print(f"    Generated {len(result)} translations")
 
-        content_text = ""
-        for item in all_content[:10]:  # More sources for translations
-            content_text += f"\n--- Source: {item['url']} ---\n"
-            content_text += f"Title: {item['title']}\n"
-            content_text += item["content"][:3000] + "\n"
+        # Step 4: Quality check on existing translations
+        console.print("\n[bold]Running quality check on existing translations...[/bold]")
+        quality_issues = await self._quality_check(translations)
 
-        analysis = self.llm.chat_json(
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {
-                    "role": "user",
-                    "content": (
-                        f"Research topic: {task['title']}\n"
-                        f"Category: {task['category']}\n\n"
-                        f"Here is the web content I collected from GitHub and related sites:\n{content_text}\n\n"
-                        f"Analyze this content and find i18n translation files or translation patterns. "
-                        f"Produce a structured JSON response following the output format in your system prompt. "
-                        f"Focus on:\n"
-                        f"1. Actual translation key-value pairs found (especially de/hu/en)\n"
-                        f"2. Repository URL and license\n"
-                        f"3. Quality assessment of the translations\n"
-                        f"4. Specific keys/terms useful for ACI's manufacturing domain\n"
-                        f"5. Any CEE language translations found (pl, cs, sk, ro)"
-                    ),
-                },
-            ],
-            max_tokens=4096,
-        )
+        # Step 5: Save results
+        all_generated = {lang: vals for lang, vals in generated_translations.items() if vals}
+        total_generated = sum(len(v) for v in all_generated.values())
 
-        # Step 3: Save result
-        source_urls = list(set(item["url"] for item in all_content))
-        quality = analysis.get("quality_score", 0.7) if isinstance(analysis, dict) else 0.7
+        result_data = {
+            "stats": {
+                "total_keys": len(all_keys),
+                "hu_keys": len(hu_keys),
+                "en_keys": len(en_keys),
+                "de_keys": len(de_keys),
+                "missing_hu": len(missing["hu"]),
+                "missing_en": len(missing["en"]),
+                "missing_de": len(missing["de"]),
+                "generated_total": total_generated,
+            },
+            "generated_translations": all_generated,
+            "quality_issues": quality_issues,
+            "missing_keys": {lang: keys for lang, keys in missing.items() if keys},
+        }
 
         self.storage.save_result(
-            drone_type="translation_research",
-            category=task["category"],
-            title=analysis.get("title", task["title"]) if isinstance(analysis, dict) else task["title"],
-            content=analysis,
-            summary=analysis.get("recommendation", "") if isinstance(analysis, dict) else "",
-            source_urls=source_urls,
-            relevance_score=quality,
+            drone_type="translation_audit",
+            category="i18n_completeness",
+            title=f"ACI Translation Audit — {total_missing} missing, {total_generated} generated",
+            content=result_data,
+            summary=f"Found {total_missing} missing translations, generated {total_generated}. Quality issues: {len(quality_issues)}",
+            source_urls=[I18N_FILES["hu"], I18N_FILES["en"], I18N_FILES["de"]],
+            relevance_score=1.0,
         )
         self.results_count += 1
 
-    def _generate_report(self):
-        """Generate a markdown summary report of all translation findings."""
-        report = f"# Translation Scout Report — {self.results_count} findings\n\n"
-        report += "## Mission\n\n"
-        report += "Find and extract high-quality i18n translations from open-source manufacturing/SaaS repos.\n"
-        report += "Target languages: HU, EN, DE (primary) + PL, CS, SK, RO (CEE expansion).\n\n"
-        report += "## Research Categories\n\n"
-        categories = [t["category"] for t in RESEARCH_TASKS]
-        for i, cat in enumerate(categories, 1):
-            report += f"{i}. `{cat}` — {RESEARCH_TASKS[i-1]['title']}\n"
-        report += f"\n## Output\n\n"
-        report += f"Results in Supabase `drone_results` table and `output/translation_research/` directory.\n"
-        report += "Use these findings to:\n"
-        report += "- Fill missing translation keys\n"
-        report += "- Improve manufacturing-specific terminology accuracy\n"
-        report += "- Prepare PL/CS/SK/RO translations for CEE market launch\n"
+        # Step 6: Save generated translations as separate JSON files for easy merge
+        for lang, new_translations in all_generated.items():
+            if new_translations:
+                # Merge with existing
+                full = {**translations.get(lang, {}), **new_translations}
+                sorted_full = dict(sorted(full.items()))
+                self.storage.save_markdown_report(
+                    drone_type="translation_audit",
+                    filename=f"{lang}_complete.json",
+                    content=json.dumps(sorted_full, ensure_ascii=False, indent=2),
+                )
+                # Also save just the new keys for review
+                self.storage.save_markdown_report(
+                    drone_type="translation_audit",
+                    filename=f"{lang}_new_keys.json",
+                    content=json.dumps(dict(sorted(new_translations.items())), ensure_ascii=False, indent=2),
+                )
+
+        # Step 7: Generate report
+        self._generate_report(result_data)
+
+        console.print(f"\n[bold green]Translation Scout finished — {self.results_count} results[/bold green]")
+        console.print(f"  Generated {total_generated} new translations")
+        console.print(f"  Quality issues found: {len(quality_issues)}")
+        return self.results_count
+
+    async def _fetch_i18n_files(self) -> dict[str, dict[str, str]]:
+        """Fetch hu.json, en.json, de.json from GitHub raw."""
+        translations: dict[str, dict[str, str]] = {}
+
+        async with httpx.AsyncClient(timeout=30) as client:
+            for lang, url in I18N_FILES.items():
+                try:
+                    console.print(f"  Fetching {lang}.json from GitHub...")
+                    resp = await client.get(url)
+                    resp.raise_for_status()
+                    translations[lang] = resp.json()
+                    console.print(f"    [green]{lang}.json — {len(translations[lang])} keys[/green]")
+                except Exception as e:
+                    console.print(f"    [red]Failed to fetch {lang}.json: {e}[/red]")
+
+        return translations
+
+    async def _quality_check(self, translations: dict[str, dict[str, str]]) -> list[dict]:
+        """Check existing translations for quality issues."""
+        issues = []
+
+        # Automated checks (no LLM needed)
+        for lang, data in translations.items():
+            for key, value in data.items():
+                # Empty values
+                if not value or not value.strip():
+                    issues.append({"lang": lang, "key": key, "issue": "empty_value", "value": value})
+
+                # Value same as key (untranslated placeholder)
+                if value == key:
+                    issues.append({"lang": lang, "key": key, "issue": "key_as_value", "value": value})
+
+                # Placeholder mismatch vs Hungarian source
+                if lang != "hu" and key in translations.get("hu", {}):
+                    hu_val = translations["hu"][key]
+                    hu_ph = self._extract_placeholders(hu_val)
+                    val_ph = self._extract_placeholders(value)
+                    if hu_ph and hu_ph != val_ph:
+                        issues.append({
+                            "lang": lang, "key": key, "issue": "placeholder_mismatch",
+                            "expected": list(hu_ph), "found": list(val_ph),
+                        })
+
+        # LLM spot-check on a sample of 30 keys
+        sample_keys = sorted(translations.get("hu", {}).keys())[:30]
+        if sample_keys:
+            sample_data = {}
+            for key in sample_keys:
+                sample_data[key] = {
+                    lang: translations[lang].get(key, "MISSING")
+                    for lang in ["hu", "en", "de"]
+                }
+
+            console.print(f"  LLM quality check on {len(sample_keys)} sample keys...")
+            llm_result = self.llm.chat_json(
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {
+                        "role": "user",
+                        "content": (
+                            f"Check these existing ACI translations for quality issues.\n"
+                            f"Look for: wrong register, wrong technical term, inconsistency, "
+                            f"machine-translation artifacts, placeholder errors.\n\n"
+                            f"Translations:\n{json.dumps(sample_data, ensure_ascii=False, indent=2)}\n\n"
+                            f"Return a JSON object:\n"
+                            f'{{"issues": [{{"key": "...", "lang": "...", "problem": "...", "suggestion": "..."}}]}}\n'
+                            f"If all translations look good, return: {{\"issues\": []}}"
+                        ),
+                    },
+                ],
+                max_tokens=2048,
+            )
+
+            if isinstance(llm_result, dict) and llm_result.get("issues"):
+                for issue in llm_result["issues"]:
+                    issues.append({
+                        "lang": issue.get("lang", "?"), "key": issue.get("key", "?"),
+                        "issue": "quality", "problem": issue.get("problem", ""),
+                        "suggestion": issue.get("suggestion", ""),
+                    })
+
+        return issues
+
+    @staticmethod
+    def _extract_placeholders(text: str) -> set[str]:
+        """Extract {placeholder} and @{placeholder} patterns from text."""
+        result = set()
+        i = 0
+        while i < len(text):
+            # Check for @{ or {
+            start = -1
+            if text[i] == '{':
+                start = i
+            elif text[i] == '@' and i + 1 < len(text) and text[i + 1] == '{':
+                start = i
+                i += 1  # skip to {
+
+            if start != -1:
+                end = text.find('}', i)
+                if end != -1:
+                    result.add(text[start:end + 1])
+                    i = end
+            i += 1
+        return result
+
+    def _generate_report(self, data: dict):
+        """Generate a summary report."""
+        stats = data.get("stats", {})
+        issues = data.get("quality_issues", [])
+
+        report = "# Translation Scout Report\n\n"
+        report += "## Summary\n\n"
+        report += f"- Total unique keys: **{stats.get('total_keys', 0)}**\n"
+        report += f"- HU: {stats.get('hu_keys', 0)} keys\n"
+        report += f"- EN: {stats.get('en_keys', 0)} keys\n"
+        report += f"- DE: {stats.get('de_keys', 0)} keys\n\n"
+        report += "## Missing Translations\n\n"
+        report += f"- HU missing: **{stats.get('missing_hu', 0)}**\n"
+        report += f"- EN missing: **{stats.get('missing_en', 0)}**\n"
+        report += f"- DE missing: **{stats.get('missing_de', 0)}**\n"
+        report += f"- Total generated: **{stats.get('generated_total', 0)}**\n\n"
+
+        if issues:
+            report += "## Quality Issues\n\n"
+            for issue in issues:
+                report += f"- `{issue.get('key')}` ({issue.get('lang')}): {issue.get('issue')}"
+                if issue.get("problem"):
+                    report += f" — {issue['problem']}"
+                if issue.get("suggestion"):
+                    report += f" → {issue['suggestion']}"
+                report += "\n"
+
+        report += "\n## Output Files\n\n"
+        report += "- `{lang}_complete.json` — Full merged translation file (existing + generated)\n"
+        report += "- `{lang}_new_keys.json` — Only the newly generated keys (for review)\n"
+        report += "\n## How to Apply\n\n"
+        report += "1. Review `*_new_keys.json` files in `output/translation_audit/`\n"
+        report += "2. Copy approved translations into `lib/i18n/fallback/{lang}.json`\n"
+        report += "3. Or replace whole file with `*_complete.json` if all looks good\n"
 
         self.storage.save_markdown_report(
-            drone_type="translation_research",
+            drone_type="translation_audit",
             filename="TRANSLATION_SCOUT_REPORT.md",
             content=report,
         )
