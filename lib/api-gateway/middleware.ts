@@ -88,19 +88,12 @@ export async function checkApiKey(
 }
 
 /**
- * Generate a random API key.
+ * Generate a cryptographically secure API key.
  */
 export function generateApiKey(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const segments = 4;
-  const segLen = 8;
-  const parts: string[] = [];
-  for (let s = 0; s < segments; s++) {
-    let seg = '';
-    for (let i = 0; i < segLen; i++) {
-      seg += chars[Math.floor(Math.random() * chars.length)];
-    }
-    parts.push(seg);
-  }
-  return parts.join('-');
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  // Format as 4 segments of 8 hex chars: xxxxxxxx-xxxxxxxx-xxxxxxxx-xxxxxxxx
+  return `${hex.slice(0, 8)}-${hex.slice(8, 16)}-${hex.slice(16, 24)}-${hex.slice(24, 32)}`;
 }

@@ -62,6 +62,11 @@ const StepSchemas = {
 
 // POST /api/setup — process setup step
 export async function POST(request: NextRequest) {
+  // CSRF check — even though setup is one-time, protect against CSRF attacks
+  const { checkCsrf } = await import('@/lib/api-utils');
+  const csrf = checkCsrf(request);
+  if (!csrf.valid) return csrf.response;
+
   try {
     const { getSetting, setSetting } = await import('@/lib/settings');
     

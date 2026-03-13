@@ -146,6 +146,28 @@ RESEARCH_TASKS = [
             "VDA 6.3 process audit requirements manufacturing system",
         ],
     },
+    # === 2026 Regulatory & Compliance ===
+    {
+        "category": "eu_regulatory_2026",
+        "title": "EU regulatory changes 2025-2026 affecting manufacturing software",
+        "queries": [
+            "EU regulation changes 2025 2026 manufacturing industry digital",
+            "European Union CSRD sustainability reporting 2025 2026 manufacturing",
+            "EU Cyber Resilience Act 2025 2026 SaaS software requirements",
+            "EU AI Act compliance manufacturing software 2025 2026",
+            "NIS2 directive cybersecurity requirements manufacturing OT IT",
+        ],
+    },
+    {
+        "category": "data_protection_manufacturing_2026",
+        "title": "GDPR and data protection for manufacturing 2026",
+        "queries": [
+            "GDPR manufacturing employee data tracking monitoring 2025 2026",
+            "employee monitoring manufacturing plant GDPR compliance",
+            "data protection impact assessment manufacturing MES system",
+            "cross-border data transfer manufacturing EU regulations Schrems",
+        ],
+    },
 ]
 
 

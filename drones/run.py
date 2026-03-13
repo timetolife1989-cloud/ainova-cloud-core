@@ -5,6 +5,7 @@ Usage:
     python run.py --drone tech_scout       # Run specific drone
     python run.py --drone industry_scout
     python run.py --drone competitor_scout
+    python run.py --drone translation_scout
     python run.py --check                  # Check system health only
 """
 
@@ -21,7 +22,7 @@ console = Console()
 
 
 @click.command()
-@click.option("--drone", type=click.Choice(["tech_scout", "industry_scout", "competitor_scout"]), default=None, help="Run a specific drone (default: all)")
+@click.option("--drone", type=click.Choice(["tech_scout", "industry_scout", "competitor_scout", "translation_scout"]), default=None, help="Run a specific drone (default: all)")
 @click.option("--check", is_flag=True, help="Only check system health, don't run drones")
 @click.option("--loop", is_flag=True, help="Continuous mode — keep running until pod is stopped")
 def main(drone: str | None, check: bool, loop: bool):

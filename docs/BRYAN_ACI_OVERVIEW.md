@@ -1,8 +1,7 @@
 # Ainova Cloud Intelligence (ACI) — System Overview
 
-> **Prepared for:** Bryan (Personal Assistant to Tibor Svasznik, CEO)
-> **Date:** March 13, 2026
-> **Version:** v1.3.0
+> **Prepared for:** Bryan ( Director of International Sales & Branding)
+
 
 ---
 

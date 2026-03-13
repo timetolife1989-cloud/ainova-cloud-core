@@ -113,7 +113,7 @@ export class SessionAdapter implements IAuthAdapter {
   // -------------------------------------------------------------------
 
   private async checkRateLimit(ip: string): Promise<void> {
-    if (process.env.FE_LOGIN_RATE_LIMIT !== 'true') return;
+    if (process.env.FE_LOGIN_RATE_LIMIT === 'false') return;
 
     try {
       const rows = await this.db.query<CountRow>(
@@ -166,7 +166,7 @@ export class SessionAdapter implements IAuthAdapter {
       details?: string | null;
     }
   ): void {
-    if (process.env.FE_LOGIN_AUDIT !== 'true') return;
+    if (process.env.FE_LOGIN_AUDIT === 'false') return;
 
     const params: QueryParam[] = [
       { name: 'event_type', type: 'nvarchar', value: eventType, maxLength: 50 },
@@ -200,6 +200,9 @@ export class SessionAdapter implements IAuthAdapter {
 
       if (isSuperadmin) {
         const { SUPERADMIN } = await import('../superadmin');
+
+        // Rate limit applies to superadmin too
+        await this.checkRateLimit(ip);
         // Ensure superadmin user exists in DB
         const existing = await this.db.query<UserRow>(
           `SELECT id, username, password_hash, full_name, email, role, is_active, first_login

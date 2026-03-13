@@ -1,5 +1,6 @@
 import { type NextRequest } from 'next/server';
 import { checkAuth } from '@/lib/rbac/middleware';
+import { checkCsrf } from '@/lib/api-utils';
 import { getAllRoles, getAllPermissions, clearPermissionCache } from '@/lib/rbac';
 import { getDb, type QueryParam } from '@/lib/db';
 import { z } from 'zod';
@@ -29,6 +30,8 @@ const CreateRoleSchema = z.object({
 
 // POST /api/admin/roles — create new role
 export async function POST(request: NextRequest) {
+  const csrf = checkCsrf(request);
+  if (!csrf.valid) return csrf.response;
   const auth = await checkAuth(request, 'admin.access');
   if (!auth.valid) return auth.response;
 
@@ -93,6 +96,8 @@ const UpdateRoleSchema = z.object({
 
 // PUT /api/admin/roles — update role
 export async function PUT(request: NextRequest) {
+  const csrf = checkCsrf(request);
+  if (!csrf.valid) return csrf.response;
   const auth = await checkAuth(request, 'admin.access');
   if (!auth.valid) return auth.response;
 
@@ -180,6 +185,8 @@ const DeleteRoleSchema = z.object({
 
 // DELETE /api/admin/roles — delete role
 export async function DELETE(request: NextRequest) {
+  const csrf = checkCsrf(request);
+  if (!csrf.valid) return csrf.response;
   const auth = await checkAuth(request, 'admin.access');
   if (!auth.valid) return auth.response;
 

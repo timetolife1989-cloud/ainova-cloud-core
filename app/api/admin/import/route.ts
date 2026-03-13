@@ -1,10 +1,13 @@
 import { type NextRequest } from 'next/server';
 import { checkAuth } from '@/lib/rbac/middleware';
+import { checkCsrf } from '@/lib/api-utils';
 import { saveUploadedFile, detectFileType, readFileHeaders, processImport, cleanupFile } from '@/lib/import/pipeline';
 
 // POST /api/admin/import — unified import endpoint
 // action: 'upload' | 'detect' | 'headers' | 'process'
 export async function POST(request: NextRequest) {
+  const csrf = checkCsrf(request);
+  if (!csrf.valid) return csrf.response;
   const auth = await checkAuth(request, 'data.import');
   if (!auth.valid) return auth.response;
 

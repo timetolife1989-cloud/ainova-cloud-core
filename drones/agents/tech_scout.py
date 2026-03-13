@@ -337,6 +337,63 @@ RESEARCH_TASKS = [
             "escalation workflow notification manufacturing critical events",
         ],
     },
+    # === ROUND 15: Security Hardening & Edge Security ===
+    {
+        "category": "edge_security_breach_detection",
+        "title": "Edge security, breach detection, and automatic lockdown",
+        "queries": [
+            "next.js middleware rate limiting bot protection implementation",
+            "real-time breach detection web application immediate lockdown",
+            "edge computing security manufacturing SaaS on-premise",
+            "automatic IP blocking brute force detection node.js",
+            "WAF web application firewall self-hosted open source",
+        ],
+    },
+    {
+        "category": "anti_scraping_data_protection",
+        "title": "Anti-scraping, anti-bot, and customer data protection",
+        "queries": [
+            "anti-scraping protection web application techniques 2025",
+            "bot detection fingerprinting browser javascript",
+            "API rate limiting sliding window token bucket node.js",
+            "customer data protection B2B SaaS best practices",
+            "data exfiltration prevention web application monitoring",
+        ],
+    },
+    # === ROUND 16: GDPR & 2026 Regulatory Compliance ===
+    {
+        "category": "gdpr_2026_compliance",
+        "title": "GDPR 2026 changes and EU data protection compliance",
+        "queries": [
+            "GDPR 2026 changes new regulations European Union",
+            "EU data protection regulation changes 2025 2026",
+            "GDPR compliance SaaS application implementation checklist",
+            "data processing agreement DPA template manufacturing SaaS",
+            "EU AI Act 2025 2026 compliance requirements SaaS",
+        ],
+    },
+    {
+        "category": "labor_law_compliance_2026",
+        "title": "EU labor law and workforce management compliance 2026",
+        "queries": [
+            "EU labor law changes 2025 2026 workforce management software",
+            "working time directive compliance software implementation",
+            "employee data protection GDPR HR manufacturing",
+            "Hungarian labor law munkajog 2025 2026 changes digital",
+            "German Arbeitszeitgesetz working time tracking software compliance",
+        ],
+    },
+    {
+        "category": "data_sovereignty_encryption",
+        "title": "Data sovereignty, encryption at rest, and zero-trust",
+        "queries": [
+            "data sovereignty EU manufacturing SaaS requirements",
+            "encryption at rest PostgreSQL Supabase implementation",
+            "zero trust architecture manufacturing SaaS next.js",
+            "data residency requirements EU GDPR SaaS application",
+            "field level encryption sensitive data web application node.js",
+        ],
+    },
 ]
 
 

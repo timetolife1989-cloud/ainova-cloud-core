@@ -90,6 +90,9 @@ class Orchestrator:
         elif drone_name == "competitor_scout":
             from agents.competitor_scout import CompetitorScout
             agent = CompetitorScout(self.llm, self.scraper, self.storage)
+        elif drone_name == "translation_scout":
+            from agents.translation_scout import TranslationScout
+            agent = TranslationScout(self.llm, self.scraper, self.storage)
         else:
             console.print(f"[red]Unknown drone: {drone_name}[/red]")
             return
@@ -112,7 +115,7 @@ class Orchestrator:
     async def run_all(self, drones: list[str] | None = None):
         """Run all specified drones sequentially."""
         if drones is None:
-            drones = ["tech_scout", "industry_scout", "competitor_scout"]
+            drones = ["tech_scout", "industry_scout", "competitor_scout", "translation_scout"]
 
         console.print(Panel(
             f"[bold cyan]Running {len(drones)} drones:[/bold cyan]\n" +
