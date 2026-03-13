@@ -55,32 +55,26 @@ git push
 ### 5. lépés: Kód letöltése a Pod-ra
 
 ```bash
-# A GitHub repód klónozása
 cd /workspace
-git clone https://github.com/YOURUSERNAME/ainova-cloud-core.git
+git clone https://github.com/timetolife1989-cloud/ainova-cloud-core.git
 cd ainova-cloud-core/drones
 ```
 
-> **FONTOS:** Cseréld ki `YOURUSERNAME`-et a saját GitHub felhasználónevedre!
-
 ### 6. lépés: .env fájl létrehozása
 
+Egyetlen COPY-PASTE (az egészet másold be egyben):
+
 ```bash
-cp .env.example .env
-nano .env
-```
-
-A nano szerkesztőben írd be a valós értékeket:
-
-```
+cat > .env << 'EOF'
 SUPABASE_URL=https://nfancsrufcvmulrxnfxx.supabase.co
 SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mYW5jc3J1ZmN2bXVscnhuZnh4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzIzODY3OCwiZXhwIjoyMDg4ODE0Njc4fQ.evReuIHoo52FOIrlVnxeeFUubmqpM8C7U0E5601xxr4
 HF_TOKEN=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
 VLLM_BASE_URL=http://localhost:8000/v1
 VLLM_MODEL=meta-llama/Llama-3.1-70B-Instruct
+EOF
 ```
 
-Mentés: `Ctrl+O` → `Enter` → `Ctrl+X`
+> Nem kell szerkesztő, nem kell nano — ez egyből létrehozza a fájlt.
 
 ### 7. lépés: Setup futtatása
 
