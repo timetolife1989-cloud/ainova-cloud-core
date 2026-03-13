@@ -3,7 +3,7 @@ import { registerModule } from '@/lib/modules/registry';
 registerModule({
   id: 'digital-twin',
   name: 'Digital Twin',
-  description: '2D gyártósor vizualizáció valós idejű gép állapotokkal',
+  description: '2D production line visualization with real-time machine statuses',
   version: '1.0.0',
   icon: '🏗️',
   color: 'cyan',

@@ -234,7 +234,7 @@ export default function SchedulingDashboardPage() {
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-1">{t('scheduling.name')} *</label>
-                <input type="text" value={formResourceName} onChange={e => setFormResourceName(e.target.value)} placeholder="pl. Kovács János" className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" />
+                <input type="text" value={formResourceName} onChange={e => setFormResourceName(e.target.value)} placeholder={t('scheduling.placeholder_name')} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-1">{t('scheduling.planned_hours')}</label>

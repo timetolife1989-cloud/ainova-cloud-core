@@ -138,11 +138,11 @@ function getRateColor(rate: number): string {
 
 // ── Period Selector ──────────────────────────────────────────────────
 
-const PERIODS: { id: Period; icon: React.ElementType; label: string }[] = [
-  { id: 'daily', icon: CalendarDays, label: 'Napi' },
-  { id: 'weekly', icon: CalendarRange, label: 'Heti' },
-  { id: 'monthly', icon: Calendar, label: 'Havi' },
-  { id: 'yearly', icon: CalendarClock, label: 'Éves' },
+const PERIODS: { id: Period; icon: React.ElementType; labelKey: string }[] = [
+  { id: 'daily', icon: CalendarDays, labelKey: 'common.daily' },
+  { id: 'weekly', icon: CalendarRange, labelKey: 'common.weekly' },
+  { id: 'monthly', icon: Calendar, labelKey: 'common.monthly' },
+  { id: 'yearly', icon: CalendarClock, labelKey: 'common.yearly' },
 ];
 
 // ── Main Component ───────────────────────────────────────────────────
@@ -197,7 +197,7 @@ export default function WorkforceCharts({ items, t }: Props) {
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
-                {p.label}
+                {t(p.labelKey)}
               </button>
             );
           })}

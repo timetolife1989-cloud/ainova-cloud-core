@@ -97,6 +97,6 @@ export async function createPlcDriver(
       return new OpcUaDriver(deviceId, config);
     }
     default:
-      throw new Error(`Ismeretlen PLC protokoll: ${protocol}`);
+      throw new Error(`Unknown PLC protocol: ${protocol}`);
   }
 }

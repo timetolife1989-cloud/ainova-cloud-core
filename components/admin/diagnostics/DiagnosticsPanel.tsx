@@ -143,7 +143,7 @@ export function DiagnosticsPanel() {
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <Activity className="w-4 h-4" />
           {data
-            ? <>Utolsó ellenőrzés: {new Date(data.timestamp).toLocaleTimeString(locale)}</>
+            ? <>{t('admin.diag.last_check')}: {new Date(data.timestamp).toLocaleTimeString(locale)}</>
             : loading ? t('common.loading') : t('common.no_data')}
         </div>
         <button

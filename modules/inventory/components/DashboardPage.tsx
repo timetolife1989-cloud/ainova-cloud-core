@@ -227,7 +227,7 @@ export default function InventoryDashboardPage() {
             <p className="text-sm text-gray-400 mb-4">{selectedItem.itemName} ({selectedItem.sku})</p>
             <div className="space-y-4">
               <div><label className="block text-xs font-medium text-gray-400 mb-1">{t('inventory.quantity')} *</label><input type="number" value={movQty} onChange={e => setMovQty(parseInt(e.target.value) || 0)} min={1} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
-              <div><label className="block text-xs font-medium text-gray-400 mb-1">{t('inventory.reference')}</label><input type="text" value={movRef} onChange={e => setMovRef(e.target.value)} placeholder="pl. rendelés szám" className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
+              <div><label className="block text-xs font-medium text-gray-400 mb-1">{t('inventory.reference')}</label><input type="text" value={movRef} onChange={e => setMovRef(e.target.value)} placeholder={t('inventory.placeholder_reference')} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" /></div>
             </div>
             {error && <div className="mt-4 p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-300 text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" /> {error}</div>}
             <div className="mt-6 flex justify-end gap-3">

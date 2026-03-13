@@ -100,7 +100,7 @@ export class SapRfcConnector implements ISapConnector {
     // await client.close();
     return {
       ok: false,
-      message: 'RFC connector előkészítve — node-rfc csomag és SAP NW RFC SDK szükséges',
+      message: 'RFC connector prepared — node-rfc package and SAP NW RFC SDK required',
     };
   }
 
@@ -153,7 +153,7 @@ export class SapODataConnector implements ISapConnector {
   async testConnection(): Promise<{ ok: boolean; message: string }> {
     // TODO: GET {baseUrl}{apiPath}/$metadata
     // const resp = await fetch(`${config.baseUrl}${config.apiPath}/$metadata`, { headers: buildHeaders() });
-    return { ok: false, message: 'OData connector előkészítve — baseUrl és hitelesítés szükséges' };
+    return { ok: false, message: 'OData connector prepared — baseUrl and authentication required' };
   }
 
   async readTable(
@@ -201,8 +201,8 @@ export function createSapConnector(config: SapConnectionConfig): ISapConnector {
       return new SapODataConnector(config);
     case 'file':
       // Fájl alapú import: lásd modules/lac-napi-perces már meglévő megoldása
-      throw new Error('File import a lac-napi-perces modulban kezelendő');
+      throw new Error('File import is handled in the file-import module');
     default:
-      throw new Error(`Ismeretlen SAP kapcsolat típus: ${(config as SapConnectionConfig).connectionType}`);
+      throw new Error(`Unknown SAP connection type: ${(config as SapConnectionConfig).connectionType}`);
   }
 }

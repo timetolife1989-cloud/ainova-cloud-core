@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { getAuth } from '@/lib/auth';
 import { getActiveModules } from '@/lib/modules/registry';
+import { t } from '@/lib/i18n';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,8 +35,8 @@ export default async function ModuleDashboardPage({ params }: Props) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
-          <h2 className="text-xl font-semibold text-white mb-2">{mod.name}</h2>
-          <p className="text-gray-400">A modul dashboard oldala nem elérhető.</p>
+          <h2 className="text-xl font-semibold text-white mb-2">{await t(moduleId + '.title')}</h2>
+          <p className="text-gray-400">{await t('modules.dashboard_unavailable')}</p>
         </div>
       </div>
     );

@@ -70,7 +70,7 @@ export class MqttDriver implements IPlcDriver {
       deviceId: this.deviceId,
       connected: false,
       errorCode: 'DRIVER_NOT_ACTIVATED',
-      errorMessage: 'MQTT driver előkészítve — npm install mqtt szükséges',
+      errorMessage: 'MQTT driver prepared — npm install mqtt required',
       lastChecked: new Date(),
     };
   }
@@ -85,13 +85,13 @@ export class MqttDriver implements IPlcDriver {
       scaledValue: null,
       quality: 'bad' as const,
       timestamp: new Date(),
-      errorMessage: 'MQTT driver nem aktív',
+      errorMessage: 'MQTT driver not active',
     }));
   }
 
   async writeTag(tag: PlcTag, value: number | boolean | string): Promise<PlcWriteResult> {
     // MQTT publis: this.mqttClient.publish(this.config.mqttTopicPub + '/' + tag.name, JSON.stringify({ value }))
-    return { tagId: tag.id, tagName: tag.name, success: false, errorMessage: 'MQTT driver nem aktív' };
+    return { tagId: tag.id, tagName: tag.name, success: false, errorMessage: 'MQTT driver not active' };
   }
 
   isConnected(): boolean { return this._connected; }

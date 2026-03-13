@@ -2,8 +2,8 @@ import { registerModule, type ModuleDefinition } from '@/lib/modules/registry';
 
 export const manifest: ModuleDefinition = {
   id: 'quality',
-  name: 'Minőségellenőrzés',
-  description: 'Mérések, selejtezés, 8D riport, hibakód katalógus',
+  name: 'Quality Control',
+  description: 'Measurements, scrap tracking, 8D reports, defect code catalog',
   icon: 'ShieldCheck',
   href: '/dashboard/modules/quality',
   color: 'bg-indigo-600',
@@ -12,7 +12,7 @@ export const manifest: ModuleDefinition = {
   dependsOn: [],
   permissions: ['quality.view', 'quality.edit', 'quality.export'],
   adminSettings: [
-    { key: 'quality_reject_codes', label: 'Hibakódok (vesszővel)', type: 'string', default: 'DIM,VIS,FUN,MAT,OTH' },
+    { key: 'quality_reject_codes', label: 'Reject codes (comma-separated)', type: 'string', default: 'DIM,VIS,FUN,MAT,OTH' },
   ],
   migrations: ['001_quality.sql'],
 };

@@ -133,12 +133,12 @@ export default function RolesPage() {
           }),
         });
         const body = await res.json() as { ok?: boolean; error?: string };
-        if (!res.ok) throw new Error(body.error ?? 'Hiba');
+        if (!res.ok) throw new Error(body.error ?? 'error.server');
       }
       await fetchRoles();
       setIsCreating(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Hiba történt');
+      setError(e instanceof Error ? e.message : 'error.server');
     } finally {
       setSaving(false);
     }
@@ -157,11 +157,11 @@ export default function RolesPage() {
         body: JSON.stringify({ id: selectedRole.id }),
       });
       const body = await res.json() as { ok?: boolean; error?: string };
-      if (!res.ok) throw new Error(body.error ?? 'Hiba');
+      if (!res.ok) throw new Error(body.error ?? 'error.server');
       setSelectedRole(null);
       await fetchRoles();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Hiba történt');
+      setError(e instanceof Error ? e.message : 'error.server');
     } finally {
       setSaving(false);
     }

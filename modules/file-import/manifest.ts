@@ -2,8 +2,8 @@ import { registerModule, type ModuleDefinition } from '@/lib/modules/registry';
 
 export const manifest: ModuleDefinition = {
   id: 'file-import',
-  name: 'Fájl Import',
-  description: 'Generikus CSV és Excel fájlok importálása admin konfigurációval',
+  name: 'File Import',
+  description: 'Generic CSV and Excel file import with admin configuration',
   icon: 'FileUp',
   href: '/dashboard/modules/file-import',
   color: 'bg-cyan-600',

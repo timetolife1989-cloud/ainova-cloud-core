@@ -46,7 +46,7 @@ export class S7Driver implements IPlcDriver {
       deviceId: this.deviceId,
       connected: false,
       errorCode: 'DRIVER_NOT_ACTIVATED',
-      errorMessage: 'S7 driver előkészítve — npm install node-snap7 szükséges',
+      errorMessage: 'S7 driver prepared — npm install node-snap7 required',
       lastChecked: new Date(),
     };
   }
@@ -62,12 +62,12 @@ export class S7Driver implements IPlcDriver {
       scaledValue: null,
       quality: 'bad' as const,
       timestamp: new Date(),
-      errorMessage: 'S7 driver nem aktív',
+      errorMessage: 'S7 driver not active',
     }));
   }
 
   async writeTag(tag: PlcTag, value: number | boolean | string): Promise<PlcWriteResult> {
-    return { tagId: tag.id, tagName: tag.name, success: false, errorMessage: 'S7 driver nem aktív' };
+    return { tagId: tag.id, tagName: tag.name, success: false, errorMessage: 'S7 driver not active' };
   }
 
   isConnected(): boolean { return this._connected; }

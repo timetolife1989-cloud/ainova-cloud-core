@@ -2,8 +2,8 @@ import { registerModule, type ModuleDefinition } from '@/lib/modules/registry';
 
 export const manifest: ModuleDefinition = {
   id: 'shift-management',
-  name: 'Műszakbeosztás',
-  description: 'Műszak tervezés, rotáció szabályok, ütközés detektálás',
+  name: 'Shift Management',
+  description: 'Shift planning, rotation rules, conflict detection',
   icon: 'CalendarClock',
   href: '/dashboard/modules/shift-management',
   color: 'bg-sky-600',
@@ -12,7 +12,7 @@ export const manifest: ModuleDefinition = {
   dependsOn: [],
   permissions: ['shift-management.view', 'shift-management.edit'],
   adminSettings: [
-    { key: 'shift_types', label: 'Műszak típusok (vesszővel)', type: 'string', default: 'Reggeli,Délutáni,Éjszakai' },
+    { key: 'shift_types', label: 'Shift types (comma-separated)', type: 'string', default: 'Morning,Afternoon,Night' },
   ],
   migrations: ['001_shift_management.sql'],
 };

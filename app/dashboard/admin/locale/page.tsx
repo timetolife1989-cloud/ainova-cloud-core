@@ -132,7 +132,7 @@ export default function LocalePage() {
           <button
             onClick={fetchLocale}
             className="p-1.5 hover:bg-gray-800 rounded-lg text-gray-500 hover:text-gray-300"
-            title="Frissítés"
+            title={t('common.refresh')}
           >
             <RefreshCw className="w-4 h-4" />
           </button>

@@ -273,7 +273,7 @@ export default function ImportConfigsPage() {
                     type="text"
                     value={formName}
                     onChange={e => setFormName(e.target.value)}
-                    placeholder="pl. SAP Visszajelentés"
+                    placeholder={t('admin.import.placeholder_name')}
                     className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100"
                   />
                 </div>
@@ -375,7 +375,7 @@ export default function ImportConfigsPage() {
                         type="text"
                         value={filter.value}
                         onChange={e => updateFilter(idx, 'value', e.target.value)}
-                        placeholder="Érték"
+                        placeholder={t('admin.import.placeholder_value')}
                         className="flex-1 bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100"
                       />
                       <button

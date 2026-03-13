@@ -152,7 +152,7 @@ export default function ModuleSettingsPage() {
         <Link href="/dashboard/admin/modules" className="p-2 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white">
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <DashboardSectionHeader title={module.name} subtitle={t('admin.modules.settings_title')} />
+        <DashboardSectionHeader title={t(moduleId + '.title')} subtitle={t('admin.modules.settings_title')} />
       </div>
 
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">

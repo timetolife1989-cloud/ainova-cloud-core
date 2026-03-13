@@ -2,8 +2,8 @@ import { registerModule, type ModuleDefinition } from '@/lib/modules/registry';
 
 export const manifest: ModuleDefinition = {
   id: 'inventory',
-  name: 'Készletnyilvántartás',
-  description: 'Készletkezelés, minimum szintek, mozgás napló',
+  name: 'Inventory',
+  description: 'Inventory management, min levels, movement log',
   icon: 'Package',
   href: '/dashboard/modules/inventory',
   color: 'bg-lime-600',
@@ -16,8 +16,8 @@ export const manifest: ModuleDefinition = {
     'inventory.export',
   ],
   adminSettings: [
-    { key: 'inventory_quantity_unit', label: 'Mennyiség mértékegysége', type: 'unit_select', default: 'pieces' },
-    { key: 'inventory_low_stock_alert', label: 'Alacsony készlet figyelmeztetés', type: 'boolean', default: 'true' },
+    { key: 'inventory_quantity_unit', label: 'Quantity unit', type: 'unit_select', default: 'pieces' },
+    { key: 'inventory_low_stock_alert', label: 'Low stock alert', type: 'boolean', default: 'true' },
   ],
   migrations: ['001_inventory.sql'],
 };

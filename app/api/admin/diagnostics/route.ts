@@ -82,7 +82,7 @@ function formatUptime(seconds: number): string {
   const h = Math.floor((seconds % 86400) / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = Math.floor(seconds % 60);
-  if (d > 0) return `${d}n ${h}ó ${m}p`;
-  if (h > 0) return `${h}ó ${m}p ${s}mp`;
-  return `${m}p ${s}mp`;
+  if (d > 0) return `${d}d ${h}h ${m}m`;
+  if (h > 0) return `${h}h ${m}m ${s}s`;
+  return `${m}m ${s}s`;
 }

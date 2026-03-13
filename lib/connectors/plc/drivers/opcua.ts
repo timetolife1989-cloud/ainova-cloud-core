@@ -51,7 +51,7 @@ export class OpcUaDriver implements IPlcDriver {
       deviceId: this.deviceId,
       connected: false,
       errorCode: 'DRIVER_NOT_ACTIVATED',
-      errorMessage: 'OPC-UA driver előkészítve — npm install node-opcua szükséges',
+      errorMessage: 'OPC-UA driver prepared — npm install node-opcua required',
       lastChecked: new Date(),
     };
   }
@@ -67,13 +67,13 @@ export class OpcUaDriver implements IPlcDriver {
       scaledValue: null,
       quality: 'bad' as const,
       timestamp: new Date(),
-      errorMessage: 'OPC-UA driver nem aktív',
+      errorMessage: 'OPC-UA driver not active',
     }));
   }
 
   async writeTag(tag: PlcTag, value: number | boolean | string): Promise<PlcWriteResult> {
     // await this.session.writeSingleNode(tag.address, new Variant({ dataType: DataType.Double, value }))
-    return { tagId: tag.id, tagName: tag.name, success: false, errorMessage: 'OPC-UA driver nem aktív' };
+    return { tagId: tag.id, tagName: tag.name, success: false, errorMessage: 'OPC-UA driver not active' };
   }
 
   isConnected(): boolean { return this._connected; }

@@ -2,8 +2,8 @@ import { registerModule, type ModuleDefinition } from '@/lib/modules/registry';
 
 export const manifest: ModuleDefinition = {
   id: 'fleet',
-  name: 'Gépjármű nyilvántartás',
-  description: 'Gépkocsi futás, kilométerek, tankolás nyomon követése',
+  name: 'Fleet Management',
+  description: 'Vehicle tracking, mileage, refueling',
   icon: 'Car',
   href: '/dashboard/modules/fleet',
   color: 'bg-amber-600',
@@ -16,9 +16,9 @@ export const manifest: ModuleDefinition = {
     'fleet.export',
   ],
   adminSettings: [
-    { key: 'fleet_distance_unit', label: 'Távolság mértékegysége', type: 'unit_select', default: 'km' },
-    { key: 'fleet_fuel_unit', label: 'Üzemanyag mértékegysége', type: 'unit_select', default: 'liters' },
-    { key: 'fleet_currency', label: 'Pénznem', type: 'unit_select', default: 'huf' },
+    { key: 'fleet_distance_unit', label: 'Distance unit', type: 'unit_select', default: 'km' },
+    { key: 'fleet_fuel_unit', label: 'Fuel unit', type: 'unit_select', default: 'liters' },
+    { key: 'fleet_currency', label: 'Currency', type: 'unit_select', default: 'huf' },
   ],
   migrations: ['001_fleet.sql'],
 };

@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
       {
         name: 'p0',
         type: 'nvarchar',
-        value: 'SAP connector előkészítve — RFC/OData aktiválás szükséges az éles szinkronizáláshoz',
+        value: 'SAP connector prepared — RFC/OData activation required for live sync',
       },
       { name: 'p1', type: 'int', value: logId },
     ]
@@ -134,11 +134,11 @@ export async function POST(request: NextRequest) {
     {
       logId,
       status: 'prepared',
-      message: 'SAP szinkronizálás előkészítve. RFC/OData kapcsolat konfigurálása szükséges.',
+      message: 'SAP sync prepared. RFC/OData connection configuration required.',
       nextSteps: [
-        'RFC: npm install node-rfc + SAP NetWeaver RFC SDK telepítése',
-        'OData: SAP BTP baseUrl és hitelesítési adatok megadása',
-        'Mező mappingek konfigurálása: /api/modules/sap-import/mappings',
+        'RFC: npm install node-rfc + SAP NetWeaver RFC SDK installation',
+        'OData: SAP BTP baseUrl and auth credentials setup',
+        'Field mapping configuration: /api/modules/sap-import/mappings',
       ],
     },
     { status: 202 }

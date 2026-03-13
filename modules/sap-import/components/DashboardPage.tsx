@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type Tab = 'connections' | 'catalog' | 'mappings' | 'log';
 type ConnectionType = 'rfc' | 'odata' | 'file';
@@ -68,19 +69,19 @@ interface SyncLog {
 const CONNECTION_TYPE_LABELS: Record<ConnectionType, string> = {
   rfc: 'RFC (SAP GUI)',
   odata: 'OData / REST',
-  file: 'Fájl import',
+  file: 'sap.conn_type_file',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
-  MM: 'MM — Anyaggazdálkodás',
-  SD: 'SD — Értékesítés',
-  PP: 'PP — Gyártástervezés',
-  PM: 'PM — Karbantartás',
-  HR: 'HR — Emberi Erőforrások',
-  QM: 'QM — Minőség',
-  FI: 'FI — Pénzügy',
-  CO: 'CO — Kontrolling',
-  BASIS: 'BASIS — Technikai',
+  MM: 'MM — Materials Management',
+  SD: 'SD — Sales & Distribution',
+  PP: 'PP — Production Planning',
+  PM: 'PM — Plant Maintenance',
+  HR: 'HR — Human Resources',
+  QM: 'QM — Quality Management',
+  FI: 'FI — Finance',
+  CO: 'CO — Controlling',
+  BASIS: 'BASIS — Technical',
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -91,6 +92,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function SapImportDashboardPage() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>('connections');
   const [connections, setConnections] = useState<SapConnection[]>([]);
   const [objects, setObjects] = useState<SapObject[]>([]);
@@ -179,13 +181,13 @@ export default function SapImportDashboardPage() {
         fetchConnections();
       } else {
         const err = await res.json();
-        setError(err.error ?? 'Hiba a mentés során');
+        setError(err.error ?? t('sap.error_save'));
       }
-    } catch { setError('Hálózati hiba'); }
+    } catch { setError(t('sap.error_network')); }
   };
 
   const handleDeleteConnection = async (id: number) => {
-    if (!confirm('Biztosan törli ezt a kapcsolatot? A hozzá tartozó mappingek is törlődnek.')) return;
+    if (!confirm(t('sap.confirm_delete_connection'))) return;
     const csrfRes = await fetch('/api/csrf');
     const { token } = await csrfRes.json();
     await fetch(`/api/modules/sap-import/connections?id=${id}`, {
@@ -207,10 +209,10 @@ export default function SapImportDashboardPage() {
   };
 
   const TABS: { id: Tab; label: string; icon: string }[] = [
-    { id: 'connections', label: 'Kapcsolatok', icon: '🔗' },
-    { id: 'catalog', label: 'SAP Katalógus', icon: '📚' },
-    { id: 'mappings', label: 'Mező Mappingek', icon: '↔️' },
-    { id: 'log', label: 'Szinkron Napló', icon: '📋' },
+    { id: 'connections', label: t('sap.tab_connections'), icon: '🔗' },
+    { id: 'catalog', label: t('sap.tab_catalog'), icon: '📚' },
+    { id: 'mappings', label: t('sap.tab_mappings'), icon: '↔️' },
+    { id: 'log', label: t('sap.tab_log'), icon: '📋' },
   ];
 
   return (
@@ -219,16 +221,16 @@ export default function SapImportDashboardPage() {
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-1">
           <span className="text-3xl">🔗</span>
-          <h1 className="text-2xl font-bold text-white">SAP Integráció</h1>
+          <h1 className="text-2xl font-bold text-white">{t('sap.title')}</h1>
           <span className="px-2 py-0.5 bg-blue-900/40 text-blue-400 text-xs font-medium rounded-full border border-blue-800">
             ENTERPRISE
           </span>
           <span className="px-2 py-0.5 bg-yellow-900/30 text-yellow-400 text-xs font-medium rounded-full border border-yellow-800">
-            ELŐKÉSZÍTVE
+            {t('sap.badge_prepared')}
           </span>
         </div>
         <p className="text-gray-400 text-sm">
-          SAP ECC / S/4HANA adatcsere — RFC, OData és fájl alapú szinkronizálás. RFC aktiváláshoz node-rfc csomag szükséges.
+          {t('sap.description')}
         </p>
       </div>
 
@@ -236,12 +238,12 @@ export default function SapImportDashboardPage() {
       <div className="bg-blue-950/30 border border-blue-800/40 rounded-xl p-4 mb-6 flex gap-3">
         <span className="text-blue-400 text-xl mt-0.5">ℹ️</span>
         <div className="text-sm text-blue-300">
-          <strong>Hogyan aktiválható az SAP kapcsolat?</strong>
+          <strong>{t('sap.how_to_activate')}</strong>
           <ol className="list-decimal ml-4 mt-1 space-y-1 text-blue-400">
-            <li>RFC: <code className="bg-blue-900/40 px-1 rounded">npm install node-rfc</code> + SAP NetWeaver RFC SDK (letöltés: support.sap.com)</li>
-            <li>OData: SAP BTP API Hub URL és OAuth token megadása a kapcsolat konfigurációban</li>
-            <li>Mező mappingek definiálása (SAP mező → ACI tábla/mező)</li>
-            <li>Szinkronizálás ütemezése vagy manuális indítása</li>
+            <li>{t('sap.step_rfc')}</li>
+            <li>{t('sap.step_odata')}</li>
+            <li>{t('sap.step_mappings')}</li>
+            <li>{t('sap.step_schedule')}</li>
           </ol>
         </div>
       </div>
@@ -273,31 +275,31 @@ export default function SapImportDashboardPage() {
       {tab === 'connections' && (
         <div>
           <div className="flex justify-between items-center mb-4">
-            <p className="text-gray-400 text-sm">SAP rendszer kapcsolatok konfigurálása</p>
+            <p className="text-gray-400 text-sm">{t('sap.conn_subtitle')}</p>
             <button
               onClick={() => setShowConnForm(true)}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors"
             >
-              + Új SAP kapcsolat
+              + {t('sap.new_connection')}
             </button>
           </div>
 
           {/* Új kapcsolat form */}
           {showConnForm && (
             <div className="bg-gray-900 border border-blue-800/40 rounded-xl p-6 mb-6">
-              <h3 className="text-white font-semibold mb-4">Új SAP Kapcsolat</h3>
+              <h3 className="text-white font-semibold mb-4">{t('sap.new_connection_heading')}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-gray-400 text-xs mb-1 block">Kapcsolat neve *</label>
+                  <label className="text-gray-400 text-xs mb-1 block">{t('sap.conn_name')} *</label>
                   <input
                     className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
-                    placeholder="pl. SAP ECC Produkció"
+                    placeholder={t('sap.placeholder_conn_name')}
                     value={connForm.name}
                     onChange={e => setConnForm(f => ({ ...f, name: e.target.value }))}
                   />
                 </div>
                 <div>
-                  <label className="text-gray-400 text-xs mb-1 block">Kapcsolat típusa</label>
+                  <label className="text-gray-400 text-xs mb-1 block">{t('sap.conn_type')}</label>
                   <select
                     className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
                     value={connForm.connectionType}
@@ -305,13 +307,13 @@ export default function SapImportDashboardPage() {
                   >
                     <option value="rfc">RFC (SAP GUI logon)</option>
                     <option value="odata">OData / REST API (S/4HANA Cloud)</option>
-                    <option value="file">Fájl import (Excel/CSV)</option>
+                    <option value="file">{t('sap.conn_type_file')}</option>
                   </select>
                 </div>
                 {connForm.connectionType === 'rfc' && (
                   <>
                     <div>
-                      <label className="text-gray-400 text-xs mb-1 block">SAP host / IP cím</label>
+                      <label className="text-gray-400 text-xs mb-1 block">{t('sap.host')}</label>
                       <input className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm" placeholder="192.168.1.100" value={connForm.host} onChange={e => setConnForm(f => ({ ...f, host: e.target.value }))} />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
@@ -325,13 +327,13 @@ export default function SapImportDashboardPage() {
                       </div>
                     </div>
                     <div>
-                      <label className="text-gray-400 text-xs mb-1 block">SAP felhasználónév</label>
+                      <label className="text-gray-400 text-xs mb-1 block">{t('sap.user')}</label>
                       <input className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm" placeholder="RFC_USER" value={connForm.sapUser} onChange={e => setConnForm(f => ({ ...f, sapUser: e.target.value }))} />
                     </div>
                     <div>
-                      <label className="text-gray-400 text-xs mb-1 block">Jelszó env kulcs (nem a jelszó!)</label>
+                      <label className="text-gray-400 text-xs mb-1 block">{t('sap.password_ref')}</label>
                       <input className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm" placeholder="SAP_PROD_PASSWORD" value={connForm.passwordRef} onChange={e => setConnForm(f => ({ ...f, passwordRef: e.target.value }))} />
-                      <p className="text-gray-600 text-xs mt-1">Pl. ha a jelszó a SAP_PROD_PASSWORD env változóban van, azt add meg itt — NEM a jelszót!</p>
+                      <p className="text-gray-600 text-xs mt-1">{t('sap.password_ref_hint')}</p>
                     </div>
                   </>
                 )}
@@ -342,7 +344,7 @@ export default function SapImportDashboardPage() {
                       <input className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm" placeholder="https://myXXXXXX.s4hana.ondemand.com" value={connForm.baseUrl} onChange={e => setConnForm(f => ({ ...f, baseUrl: e.target.value }))} />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="text-gray-400 text-xs mb-1 block">API elérési út</label>
+                      <label className="text-gray-400 text-xs mb-1 block">{t('sap.api_path')}</label>
                       <input className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm" placeholder="/sap/opu/odata/sap/API_MATERIAL_SRV" value={connForm.apiPath} onChange={e => setConnForm(f => ({ ...f, apiPath: e.target.value }))} />
                     </div>
                   </>
@@ -351,21 +353,21 @@ export default function SapImportDashboardPage() {
                   <label className="text-gray-400 text-xs mb-1 block">Nyelv</label>
                   <select className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm" value={connForm.language} onChange={e => setConnForm(f => ({ ...f, language: e.target.value }))}>
                     <option value="HU">Magyar (HU)</option>
-                    <option value="DE">Német (DE)</option>
+                    <option value="DE">{t('sap.lang_de')}</option>
                     <option value="EN">Angol (EN)</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-gray-400 text-xs mb-1 block">Megjegyzés</label>
-                  <input className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm" placeholder="Opcionális leírás" value={connForm.description} onChange={e => setConnForm(f => ({ ...f, description: e.target.value }))} />
+                  <label className="text-gray-400 text-xs mb-1 block">{t('sap.notes')}</label>
+                  <input className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm" placeholder={t('sap.placeholder_notes')} value={connForm.description} onChange={e => setConnForm(f => ({ ...f, description: e.target.value }))} />
                 </div>
               </div>
               <div className="flex gap-2 mt-4">
                 <button onClick={handleSaveConnection} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium">
-                  Mentés
+                  {t('common.save')}
                 </button>
                 <button onClick={() => setShowConnForm(false)} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium">
-                  Mégse
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>
@@ -378,8 +380,8 @@ export default function SapImportDashboardPage() {
           ) : connections.length === 0 ? (
             <div className="text-center py-16 text-gray-500">
               <p className="text-4xl mb-3">🔗</p>
-              <p className="font-medium">Még nincs SAP kapcsolat konfigurálva</p>
-              <p className="text-sm mt-1">Kattints az &quot;Új SAP kapcsolat&quot; gombra a konfiguráláshoz</p>
+              <p className="font-medium">{t('sap.no_connections')}</p>
+              <p className="text-sm mt-1">{t('sap.no_connections_hint')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -393,7 +395,7 @@ export default function SapImportDashboardPage() {
                         <p className="text-gray-500 text-xs">{CONNECTION_TYPE_LABELS[conn.connectionType]}</p>
                       </div>
                       <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${conn.isActive ? 'bg-green-900/30 text-green-400' : 'bg-gray-800 text-gray-500'}`}>
-                        {conn.isActive ? 'Aktív' : 'Inaktív'}
+                        {conn.isActive ? t('common.active') : t('common.inactive')}
                       </span>
                     </div>
 
@@ -424,7 +426,7 @@ export default function SapImportDashboardPage() {
                     {/* Utolsó teszt */}
                     {conn.lastTestedAt && (
                       <p className="text-gray-600 text-xs mb-2">
-                        Utolsó teszt: {new Date(conn.lastTestedAt).toLocaleString('hu-HU')} — {conn.lastTestOk ? '✅ OK' : '❌ Hiba'}
+                        {t('sap.last_test')}: {new Date(conn.lastTestedAt).toLocaleString()} — {conn.lastTestOk ? '✅ OK' : '❌ ' + t('common.error')}
                       </p>
                     )}
 
@@ -434,13 +436,13 @@ export default function SapImportDashboardPage() {
                         disabled={testing === conn.id}
                         className="px-3 py-1.5 bg-blue-900/40 hover:bg-blue-800/40 text-blue-400 rounded text-xs font-medium disabled:opacity-50"
                       >
-                        {testing === conn.id ? 'Tesztelés...' : '🔌 Kapcsolat teszt'}
+                        {testing === conn.id ? t('sap.testing') : t('sap.test_connection')}
                       </button>
                       <button
                         onClick={() => handleDeleteConnection(conn.id)}
                         className="px-3 py-1.5 bg-red-900/20 hover:bg-red-900/40 text-red-500 rounded text-xs font-medium"
                       >
-                        Törlés
+                        {t('common.delete')}
                       </button>
                     </div>
                   </div>
@@ -460,14 +462,14 @@ export default function SapImportDashboardPage() {
               value={catalogCategory}
               onChange={e => setCatalogCategory(e.target.value)}
             >
-              <option value="">Minden kategória</option>
+              <option value="">{t('sap.all_categories')}</option>
               {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
                 <option key={val} value={val}>{label} ({categoryCounts[val] ?? 0})</option>
               ))}
             </select>
             <input
               className="flex-1 bg-gray-900 border border-gray-800 rounded-lg px-3 py-2 text-white text-sm"
-              placeholder="Keresés: MARA, megrendelés, BAPI..."
+              placeholder={t('sap.search_placeholder')}
               value={catalogSearch}
               onChange={e => setCatalogSearch(e.target.value)}
             />
@@ -495,7 +497,7 @@ export default function SapImportDashboardPage() {
                     <p className="text-gray-300 text-sm">{obj.descriptionHu}</p>
                     {obj.keyFields.length > 0 && (
                       <p className="text-gray-600 text-xs mt-0.5">
-                        Kulcsmezők: <span className="font-mono text-gray-500">{obj.keyFields.join(', ')}</span>
+                        {t('sap.key_fields')}: <span className="font-mono text-gray-500">{obj.keyFields.join(', ')}</span>
                       </p>
                     )}
                   </div>
@@ -508,7 +510,7 @@ export default function SapImportDashboardPage() {
                 </div>
               ))}
               {objects.length === 0 && (
-                <div className="text-center py-10 text-gray-500">Nincs találat</div>
+                <div className="text-center py-10 text-gray-500">{t('sap.no_results')}</div>
               )}
             </div>
           )}
@@ -519,7 +521,7 @@ export default function SapImportDashboardPage() {
       {tab === 'mappings' && (
         <div>
           <div className="flex justify-between items-center mb-4">
-            <p className="text-gray-400 text-sm">SAP mező → ACI mező konverziós szabályok</p>
+            <p className="text-gray-400 text-sm">{t('sap.mapping_subtitle')}</p>
           </div>
 
           {loading ? (
@@ -529,9 +531,9 @@ export default function SapImportDashboardPage() {
           ) : mappings.length === 0 ? (
             <div className="text-center py-16 text-gray-500">
               <p className="text-4xl mb-3">↔️</p>
-              <p>Még nincs mező mapping konfigurálva</p>
+              <p>{t('sap.no_mappings')}</p>
               <p className="text-sm mt-1 text-gray-600">
-                A mappingek definiálják, hogy egy SAP tábla melyik mezője melyik ACI táblához/mezőhöz kerül.
+                {t('sap.no_mappings_hint')}
               </p>
             </div>
           ) : (
@@ -539,13 +541,13 @@ export default function SapImportDashboardPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-gray-500 text-xs border-b border-gray-800">
-                    <th className="text-left pb-2 pr-4">Kapcsolat</th>
-                    <th className="text-left pb-2 pr-4">SAP objektum</th>
-                    <th className="text-left pb-2 pr-4">SAP mező</th>
-                    <th className="text-left pb-2 pr-4">ACI tábla</th>
-                    <th className="text-left pb-2 pr-4">ACI mező</th>
-                    <th className="text-left pb-2 pr-4">Transzform</th>
-                    <th className="text-left pb-2">Aktív</th>
+                    <th className="text-left pb-2 pr-4">{t('sap.th_connection')}</th>
+                    <th className="text-left pb-2 pr-4">{t('sap.th_sap_object')}</th>
+                    <th className="text-left pb-2 pr-4">{t('sap.th_sap_field')}</th>
+                    <th className="text-left pb-2 pr-4">{t('sap.th_aci_table')}</th>
+                    <th className="text-left pb-2 pr-4">{t('sap.th_aci_field')}</th>
+                    <th className="text-left pb-2 pr-4">{t('sap.th_transform')}</th>
+                    <th className="text-left pb-2">{t('common.active')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -575,9 +577,9 @@ export default function SapImportDashboardPage() {
       {tab === 'log' && (
         <div>
           <div className="flex justify-between items-center mb-4">
-            <p className="text-gray-400 text-sm">Utolsó 50 szinkronizálási esemény</p>
+            <p className="text-gray-400 text-sm">{t('sap.log_subtitle')}</p>
             <button onClick={fetchLog} className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-400 rounded text-xs">
-              ↻ Frissít
+              ↻ {t('common.refresh')}
             </button>
           </div>
 
@@ -588,7 +590,7 @@ export default function SapImportDashboardPage() {
           ) : syncLog.length === 0 ? (
             <div className="text-center py-16 text-gray-500">
               <p className="text-4xl mb-3">📋</p>
-              <p>Még nem volt szinkronizálás</p>
+              <p>{t('sap.no_sync_yet')}</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -610,10 +612,10 @@ export default function SapImportDashboardPage() {
                     </div>
                   </div>
                   <div className="mt-2 flex gap-4 text-xs">
-                    <span className="text-gray-500">Olvasott: <span className="text-gray-300">{log.recordsRead}</span></span>
-                    <span className="text-gray-500">Írott: <span className="text-green-400">{log.recordsWritten}</span></span>
-                    <span className="text-gray-500">Hiba: <span className={log.recordsError > 0 ? 'text-red-400' : 'text-gray-500'}>{log.recordsError}</span></span>
-                    <span className="text-gray-500">Indító: <span className="text-gray-400">{log.triggeredBy}</span></span>
+                    <span className="text-gray-500">{t('sap.read')}: <span className="text-gray-300">{log.recordsRead}</span></span>
+                    <span className="text-gray-500">{t('sap.written')}: <span className="text-green-400">{log.recordsWritten}</span></span>
+                    <span className="text-gray-500">{t('common.error')}: <span className={log.recordsError > 0 ? 'text-red-400' : 'text-gray-500'}>{log.recordsError}</span></span>
+                    <span className="text-gray-500">{t('sap.triggered_by')}: <span className="text-gray-400">{log.triggeredBy}</span></span>
                   </div>
                   {log.errorDetails && (
                     <div className="mt-2 text-xs text-yellow-500 bg-yellow-900/20 rounded p-2">{log.errorDetails}</div>

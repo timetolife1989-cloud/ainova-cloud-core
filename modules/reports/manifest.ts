@@ -2,8 +2,8 @@ import { registerModule, type ModuleDefinition } from '@/lib/modules/registry';
 
 export const manifest: ModuleDefinition = {
   id: 'reports',
-  name: 'Riportok',
-  description: 'Alap riport generátor — diagramok, táblák, Excel export',
+  name: 'Reports',
+  description: 'Basic report generator — charts, tables, Excel export',
   icon: 'PieChart',
   href: '/dashboard/modules/reports',
   color: 'bg-violet-600',
@@ -18,13 +18,13 @@ export const manifest: ModuleDefinition = {
   adminSettings: [
     {
       key: 'reports_default_period',
-      label: 'Alapértelmezett időszak',
+      label: 'Default period',
       type: 'select',
       default: '30',
       options: [
-        { value: '7', label: 'Utolsó 7 nap' },
-        { value: '30', label: 'Utolsó 30 nap' },
-        { value: '90', label: 'Utolsó 90 nap' },
+        { value: '7', label: 'Last 7 days' },
+        { value: '30', label: 'Last 30 days' },
+        { value: '90', label: 'Last 90 days' },
       ],
     },
   ],

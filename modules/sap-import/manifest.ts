@@ -2,8 +2,8 @@ import { registerModule } from '@/lib/modules/registry';
 
 registerModule({
   id: 'sap-import',
-  name: 'SAP Integráció',
-  description: 'SAP ECC / S/4HANA adatcsere — RFC, OData és fájl alapú szinkronizálás előkészítve',
+  name: 'SAP Integration',
+  description: 'SAP ECC / S/4HANA data exchange — RFC, OData and file-based synchronization (prepared)',
   version: '1.0.0',
   icon: '🔗',
   color: 'blue',
@@ -13,30 +13,30 @@ registerModule({
   adminSettings: [
     {
       key: 'sap_default_language',
-      label: 'SAP alapértelmezett nyelv',
+      label: 'SAP default language',
       type: 'select',
       default: 'HU',
       options: [
-        { value: 'HU', label: 'Magyar (HU)' },
-        { value: 'DE', label: 'Német (DE)' },
-        { value: 'EN', label: 'Angol (EN)' },
+        { value: 'HU', label: 'Hungarian (HU)' },
+        { value: 'DE', label: 'German (DE)' },
+        { value: 'EN', label: 'English (EN)' },
       ],
     },
     {
       key: 'sap_sync_interval_hours',
-      label: 'Szinkronizálás gyakorisága (óra)',
+      label: 'Sync interval (hours)',
       type: 'number',
       default: '24',
     },
     {
       key: 'sap_max_rows_per_sync',
-      label: 'Max sorok szinkronizálásonként',
+      label: 'Max rows per sync',
       type: 'number',
       default: '10000',
     },
     {
       key: 'sap_cache_enabled',
-      label: 'SAP adat cache engedélyezve',
+      label: 'SAP data cache enabled',
       type: 'boolean',
       default: 'true',
     },

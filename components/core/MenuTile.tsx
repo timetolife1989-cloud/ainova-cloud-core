@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import * as LucideIcons from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface MenuTileProps {
   title: string;
@@ -32,6 +33,7 @@ export const MenuTile = React.memo(function MenuTile({
   onPinToggle,
 }: MenuTileProps) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleClick = () => {
     router.push(href);
@@ -74,7 +76,7 @@ export const MenuTile = React.memo(function MenuTile({
                 ? 'text-indigo-400 hover:text-indigo-300'
                 : 'text-gray-600 hover:text-gray-400'
             }`}
-            title={isPinned ? 'Kitűzés eltávolítása' : 'Kitűzés'}
+            title={isPinned ? t('common.unpin') : t('common.pin')}
           >
             <LucideIcons.Pin className="w-3.5 h-3.5" />
           </button>

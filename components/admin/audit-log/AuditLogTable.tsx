@@ -45,6 +45,7 @@ function EventBadge({ eventType }: { eventType: string }) {
 const TRUNCATE_AT = 60;
 
 function DetailsCell({ details }: { details: string | null }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
   if (!details) return <span className="text-gray-600 text-xs">—</span>;
@@ -58,7 +59,7 @@ function DetailsCell({ details }: { details: string | null }) {
         <button
           onClick={() => setExpanded(v => !v)}
           className="ml-1 inline-flex items-center text-indigo-400 hover:text-indigo-300 transition-colors"
-          aria-label={expanded ? 'Összecsuk' : 'Kibont'}
+          aria-label={expanded ? t('common.collapse') : t('common.expand')}
         >
           {expanded
             ? <ChevronUp   className="w-3 h-3" />

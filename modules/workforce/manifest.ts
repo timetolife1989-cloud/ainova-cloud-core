@@ -2,8 +2,8 @@ import { registerModule, type ModuleDefinition } from '@/lib/modules/registry';
 
 export const manifest: ModuleDefinition = {
   id: 'workforce',
-  name: 'Létszám & Jelenlét',
-  description: 'Napi műszaki létszám rögzítés, hiányzások, jogosítványok nyomon követése',
+  name: 'Workforce & Attendance',
+  description: 'Daily shift headcount recording, absences, certifications tracking',
   icon: 'Users',
   href: '/dashboard/modules/workforce',
   color: 'bg-indigo-600',
@@ -16,9 +16,9 @@ export const manifest: ModuleDefinition = {
     'workforce.export',
   ],
   adminSettings: [
-    { key: 'workforce_shifts_per_day', label: 'Műszakok száma naponta', type: 'number', default: '3' },
-    { key: 'workforce_unit', label: 'Létszám mértékegysége', type: 'unit_select', default: 'pieces' },
-    { key: 'workforce_track_absences', label: 'Hiányzások nyomon követése', type: 'boolean', default: 'true' },
+    { key: 'workforce_shifts_per_day', label: 'Shifts per day', type: 'number', default: '3' },
+    { key: 'workforce_unit', label: 'Headcount unit', type: 'unit_select', default: 'pieces' },
+    { key: 'workforce_track_absences', label: 'Track absences', type: 'boolean', default: 'true' },
   ],
   migrations: ['001_workforce.sql', '002_workforce_overtime.sql'],
 };

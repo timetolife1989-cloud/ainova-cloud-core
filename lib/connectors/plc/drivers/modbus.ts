@@ -46,7 +46,7 @@ export class ModbusDriver implements IPlcDriver {
       deviceId: this.deviceId,
       connected: false,
       errorCode: 'DRIVER_NOT_ACTIVATED',
-      errorMessage: 'Modbus driver előkészítve — npm install modbus-serial szükséges',
+      errorMessage: 'Modbus driver prepared — npm install modbus-serial required',
       lastChecked: new Date(),
     };
   }
@@ -68,13 +68,13 @@ export class ModbusDriver implements IPlcDriver {
       scaledValue: null,
       quality: 'bad' as const,
       timestamp: new Date(),
-      errorMessage: 'Modbus driver nem aktív',
+      errorMessage: 'Modbus driver not active',
     }));
   }
 
   async writeTag(tag: PlcTag, value: number | boolean | string): Promise<PlcWriteResult> {
     // TODO: FC06 writeSingleRegister / FC05 writeSingleCoil
-    return { tagId: tag.id, tagName: tag.name, success: false, errorMessage: 'Modbus driver nem aktív' };
+    return { tagId: tag.id, tagName: tag.name, success: false, errorMessage: 'Modbus driver not active' };
   }
 
   isConnected(): boolean { return this._connected; }
