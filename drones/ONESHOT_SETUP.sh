@@ -30,8 +30,8 @@ echo ">>> 5/5 — vLLM szerver indítása (háttérben)..."
 nohup python -m vllm.entrypoints.openai.api_server \
     --model meta-llama/Llama-3.1-70B-Instruct \
     --tensor-parallel-size 2 \
-    --gpu-memory-utilization 0.90 \
-    --max-model-len 8192 \
+    --gpu-memory-utilization 0.95 \
+    --max-model-len 32768 \
     --dtype auto \
     --port 8000 \
     > vllm.log 2>&1 &
