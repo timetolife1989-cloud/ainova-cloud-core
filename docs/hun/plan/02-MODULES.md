@@ -1,6 +1,6 @@
 # MODUL FEJLESZTÉSI FELADATOK
 
-> Utolsó frissítés: 2026.03.12 — ŐSZINTE státuszok, nem hazugság
+> Utolsó frissítés: 2026.03.13 — ŐSZINTE státuszok, nem hazugság
 
 ## Státusz összefoglaló
 
@@ -13,14 +13,15 @@
 | oee | ✅ Működik | A/P/Q/OEE kalkuláció, gépek, rekordok |
 | shift-management | ✅ Működik | Műszakdefiníciók + beosztás, ütközés detektálás |
 | delivery | ✅ Működik | Szállítmány CRUD, szűrők, összesítő kártyák |
-| performance | ✅ Működik | Teljesítmény CRUD, KPI kártyák (⚠️ célérték UI hiányzik) |
+| performance | ✅ Működik | Teljesítmény CRUD, KPI kártyák, célérték beállító UI (CRUD API + tab + modal) |
 | scheduling | ✅ Működik | Kapacitástervezés (⚠️ allokáció UI hiányzik) |
-| quality | ✅ Működik | Minőségellenőrzés CRUD (⚠️ 8D riport UI hiányzik) |
-| maintenance | ✅ Működik | Karbantartás ütemezés (⚠️ "kész" gomb / napló UI hiányzik) |
-| reports | ⚠️ Váz | Riport definíciókat ment, de NEM tud riportot futtatni |
+| quality | ✅ Működik | Minőségellenőrzés CRUD + 8D riport wizard (D1-D8, viewer modal, i18n) |
+| maintenance | ✅ Működik | Karbantartás ütemezés + "kész" jelölés + napló UI (complete API, log API, tab) |
+| reports | ✅ Működik | Riport motor implementálva (query API, viewer, editor, delete — recharts alapú) |
 | file-import | ⚠️ Részleges | Saját API endpoint nincs |
-| plc-connector | ⚠️ Részleges | Eszköz nyilvántartás van, S7/Modbus/MQTT driver NINCS |
-| digital-twin | ⚠️ Részleges | Hardcoded demo adat, API NINCS |
+| plc-connector | ⚠️ Előkészítve | Eszköz nyilvántartás + 4 driver interfész kész (S7/Modbus TCP/Modbus RTU/MQTT/OPC-UA stub), 002 migráció (alerts, driver_config, poll_status — hardver aktiváláshoz npm install szükséges) |
+| digital-twin | ✅ Működik | Valós API endpoint (CRUD, seed 7 gép, layout DB) |
+| sap-import | ⚠️ Előkészítve | Enterprise — teljes séma (mod_sap_* 5 tábla, 50+ objektum katalógus seed), 4 API route, 4 fül admin UI; RFC/OData aktiváláshoz node-rfc + SAP NW RFC SDK szükséges |
 
 ---
 
@@ -39,19 +40,18 @@
 
 ## Hiányzó al-funkciók működő moduloknál
 
-### reports — SKELETON
-- ⬜ Nincs riport motor — csak definíciókat CRUD-ol
-- ⬜ "Megtekintés" és "Exportálás" gombok nem csinálnak semmit
-- ⬜ Komplett újragondolás kell (chart.js/recharts alapú riport engine)
+### reports — KÉSZ ✅
+- ✅ Riport motor implementálva (query API, viewer, editor, delete — commit 92f6da0)
+- ✅ Recharts alapú vizualizáció
 
-### quality — 8D hiányzik
-- ⬜ `quality_8d_reports` tábla létezik, API/UI NINCS
+### quality — 8D KÉSZ ✅
+- ✅ `quality_8d_reports` tábla + API + wizard UI D1-D8 (commit 5433b6d)
 
-### maintenance — "Kész" jelölés hiányzik
-- ⬜ `maintenance_log` tábla létezik, de nincs API/UI a teljesítés rögzítésére
+### maintenance — "Kész" jelölés KÉSZ ✅
+- ✅ `maintenance_log` tábla + complete API + napló tab UI (commit 10cfac1)
 
-### performance — Célértékek hiányzik
-- ⬜ `performance_targets` tábla létezik, nincs célérték beállító UI
+### performance — Célértékek KÉSZ ✅
+- ✅ `performance_targets` tábla + célérték beállító API + modal UI (commit e13b520)
 
 ### scheduling — Allokáció hiányzik
 - ⬜ `scheduling_allocations` tábla létezik, nincs allokáció kezelő UI

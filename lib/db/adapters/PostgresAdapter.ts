@@ -144,6 +144,14 @@ function convertSqlSyntax(sqlStr: string): string {
     '$1 ON CONFLICT DO NOTHING'
   );
 
+  // INSERT OR IGNORE INTO ... → INSERT INTO ... ON CONFLICT DO NOTHING (SQLite compat)
+  if (/INSERT\s+OR\s+IGNORE\s+INTO/i.test(s)) {
+    s = s.replace(/INSERT\s+OR\s+IGNORE\s+INTO/gi, 'INSERT INTO');
+    if (!/ON\s+CONFLICT/i.test(s)) {
+      s = s.trimEnd().replace(/;?\s*$/, '') + ' ON CONFLICT DO NOTHING';
+    }
+  }
+
   // BIT/BOOLEAN columns: = 1 → = true, = 0 → = false
   s = s.replace(/\b(is_active|first_login|success|is_read|is_default|is_builtin)\s*=\s*1\b/gi, '$1 = true');
   s = s.replace(/\b(is_active|first_login|success|is_read|is_default|is_builtin)\s*=\s*0\b/gi, '$1 = false');

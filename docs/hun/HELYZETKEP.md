@@ -1,6 +1,6 @@
 # HELYZETKÉP — Hol tartasz, mi működik, mi nem, és mit csinálj
 
-> **Készült:** 2026. március 10. (frissítve: 2026.03.10 — nyelvváltó végleges fix, SW cache fix)
+> **Készült:** 2026. március 10. (frissítve: 2026.03.13 — SAP/PLC/AI előkészítés, sap-import modul hozzáadva)
 > **Cél:** Rendet tenni a fejedben. Ezt a dokumentumot olvasd el elejétől végéig.
 
 ---
@@ -254,28 +254,33 @@ A program rétegei egyszerűen:
 - Import pipeline (Excel/CSV)
 - Ctrl+K keresés (Command Palette)
 - Build hiba nélkül lefordul (TypeScript 0 error)
+- Reports riport motor (query API, viewer, editor — recharts alapú)
+- Quality 8D riport wizard (D1-D8, CRUD API, viewer modal)
+- Maintenance "kész" jelölés + napló (complete API, log API, tab UI)
+- Performance célérték beállító UI (targets CRUD API + modal)
+- Digital Twin valós API (CRUD, 7 gép seed, layout DB)
 
-### ⚠️ Ami félig kész:
+### ⚠️ Ami félig kész / előkészítve:
 - Nyelvkezelés (dashboard KÉSZ, de login/setup/admin oldalak szövegei még hardcode)
 - Modul dashboardok (UI van, de valódi gyártási logika nincs)
 - Export (PDF/Excel keret kész, de nem tesztelve valós adattal)
 - Email értesítések (kód kész, de SMTP konfig nincs)
 - Workflow engine (keret kész, de nem tesztelve)
+- **AI Asszisztens** — SYSTEM_PROMPT kész (18 modul + SAP + PLC táblaismeret), de OpenAI API kulcs szükséges
+- **PLC Connector** — driver interfészek + 4 stub driver kész (S7/Modbus TCP/Modbus RTU/MQTT/OPC-UA), 002 migráció (alerts, driver_config, poll_status); hardver-aktiváláshoz `npm install node-snap7/modbus-serial/mqtt/node-opcua` szükséges
+- **SAP import** — teljes séma (mod_sap_* 5 tábla, 50+ objektum katalógus), 4 API route, 4 fül admin UI kész; RFC-aktiváláshoz `npm install node-rfc` + SAP NW RFC SDK szükséges
 
 ### ❌ Ami SKELETON (csak váz, nem funkcionális):
-- AI Asszisztens (kell OpenAI API kulcs + valós adatok)
-- PLC Connector (csak manifest + üres dashboard)
-- Digital Twin (2D demo, nem valódi)
 - SSE real-time (event bus kész, de nincs ki/bekapcsolva sehol)
 - API Gateway (kód kész, de nincs kliens aki használná)
 - Multi-site (csak CRUD, nincs bekötve a modulokba)
 - Dashboard Builder (layout mentés kész, widget renderelés nincs)
 
 ### 🔢 Számokban:
-- **17 modul** regisztrálva (15 aktív a loaderben)
-- **55+ API route** definiálva
-- **15 DB migráció** (core táblák)
-- **~100 TypeScript fájl** a lib/ és modules/ mappákban
+- **18 modul** regisztrálva (17 aktív a loaderben, incl. sap-import)
+- **60+ API route** definiálva
+- **17 DB migráció** (core táblák + modul migrációk)
+- **~120 TypeScript fájl** a lib/ és modules/ mappákban
 - **0 TypeScript build hiba** (tehát buildel, de ez nem jelenti hogy működik!)
 
 ---

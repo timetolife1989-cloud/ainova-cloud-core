@@ -119,8 +119,9 @@ Widget típusok:
 
 ## FÁZIS 3 — INNOVÁCIÓS SZINT (v2.0) — 2-4 hónap
 
-### 3.1 🟢 AI Asszisztens ⏱️ 2 hét
-**Javaslat:** Természetes nyelvű kérdések a gyártási adatokról.
+### 3.1 🟢 AI Asszisztens ⏱️ 2 hét — ✅ ELŐKÉSZÍTVE (2026-03-13)
+**Jelenlegi állapot:** SYSTEM_PROMPT teljes újraírás — 18 modul + SAP + PLC táblaismeret, OEE benchmark, BI fókusz, multilingual.
+**Aktiváláshoz:** `OPENAI_API_KEY` env var szükséges.
 **Példák:**
 - "Mennyi volt a múlt heti OEE az 1-es gépen?"
 - "Melyik dolgozó volt a legtöbbet távol az elmúlt hónapban?"
@@ -140,8 +141,8 @@ LLM → Természetes nyelvű válasz + chart javaslat
 UI megjelenítés (szöveg + opcionális chart)
 ```
 
-- `lib/ai/assistant.ts` — AI asszisztens logic
-- `app/api/ai/query/route.ts` — API endpoint
+- `lib/ai/assistant.ts` — AI asszisztens logic ✅
+- `app/api/ai/query/route.ts` — API endpoint ✅
 - `components/core/AiChat.tsx` — Chat panel (floating widget)
 - Biztonsági réteg: read-only query, RBAC szűrés, rate limit
 
@@ -154,7 +155,8 @@ UI megjelenítés (szöveg + opcionális chart)
 - Dashboard widget: "Várható meghibásodás: 12 nap"
 - Alert küldés a karbantartási csapatnak
 
-### 3.3 🟢 PLC Connector (IoT Edge) ⏱️ 3 hét
+### 3.3 🟢 PLC Connector (IoT Edge) ⏱️ 3 hét — ✅ DRIVER STUBS ELŐKÉSZÍTVE (2026-03-13)
+**Jelenlegi állapot:** Driver interfészek + 4 stub driver kész (S7/Modbus TCP/Modbus RTU/MQTT/OPC-UA), 002 migráció (alerts, driver_config, poll_status, alert_events). Hardver-aktiváláshoz npm install szükséges.
 **Javaslat:** Automatikus adatgyűjtés Logo PLC / Siemens S7 vezérlőkből.
 **Technológia:** 
 - Node-RED vagy egyedi Node.js agent
@@ -163,12 +165,15 @@ UI megjelenítés (szöveg + opcionális chart)
 - Edge agent → MQTT → Cloud API
 
 **Implementáció:**
-- `modules/plc-connector/agent/` — Edge agent (Node.js)
+- `lib/connectors/plc/interface.ts` — IPlcDriver + createPlcDriver factory ✅
+- `lib/connectors/plc/drivers/` — s7.ts, modbus.ts, mqtt.ts, opcua.ts stub driverek ✅
+- `modules/plc-connector/agent/` — Edge agent (Node.js) — TODO
 - `modules/plc-connector/api/route.ts` — Data receiver API
 - Admin konfiguráció: PLC IP, register mapping, polling interval
 - Real-time dashboard: gép státusz, darabszámláló, hőmérséklet
 
-### 3.4 🟢 Digital Twin Vizualizáció ⏱️ 3 hét
+### 3.4 🟢 Digital Twin Vizualizáció ⏱️ 3 hét — ✅ KÉSZ (2026-03-12)
+**Jelenlegi állapot:** Valós API endpoint (CRUD, 7 gép seed, layout DB integráció).
 **Javaslat:** 2D gyártósor layout, ahol a gépek valós idejű állapota látható.
 **Technológia:** Canvas API vagy `react-flow` (node-based editor)
 **Implementáció:**

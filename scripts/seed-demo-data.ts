@@ -491,12 +491,14 @@ async function createTablesIfNeeded(db: IDatabaseAdapter) {
 
   // Bootstrap admin with known password
   const adminHash = await bcrypt.hash('Admin1234!', 10);
+  const isActiveVal = DB_ADAPTER === 'postgres' ? 'true' : '1';
+  const firstLoginVal = DB_ADAPTER === 'postgres' ? 'false' : '0';
   try {
-    await db.execute(`INSERT OR IGNORE INTO core_users (username, password_hash, full_name, role, is_active, first_login) VALUES (@p0,@p1,@p2,@p3,1,0)`,
+    await db.execute(`INSERT OR IGNORE INTO core_users (username, password_hash, full_name, role, is_active, first_login) VALUES (@p0,@p1,@p2,@p3,${isActiveVal},${firstLoginVal})`,
       [{name:'p0',type:'nvarchar',value:'admin'},{name:'p1',type:'nvarchar',value:adminHash},
        {name:'p2',type:'nvarchar',value:'Demo Admin'},{name:'p3',type:'nvarchar',value:'admin'}]);
     // Also update existing admin's hash in case user already exists
-    await db.execute(`UPDATE core_users SET password_hash=@p1, full_name='Demo Admin', first_login=0 WHERE username=@p0`,
+    await db.execute(`UPDATE core_users SET password_hash=@p1, full_name='Demo Admin', first_login=${firstLoginVal} WHERE username=@p0`,
       [{name:'p0',type:'nvarchar',value:'admin'},{name:'p1',type:'nvarchar',value:adminHash}]);
   } catch {}
 }

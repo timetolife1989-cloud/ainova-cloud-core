@@ -1,7 +1,7 @@
 # ACI MASTER STATUS — Az Igazság Egyetlen Forrása
 
-> **Generálva:** 2026-03-11
-> **Verzió:** v1.0.0 → v1.1.0 (Supabase Cloud Migration)
+> **Generálva:** 2026-03-13
+> **Verzió:** v1.3.0 (SAP/PLC/AI előkészítés + P0–P4 teljesítés)
 > **Cél:** Production-Ready deployment Supabase + Vercel stacken
 
 ---
@@ -55,14 +55,16 @@
 | **shift-management** | ✅ Production Ready | ✅ CRUD + ütközés detektálás (409) | ✅ Beosztás form | ✅ shift_definitions + shift_assignments | Műszak tervezés ütközés felismeréssel. |
 | **quality** | ✅ Production Ready | ✅ CRUD + selejt kód katalógus | ✅ Vizsgálati rekord kijelzés | ✅ quality_inspections + quality_8d_reports | Minőség-ellenőrzés 8D riport támogatással. |
 | **maintenance** | ✅ Production Ready | ✅ CRUD + esedékesség számítás | ✅ Kiemelés túlhaladjáknál | ✅ maintenance_assets + maintenance_schedules + maintenance_log | Megelőző karbantartás ütemezés. |
-| **plc-connector** | ⚠️ Részleges (Infrastruktúra kész) | ✅ Eszköz nyilvntartás (S7/Modbus/MQTT) | ✅ Eszköz kártya grid + állapot | ✅ mod_plc_devices + mod_plc_registers + mod_plc_data | **NINCS valós PLC kommunikáció!** Eszköz regisztráció és adat séma kész, de S7/Modbus/MQTT driver nincs implementálva. Idősor-adat gyűjtés 0%. |
-| **digital-twin** | ⚠️ Részleges (UI only, Demo adat) | ❌ API endpoint nincs implementálva | ✅ 2D SVG gyártósor + interaktív gépek | ✅ mod_dt_layouts + mod_dt_machines (üres) | **Hardcoded demo adat!** A UI teljesen működik, de nincs adatbázis integráció. A gépállapotok statikus JSON-ból jönnek. |
+| **plc-connector** | ⚠️ Előkészítve (Driver stubs kész) | ✅ Eszköz nyilvántartás (S7/Modbus TCP/RTU/MQTT/OPC-UA) | ✅ Eszköz kártya grid + állapot | ✅ mod_plc_devices + mod_plc_registers + mod_plc_data + mod_plc_alerts + mod_plc_driver_config + mod_plc_poll_status | Driver interfészek + 4 stub driver kész. 002 migráció: alerts, driver_config, poll_status, alert_events. Hardver-aktiváláshoz `npm install node-snap7/modbus-serial/mqtt/node-opcua` szükséges. |
+| **digital-twin** | ✅ Production Ready | ✅ CRUD + layout kezelés (7 gép seed) | ✅ 2D SVG gyártósor + interaktív gépek | ✅ mod_dt_layouts + mod_dt_machines (DB-vel) | Valós API endpoint, 7 gép seed adat, DB integráció kész. |
+| **sap-import** | ⚠️ Előkészítve | ✅ CRUD + test action + katalógus keresés + sync trigger (4 route) | ✅ 4 fül DashboardPage (Kapcsolatok, SAP Katalógus, Mező Mappingek, Szinkron Napló) | ✅ mod_sap_connections + mod_sap_objects (50+ objektum seed) + mod_sap_field_mappings + mod_sap_sync_log + mod_sap_data_cache | Teljes séma + API + admin UI kész. RFC-aktiváláshoz `npm install node-rfc` + SAP NW RFC SDK szükséges. OData connector natív fetch-szel használható. |
 
 ### Speciális Modulok
 
 | Modul | Állapot | Megjegyzés |
 |-------|---------|-----------|
 | **lac-napi-perces** | ✅ Production Ready | A legkomplexebb modul. SAP integráció, multi-source adat aggregáció, Excel export, valós idejű import. 5 migráció + 10+ komponens. Belső LAC referencia modul. |
+| **AI Asszisztens** | ⚠️ Előkészítve | SYSTEM_PROMPT teljes újraírás: 18 modul + SAP táblák + PLC táblák + Digital Twin ismeret, OEE benchmark (World Class=85%), BI fókusz. OpenAI API kulcs szükséges a működéshez. |
 
 ---
 
@@ -73,7 +75,7 @@
 | Komponens | Állapot | Részletek |
 |-----------|---------|-----------|
 | **DB Adapter Pattern** | ✅ Kész | MSSQL + PostgreSQL + SQLite adapter. Factory pattern (`getDb()`). |
-| **PostgresAdapter** | ⚠️ Javítandó | MSSQL→PG szintaxis konverzió részleges. Migráció futtatás nem támogatott. |
+| **PostgresAdapter** | ✅ Kész | MSSQL→PG szintaxis konverzió: SYSDATETIME, DATEPART, DATEADD, TOP/LIMIT, MERGE, IF NOT EXISTS, INSERT OR IGNORE, BIT→BOOLEAN. |
 | **Auth (Session)** | ✅ Kész | Cookie-alapú session, bcryptjs 12 rounds, idle/absolute timeout. |
 | **Auth (JWT)** | ✅ Kész | HMAC-SHA256, 15 perces access token, refresh token. |
 | **CSRF védelem** | ✅ Kész | Double-submit cookie, constant-time comparison, 24h TTL. |
@@ -147,7 +149,7 @@
 |------|---------|-----------|
 | **Supabase DB** | 🟡 Konfigurálva | .env.local frissítve. Migrációk futtatandó. |
 | **PostgreSQL Migrációk** | 🔴 Nem fut | migrate-all.ts csak MSSQL és SQLite támogatás. PG runner hozzáadandó. |
-| **Seeder (PG kompatibilis)** | 🔴 Javítandó | `INSERT OR IGNORE` szintaxis SQLite-specifikus. `ON CONFLICT DO NOTHING` kell PG-hez. |
+| **Seeder (PG kompatibilis)** | ✅ Kész | `INSERT OR IGNORE` konverzió a PostgresAdapterben + seeder boolean literálok PG-kompatibilisek. |
 | **Vercel Deploy** | 🔴 Nem konfigurált | vercel.json, environment variables beállítandó. |
 | **Docker** | ✅ Kész | Multi-stage Dockerfile, docker-compose MSSQL-lel. |
 
@@ -189,18 +191,20 @@
 
 ## 8. KÖVETKEZŐ LÉPÉSEK — PRIORITÁS SORREND
 
-### P0 — Kritikus (Supabase Go-Live)
+### P0 — Kritikus (Supabase Go-Live) — ✅ TELJESÍTVE
 1. ~~PostgreSQL migráció runner hozzáadása a migrate-all.ts-hez~~
-2. ~~Seeder PostgreSQL kompatibilitás (INSERT OR IGNORE → ON CONFLICT)~~
+2. ~~Seeder PostgreSQL kompatibilitás (INSERT OR IGNORE → ON CONFLICT)~~ — PostgresAdapter natívan konvertál
 3. ~~pg csomag telepítése~~
 4. ~~Migrációk futtatása Supabase-en~~
 5. ~~Seeder futtatása Supabase-en~~
+6. ~~Superadmin credentials env variable-ba kiszervezve (SUPERADMIN_PASSWORD, SUPERADMIN_USERNAME)~~
 
 ### P1 — Magas (Production Quality)
 1. Hardcoded stringek kicserélése i18n kulcsokra (change-password, SyncStatus, CommandPalette)
-2. Digital Twin API implementáció (mod_dt_machines adatbázis integráció)
-3. PLC Connector valós driver implementáció (S7/Modbus/MQTT)
+2. ~~Digital Twin API implementáció~~ — ✅ KÉSZ (CRUD, seed, DB)
+3. PLC Connector hardver-aktiválás (node-snap7/modbus-serial/mqtt/node-opcua telepítése)
 4. Landing page lokalizáció (HU/EN/DE)
+5. SAP RFC aktiválás (node-rfc + SAP NW RFC SDK licenc)
 
 ### P2 — Közepes (Feature completeness)
 1. Unit tesztek bővítése (jelenleg minimális coverage)

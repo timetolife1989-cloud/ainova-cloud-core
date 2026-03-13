@@ -75,6 +75,12 @@ ainova-cloud-core/
 │   │   ├── sql-dialect.ts        # SQL dialektus absztrakció
 │   │   └── index.ts              # DB factory
 │   ├── import/                   # Import pipeline (CSV/Excel)
+│   ├── connectors/               # Külső rendszer connector stubs
+│   │   ├── sap/
+│   │   │   └── interface.ts      # SapRfcConnector + SapODataConnector + factory
+│   │   └── plc/
+│   │       ├── interface.ts      # IPlcDriver + createPlcDriver factory
+│   │       └── drivers/          # S7, Modbus, MQTT, OPC-UA stub driverek
 │   ├── modules/                  # Modul rendszer
 │   │   ├── registry.ts           # Modul regisztráció, dependency check
 │   │   └── types.ts              # ModuleManifest típusok
@@ -99,6 +105,9 @@ ainova-cloud-core/
 │   ├── shift-management/         # Enterprise: Műszakbeosztás
 │   ├── quality/                  # Enterprise: Minőségellenőrzés
 │   ├── maintenance/              # Enterprise: Karbantartás
+│   ├── plc-connector/            # Enterprise: PLC adatgyűjtés (S7/Modbus/MQTT/OPC-UA)
+│   ├── digital-twin/             # Enterprise: Digitális iker vizualizáció
+│   ├── sap-import/               # Enterprise: SAP integráció (RFC/OData előkészítve)
 │   └── lac-napi-perces/          # LAC referencia implementáció
 ├── scripts/                      # CLI scriptek
 │   ├── migrate-all.ts            # DB migráció futtatás
@@ -132,7 +141,7 @@ A `sql-dialect.ts` absztrakciós réteg kezeli a DB-specifikus szintaxist:
 - `returning()` — OUTPUT INSERTED / RETURNING
 - `param()` — @name / $N / ?
 
-### 3.3 Core Táblák (14 migráció)
+### 3.3 Core Táblák (15 migráció)
 
 | # | Tábla | Leírás |
 |---|-------|--------|

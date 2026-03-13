@@ -407,15 +407,27 @@ Minden modulban elérhető export funkció:
 - Alapértelmezett telephely: "Főtelephely" (HQ)
 
 ### 28. PLC Connector
-- PLC vezérlők automatikus adatgyűjtése (Siemens S7, Modbus, MQTT)
-- Eszközök, registerek, adatgyűjtés táblák
+- PLC vezérlők automatikus adatgyűjtése (Siemens S7, Modbus TCP/RTU, MQTT, OPC-UA)
+- Driver interfészek előkészítve: `lib/connectors/plc/interface.ts` + 4 stub driver
+- 002 migráció: mod_plc_alerts, mod_plc_driver_config, mod_plc_poll_status táblák
+- Aktiváláshoz: `npm install node-snap7` / `modbus-serial` / `mqtt` / `node-opcua`
 - Dashboard: online/offline státusz, eszközlista
 
 ### 29. Digital Twin
 - 2D gyártósor vizualizáció canvas-on
+- Valós API endpoint: CRUD + 7 gép seed + layout DB integráció ✅
 - Gépek valós idejű állapota (fut/áll/figyelmeztetés/hiba/karbantartás)
 - Kattintás → részletek popup
-- Demo adatok, ha nincs layout
+
+### 29a. SAP Import
+- SAP R/3 és S/4HANA integráció (RFC + OData)
+- Modul: `sap-import` (Enterprise tier)
+- Séma: 5 tábla (connections, objects, field_mappings, sync_log, data_cache)
+- 50+ SAP objektum katalógus seed (MM/SD/PP/PM/HR/QM/FI-CO/BASIS)
+- API route-ok: connections (CRUD + test), objects (katalógus keresés), mappings (CRUD), sync (trigger)
+- Admin UI: 4 fül DashboardPage
+- Connector: `lib/connectors/sap/interface.ts` (SapRfcConnector, SapODataConnector, factory)
+- Aktiváláshoz: `npm install node-rfc` + SAP NW RFC SDK (ingyenes letöltés SAP-tól)
 
 ### 30. Dashboard Builder
 - Felhasználónkénti dashboard layoutok

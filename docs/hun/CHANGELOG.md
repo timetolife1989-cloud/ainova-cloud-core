@@ -2,6 +2,75 @@
 
 Minden jelentős változás dokumentálva van ebben a fájlban.
 
+## [1.3.0] - 2026-03-13
+
+### SAP Integráció előkészítés
+- **sap-import modul** — Enterprise tier, aktiválva a _loader.ts-ben
+- **mod_sap_connections** — SAP rendszer kapcsolatok táblája
+- **mod_sap_objects** — 50+ SAP objektum katalógus (MM/SD/PP/PM/HR/QM/FI-CO/BASIS)
+- **mod_sap_field_mappings** — Mező leképezés konfigurációk
+- **mod_sap_sync_log** — Szinkronizáció napló
+- **mod_sap_data_cache** — Adat cache réteg
+- **API route-ok** — connections (CRUD + test), objects (katalógus keresés), mappings (CRUD), sync (trigger)
+- **DashboardPage** — 4 fül admin UI (Kapcsolatok, SAP Katalógus, Mező Mappingek, Szinkron Napló)
+- **lib/connectors/sap/interface.ts** — RFC + OData connector stub interfészek (SapRfcConnector, SapODataConnector, createSapConnector factory)
+
+### PLC Driver Interfészek
+- **lib/connectors/plc/interface.ts** — IPlcDriver absztrakt interfész + createPlcDriver factory
+- **drivers/s7.ts** — Siemens S7 stub (node-snap7 integrációhoz)
+- **drivers/modbus.ts** — Modbus TCP/RTU stub (modbus-serial integrációhoz)
+- **drivers/mqtt.ts** — MQTT stub (mqtt csomag integrációhoz)
+- **drivers/opcua.ts** — OPC-UA stub (node-opcua integrációhoz)
+- **002_plc_enhancements.sql** — mod_plc_alerts, mod_plc_driver_config, mod_plc_poll_status, mod_plc_alert_events táblák
+- **plc-connector manifest** — OPC-UA hozzáadva protokoll opcióhoz, 002 migráció regisztrálva
+
+### AI Asszisztens fejlesztés
+- **SYSTEM_PROMPT teljes újraírás** — mind a 18 modul + SAP táblák (mod_sap_*) + PLC táblák (mod_plc_*) + Digital Twin táblák ismeret
+- **BI fókusz** — OEE benchmark (World Class = 85%), minőségi arány formula, karbantartási minták
+- **Többnyelvű** — HU/DE/EN válasz a kérdés nyelvének megfelelően
+- **SQL szabályok** — MSSQL alapértelmezett + PostgreSQL opció kezelve
+
+---
+
+## [1.2.0] - 2026-03-12
+
+### Stabilitás & PostgreSQL Go-Live (P0)
+- **Supabase felhő integráció** — PgBouncer SSL, Vercel deployment
+- **pg.types parser** — DECIMAL/NUMERIC számként, DATE ISO stringként
+- **Auth javítás** — bcrypt boolean konverzió, session timeout fix
+- **Security headers** — CSP, HSTS, Permissions-Policy, SameSite=strict
+
+### UX & i18n (P0–P1)
+- **Workforce UX teljes újraírás** — shift gombok, overwrite detection, overtime rögzítés
+- **i18n: 14 modul DashboardPage konvertálva** — 260+ kulcs HU/EN/DE
+- **i18n: Admin panel** — UserTable, UserForm, UserFilters, AuditLogTable, SyncStatusWidget
+- **Nyelvváltó javítás** — SW cache kizárás, I18nProvider module-level store
+- **Mobile Header** — logo+avatar+lang+logout responsive layout
+- **Dátum input mezők** — dark theme CSS (color-scheme: dark)
+- **Landing page i18n** — 50+ kulcs HU/EN/DE, marketing layout
+- **Password change oldal i18n** — 27 kulcs HU/EN/DE
+
+### Teljesítmény optimalizálás (P1)
+- **useMemo** — 6 modulban memorizált számítások
+- **staleTime 5min** — React Query cache optimalizálás
+- **CommandPalette lazy load** — dead Inter import törölve
+- **refetchOnWindowFocus kikapcsolva** — felesleges API hívások csökkentve
+
+### Modul funkciók (P3)
+- **Reports riport motor** — query API, viewer, editor, delete (commit 92f6da0)
+- **Maintenance "kész" jelölés** — complete API, log API, tab UI (commit 10cfac1)
+- **Quality 8D riport** — CRUD API + D1-D8 wizard + viewer modal (commit 5433b6d)
+- **Performance célérték UI** — targets CRUD API + modal (commit e13b520)
+- **Excel/PDF export** — SQL injection fix, ExportButton 9 modulba, i18n
+
+### Demo & Digital Twin (P4)
+- **Digital Twin valós API** — CRUD, 7 gép seed, layout DB
+- **Demo auto-reset** — Vercel Cron 03:00 UTC, CRON_SECRET
+- **Demo seed bővítés** — reports 8 mentett def., PLC 4 eszköz, quality 8D 4 riport
+- **Mobile responsive** — 5 loading grid + audit oldal
+
+---
+
 ## [1.0.0] - 2026-03-08
 
 ### Core rendszer

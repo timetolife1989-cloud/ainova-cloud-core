@@ -1,4 +1,4 @@
-# PRIORITÁSOK — 2026.03.12
+# PRIORITÁSOK — 2026.03.13
 
 > ŐSZINTE státusz. Nincs hamis ✅ — csak az van megjelölve ami TÉNYLEG működik a live URL-en.
 
@@ -48,8 +48,8 @@
 ## P4 — NICE TO HAVE (javítva, push-olva)
 
 - ✅ Digital Twin: valós API endpoint (CRUD, seed 7 gép, layout DB)
-- ⬜ PLC Connector: S7/Modbus/MQTT driverek (hardver-függő)
-- ⬜ SAP import modul (SAP RFC hozzáférés szükséges)
+- ✅ PLC Connector: driver interfészek előkészítve (S7/Modbus TCP/Modbus RTU/MQTT/OPC-UA stub driverek, 002 migráció — alerts, driver_config, poll_status táblák)
+- ✅ SAP import modul: teljes séma + API + admin UI előkészítve (mod_sap_* 5 tábla, 50+ objektum katalógus seed, 4 API route, 4 fül DashboardPage — RFC/OData aktiváláshoz külső integrációs kulcs szükséges)
 - ✅ Demo környezet auto-reset (Vercel Cron 03:00 UTC, CRON_SECRET)
 - ✅ Mobile responsive optimalizáció (5 loading grid + audit)
-- ⬜ AI funkciók (prediktív karbantartás — ML modell szükséges)
+- ✅ AI Asszisztens SYSTEM_PROMPT teljes újraírás (mind a 18 modul + SAP + PLC táblaismeret, OEE benchmark, minőségi formula, BI fókusz — OpenAI API kulcs szükséges)
