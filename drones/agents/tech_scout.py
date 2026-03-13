@@ -18,8 +18,9 @@ with open(PROMPT_PATH, "r", encoding="utf-8") as f:
     SYSTEM_PROMPT = f.read()
 
 
-# Research tasks ordered by priority (most critical ACI problems first)
+# Research tasks — code, UI, architecture, frameworks, everything for building ACI
 RESEARCH_TASKS = [
+    # === ROUND 1: Critical ACI fixes ===
     {
         "category": "nextjs_i18n_performance",
         "title": "Instant language switching in Next.js",
@@ -42,12 +43,13 @@ RESEARCH_TASKS = [
     },
     {
         "category": "manufacturing_dashboard_ui",
-        "title": "Modern manufacturing dashboard UI/UX",
+        "title": "Modern manufacturing dashboard UI/UX patterns",
         "queries": [
             "manufacturing dashboard UI design modern 2024 2025",
             "MES software user interface best practices",
             "industrial SaaS dashboard layout patterns tailwind",
             "react dashboard template manufacturing production",
+            "shadcn ui dashboard components data tables charts",
         ],
     },
     {
@@ -59,9 +61,10 @@ RESEARCH_TASKS = [
             "next.js middleware tenant routing",
         ],
     },
+    # === ROUND 2: Real-time & IoT ===
     {
         "category": "plc_communication",
-        "title": "PLC communication implementation in Node.js",
+        "title": "PLC/IoT communication in Node.js",
         "queries": [
             "node.js S7 protocol PLC communication node-snap7",
             "modbus tcp node.js implementation industrial",
@@ -76,6 +79,206 @@ RESEARCH_TASKS = [
             "next.js server sent events SSE real-time updates",
             "react real-time dashboard websocket vs SSE",
             "manufacturing real-time production monitoring architecture",
+            "supabase realtime subscriptions react dashboard",
+        ],
+    },
+    # === ROUND 3: UI Components & Design System ===
+    {
+        "category": "react_component_patterns",
+        "title": "React component architecture for enterprise SaaS",
+        "queries": [
+            "react compound component pattern enterprise",
+            "react headless ui pattern reusable components",
+            "react design system architecture scalable",
+            "storybook component library manufacturing SaaS",
+        ],
+    },
+    {
+        "category": "tailwind_industrial_ui",
+        "title": "Tailwind CSS industrial/manufacturing UI designs",
+        "queries": [
+            "tailwind css dashboard design system dark mode",
+            "tailwind industrial monitoring UI components",
+            "tremor react dashboard components charts tailwind",
+            "recharts vs visx vs nivo react chart library comparison 2025",
+        ],
+    },
+    {
+        "category": "data_table_patterns",
+        "title": "Advanced data tables for manufacturing data",
+        "queries": [
+            "tanstack table react advanced filtering sorting pagination",
+            "react data grid manufacturing large dataset performance",
+            "ag-grid vs tanstack table comparison features",
+            "virtual scrolling large tables react performance",
+        ],
+    },
+    # === ROUND 4: Database & API Architecture ===
+    {
+        "category": "supabase_advanced",
+        "title": "Supabase advanced patterns for SaaS",
+        "queries": [
+            "supabase edge functions typescript patterns",
+            "supabase database triggers automation",
+            "supabase storage file uploads manufacturing documents",
+            "supabase auth custom claims multi-tenant",
+            "postgresql materialized views manufacturing reporting",
+        ],
+    },
+    {
+        "category": "api_design_patterns",
+        "title": "API design patterns for manufacturing SaaS",
+        "queries": [
+            "next.js api routes best practices rate limiting validation",
+            "REST API design manufacturing ERP integration patterns",
+            "tRPC vs REST vs GraphQL next.js comparison 2025",
+            "API versioning strategy SaaS application",
+        ],
+    },
+    # === ROUND 5: Testing & Quality ===
+    {
+        "category": "testing_strategy",
+        "title": "Testing strategy for Next.js SaaS applications",
+        "queries": [
+            "playwright end to end testing next.js application",
+            "vitest unit testing react components best practices",
+            "testing manufacturing software critical paths",
+            "CI CD pipeline github actions next.js deployment",
+        ],
+    },
+    {
+        "category": "error_handling",
+        "title": "Error handling and monitoring patterns",
+        "queries": [
+            "sentry error monitoring next.js setup best practices",
+            "react error boundary patterns production",
+            "structured logging next.js application pino winston",
+            "manufacturing software audit trail implementation",
+        ],
+    },
+    # === ROUND 6: Advanced Features ===
+    {
+        "category": "workflow_automation",
+        "title": "No-code workflow automation engine patterns",
+        "queries": [
+            "no-code workflow builder react implementation",
+            "rule engine javascript manufacturing automation",
+            "n8n workflow automation self hosted architecture",
+            "zapier like automation builder open source react",
+        ],
+    },
+    {
+        "category": "report_generation",
+        "title": "Report generation and PDF export in React",
+        "queries": [
+            "react pdf generation manufacturing reports",
+            "puppeteer pdf generation server side next.js",
+            "excel export large dataset react manufacturing",
+            "scheduled report generation node.js cron",
+        ],
+    },
+    {
+        "category": "ai_assistant_patterns",
+        "title": "AI assistant integration patterns for SaaS",
+        "queries": [
+            "AI chat assistant integration react SaaS application",
+            "function calling local LLM manufacturing data queries",
+            "RAG retrieval augmented generation next.js implementation",
+            "text to SQL natural language database query",
+        ],
+    },
+    # === ROUND 7: Security & Auth ===
+    {
+        "category": "auth_rbac",
+        "title": "Authentication and RBAC for manufacturing SaaS",
+        "queries": [
+            "supabase auth role based access control implementation",
+            "next.js middleware authentication authorization patterns",
+            "RBAC permission system manufacturing software roles",
+            "row level security postgresql multi-tenant SaaS",
+        ],
+    },
+    {
+        "category": "security_best_practices",
+        "title": "Security best practices for SaaS applications",
+        "queries": [
+            "next.js security headers CSP CORS configuration",
+            "input validation sanitization next.js api routes",
+            "OWASP top 10 next.js mitigation strategies",
+            "secrets management environment variables production",
+        ],
+    },
+    # === ROUND 8: DevOps & Deployment ===
+    {
+        "category": "docker_deployment",
+        "title": "Docker deployment for Next.js + database",
+        "queries": [
+            "next.js docker production deployment best practices",
+            "docker compose next.js mssql supabase setup",
+            "next.js standalone output docker image optimization",
+            "nginx reverse proxy next.js production configuration",
+        ],
+    },
+    {
+        "category": "monitoring_observability",
+        "title": "Monitoring and observability for manufacturing SaaS",
+        "queries": [
+            "next.js application performance monitoring APM",
+            "prometheus grafana monitoring manufacturing software",
+            "health check endpoint patterns node.js application",
+            "uptime monitoring SaaS application best practices",
+        ],
+    },
+    # === ROUND 9: Advanced Manufacturing Features ===
+    {
+        "category": "digital_twin",
+        "title": "Digital twin implementation for manufacturing",
+        "queries": [
+            "digital twin manufacturing implementation web technology",
+            "3D visualization react three.js manufacturing plant",
+            "real-time equipment status dashboard react",
+            "digital twin data model manufacturing equipment",
+        ],
+    },
+    {
+        "category": "predictive_analytics",
+        "title": "Predictive analytics for manufacturing in browser",
+        "queries": [
+            "tensorflow.js browser machine learning manufacturing",
+            "predictive maintenance web application implementation",
+            "time series forecasting javascript manufacturing",
+            "anomaly detection real-time manufacturing data",
+        ],
+    },
+    {
+        "category": "shift_workforce_management",
+        "title": "Shift and workforce management system design",
+        "queries": [
+            "shift scheduling algorithm manufacturing typescript",
+            "workforce management dashboard react implementation",
+            "attendance tracking system web application design",
+            "overtime calculation labor law compliance software",
+        ],
+    },
+    # === ROUND 10: Integration & Interop ===
+    {
+        "category": "sap_integration",
+        "title": "SAP integration patterns for web applications",
+        "queries": [
+            "SAP RFC BAPI integration node.js connector",
+            "SAP IDoc processing node.js middleware",
+            "ERP integration patterns manufacturing MES",
+            "SAP S4HANA API integration REST OData",
+        ],
+    },
+    {
+        "category": "fleet_management",
+        "title": "Fleet and vehicle tracking system architecture",
+        "queries": [
+            "fleet management system web application architecture",
+            "vehicle GPS tracking real-time map react",
+            "fuel consumption tracking system design",
+            "leaflet mapbox react fleet tracking dashboard",
         ],
     },
 ]
@@ -175,16 +378,13 @@ class TechScout:
         """Generate a markdown summary report of all findings."""
         report = f"# Tech Scout Report — {self.results_count} findings\n\n"
         report += "## Summary\n\n"
-        report += "This report contains technical research results for improving ACI.\n"
-        report += "Each finding includes actionable code snippets and implementation recommendations.\n\n"
-        report += f"Results saved to Supabase `drone_results` table and `output/tech/` directory.\n\n"
-        report += "## Priority Actions\n\n"
-        report += "1. **Fix i18n performance** — see `nextjs_i18n_performance` results\n"
-        report += "2. **Optimize Next.js bundle** — see `nextjs_performance` results\n"
-        report += "3. **Redesign dashboard UI** — see `manufacturing_dashboard_ui` results\n"
-        report += "4. **Implement multi-tenant** — see `multi_tenant_saas` results\n"
-        report += "5. **Real PLC drivers** — see `plc_communication` results\n"
-        report += "6. **Real-time updates** — see `realtime_dashboard` results\n"
+        report += "Comprehensive technical research for building ACI.\n"
+        report += "Each finding includes actionable patterns, code snippets, and architecture recommendations.\n\n"
+        report += f"Results in Supabase `drone_results` table and `output/tech_research/` directory.\n\n"
+        report += "## Research Categories\n\n"
+        categories = [t["category"] for t in RESEARCH_TASKS]
+        for i, cat in enumerate(categories, 1):
+            report += f"{i}. `{cat}`\n"
 
         self.storage.save_markdown_report(
             drone_type="tech_research",

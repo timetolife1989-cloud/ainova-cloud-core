@@ -22,43 +22,44 @@ COMPETITORS = [
         "name": "Katana MRP",
         "website": "katana.com",
         "queries": [
-            "Katana MRP features pricing review 2024 2025",
-            "Katana MRP manufacturing software G2 review",
-            "site:katana.com pricing features manufacturing",
+            "Katana MRP tech stack architecture cloud infrastructure",
+            "Katana MRP API documentation integrations features",
+            "Katana MRP manufacturing features OEE production tracking",
         ],
     },
     {
         "name": "MRPeasy",
         "website": "mrpeasy.com",
         "queries": [
-            "MRPeasy features pricing review 2024 2025",
-            "MRPeasy manufacturing MRP software G2 review",
-            "site:mrpeasy.com pricing features",
+            "MRPeasy features manufacturing modules inventory production",
+            "MRPeasy MRP software technology stack cloud",
+            "MRPeasy API integration manufacturing workflow",
         ],
     },
     {
         "name": "Odoo Manufacturing",
         "website": "odoo.com",
         "queries": [
-            "Odoo Manufacturing MRP features pricing 2024 2025",
-            "Odoo manufacturing module review G2 Capterra",
-            "Odoo vs Katana vs MRPeasy manufacturing comparison",
+            "Odoo Manufacturing module architecture open source code",
+            "Odoo MRP IoT integration PLC implementation",
+            "Odoo manufacturing dashboard UI features 2025",
         ],
     },
     {
         "name": "Tulip",
         "website": "tulip.co",
         "queries": [
-            "Tulip manufacturing app platform features pricing",
-            "Tulip.co MES no-code manufacturing review",
+            "Tulip no-code manufacturing app platform architecture",
+            "Tulip MES edge computing IoT connector features",
+            "Tulip manufacturing analytics dashboard design",
         ],
     },
     {
         "name": "SFactrix",
         "website": "sfactrix.com",
         "queries": [
-            "SFactrix MES manufacturing software features pricing",
-            "SFactrix cloud MES review",
+            "SFactrix cloud MES features OEE real-time monitoring",
+            "SFactrix manufacturing execution system architecture",
         ],
     },
     {
@@ -66,17 +67,18 @@ COMPETITORS = [
         "website": "prodsmart.com",
         "queries": [
             "Prodsmart Autodesk Fusion Operations manufacturing features",
-            "Prodsmart MES review 2024",
+            "Prodsmart MES shop floor tracking IoT architecture",
         ],
     },
 ]
 
 MARKET_ANALYSIS_QUERIES = [
-    "manufacturing MES software comparison 2024 2025 small medium business",
-    "MES MOM software market gap analysis SMB",
-    "manufacturing software Hungary CEE Eastern Europe",
-    "best MES software small manufacturers affordable",
-    "manufacturing software trends 2025 AI IoT cloud",
+    "manufacturing MES software technology trends 2025 AI IoT cloud",
+    "MES MOM software features SMB manufacturers need most",
+    "manufacturing software open source vs commercial comparison",
+    "best manufacturing software features small medium business 2025",
+    "manufacturing SaaS technology stack architecture patterns",
+    "MES software UI UX design trends modern manufacturing",
 ]
 
 

@@ -23,7 +23,8 @@ console = Console()
 @click.command()
 @click.option("--drone", type=click.Choice(["tech_scout", "industry_scout", "competitor_scout"]), default=None, help="Run a specific drone (default: all)")
 @click.option("--check", is_flag=True, help="Only check system health, don't run drones")
-def main(drone: str | None, check: bool):
+@click.option("--loop", is_flag=True, help="Continuous mode — keep running until pod is stopped")
+def main(drone: str | None, check: bool, loop: bool):
     """Ainova Drone System — Automated data collection agents."""
 
     console.print(Panel(
@@ -51,13 +52,15 @@ def main(drone: str | None, check: bool):
     console.print(f"[dim]Session: {Config.SESSION_ID}[/dim]")
     console.print(f"[dim]Model: {Config.VLLM_MODEL}[/dim]")
     console.print(f"[dim]Output: {Config.OUTPUT_DIR}[/dim]")
+    if loop:
+        console.print(f"[bold yellow]LOOP MODE — runs continuously until you stop the pod[/bold yellow]")
     console.print()
 
     # Run
-    asyncio.run(_run(drone, check))
+    asyncio.run(_run(drone, check, loop))
 
 
-async def _run(drone: str | None, check: bool):
+async def _run(drone: str | None, check: bool, loop: bool):
     orchestrator = Orchestrator()
 
     try:
@@ -67,7 +70,16 @@ async def _run(drone: str | None, check: bool):
             console.print("[bold green]All systems healthy![/bold green]")
             return
 
-        if drone:
+        if loop:
+            round_num = 1
+            while True:
+                console.print(f"\n[bold magenta]═══ ROUND {round_num} ═══[/bold magenta]")
+                await orchestrator.run_all()
+                console.print(f"[bold green]Round {round_num} complete — {orchestrator.total_results} total results[/bold green]")
+                console.print("[dim]Starting next round in 30 seconds...[/dim]")
+                await asyncio.sleep(30)
+                round_num += 1
+        elif drone:
             await orchestrator.run_drone(drone)
             await orchestrator.finalize()
         else:

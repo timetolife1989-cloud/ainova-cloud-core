@@ -47,7 +47,8 @@ class Config:
         """Check that all required config values are set. Returns list of errors."""
         errors = []
         if not cls.SUPABASE_SERVICE_KEY:
-            errors.append("SUPABASE_SERVICE_KEY is not set")
+            # Not fatal — drones save locally too
+            pass
         if not cls.HF_TOKEN:
             errors.append("HF_TOKEN is not set")
         return errors
