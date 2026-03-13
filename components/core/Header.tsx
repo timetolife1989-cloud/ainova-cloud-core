@@ -1,9 +1,10 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
-import React from 'react';
-import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface HeaderProps {
   appName: string;
@@ -50,55 +51,15 @@ function getRoleBadgeColor(role: string): string {
   return 'bg-gray-600 text-white';
 }
 
-const LOCALE_LABELS: Record<string, { flag: string; label: string }> = {
-  hu: { flag: '🇭🇺', label: 'Magyar' },
-  en: { flag: '🇬🇧', label: 'English' },
-  de: { flag: '🇩🇪', label: 'Deutsch' },
-};
-
 export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { t } = useTranslation();
   const [currentTime, setCurrentTime] = React.useState<Date | null>(null);
-  const [langOpen, setLangOpen] = React.useState(false);
-  const langRef = React.useRef<HTMLDivElement>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  React.useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleLocaleChange = async (newLocale: string) => {
-    setLangOpen(false);
-    
-    try {
-      const csrfRes = await fetch('/api/csrf');
-      if (!csrfRes.ok) throw new Error('CSRF token fetch failed');
-      const { token } = await csrfRes.json();
-      
-      const res = await fetch('/api/admin/settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
-        body: JSON.stringify({ key: 'app_locale', value: newLocale }),
-      });
-      
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Failed to save locale: ${res.status} ${errorText}`);
-      }
-      
-      // Trigger RSC re-render so server re-reads locale from DB
-      router.refresh();
-      // Fallback: full reload after a short delay if RSC doesn't update
-      setTimeout(() => window.location.reload(), 600);
-    } catch (err) {
-      console.error('[Header] Locale change failed:', err);
-      alert(`${t('common.lang_change_failed')}: ${err instanceof Error ? err.message : ''}`);
-    }
-  };
+  // Close mobile menu on route change
+  useEffect(() => { setMobileMenuOpen(false); }, [pathname]);
 
   React.useEffect(() => {
     setCurrentTime(new Date());
@@ -190,40 +151,7 @@ export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) 
           </div>
 
           {/* 3. Language Switcher — always visible, even on mobile */}
-          <div className="relative flex-shrink-0 px-1.5 md:px-3 border-r border-gray-700" ref={langRef}>
-            <button
-              onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/10 transition-colors text-sm"
-            >
-              <span className="text-base">{LOCALE_LABELS[locale]?.flag ?? '🌐'}</span>
-              <span className="text-gray-300 text-xs font-medium">{locale.toUpperCase()}</span>
-              <svg className={`w-3 h-3 text-gray-400 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-            </button>
-            <AnimatePresence>
-              {langOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  className="absolute top-full right-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden z-50 min-w-[140px]"
-                >
-                  {Object.entries(LOCALE_LABELS).map(([code, { flag, label }]) => (
-                    <button
-                      key={code}
-                      onClick={() => handleLocaleChange(code)}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-blue-600/30 transition-colors ${
-                        code === locale ? 'bg-blue-600/20 text-blue-300' : 'text-gray-300'
-                      }`}
-                    >
-                      <span>{flag}</span>
-                      <span>{label}</span>
-                      {code === locale && <span className="ml-auto text-blue-400">✓</span>}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          <LanguageSwitcher locale={locale} className="flex-shrink-0 px-1.5 md:px-3 border-r border-gray-700" />
 
           {/* 3b. Search trigger (Ctrl+K) — hidden on mobile */}
           <div className="hidden md:block flex-shrink-0 px-2">
@@ -279,8 +207,106 @@ export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) 
             </motion.button>
           </div>
 
+          {/* 6. Mobile hamburger — md:hidden */}
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="md:hidden flex-shrink-0 p-2 rounded-lg hover:bg-white/10 transition-colors"
+            aria-label="Open menu"
+          >
+            <svg className="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
         </div>
       </div>
+
+      {/* Mobile Slide-in Sidebar */}
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-[100]">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          {/* Panel */}
+          <div className="absolute top-0 right-0 w-72 h-full bg-gray-900/98 backdrop-blur-xl border-l border-blue-500/20 shadow-2xl overflow-y-auto">
+            {/* Close button */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-800">
+              <span className="text-lg font-bold text-white">{appName}</span>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                aria-label="Close menu"
+              >
+                <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* User info */}
+            <div className="p-4 border-b border-gray-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                  {getInitials(username)}
+                </div>
+                <div>
+                  <p className="text-white text-sm font-medium">{username}</p>
+                  <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold ${getRoleBadgeColor(role)}`}>
+                    {role}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Nav links */}
+            <nav className="p-3 space-y-1">
+              <a
+                href="/dashboard"
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                  pathname === '/dashboard' ? 'bg-blue-600/20 text-blue-300' : 'text-gray-300 hover:bg-white/5'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                {t('dashboard.title')}
+              </a>
+              {(role?.toLowerCase().includes('admin')) && (
+                <a
+                  href="/dashboard/admin"
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                    pathname?.startsWith('/dashboard/admin') ? 'bg-purple-600/20 text-purple-300' : 'text-gray-300 hover:bg-white/5'
+                  }`}
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  {t('admin.title')}
+                </a>
+              )}
+            </nav>
+
+            {/* Date/time */}
+            {currentTime && (
+              <div className="px-4 py-3 border-t border-gray-800">
+                <p className="text-xs text-gray-400">{formatDateTime(currentTime)}</p>
+                <p className="text-[10px] text-gray-500">{getDayName(currentTime, locale)} &bull; {getWeekNumber(currentTime)}. {t('common.week_short')}</p>
+              </div>
+            )}
+
+            {/* Logout */}
+            <div className="p-3 border-t border-gray-800">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-600/10 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                {t('common.logout')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

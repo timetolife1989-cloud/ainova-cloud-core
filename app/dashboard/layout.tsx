@@ -5,7 +5,8 @@ import { getLocale, getTranslationsForLocale } from '@/lib/i18n';
 import { Header } from '@/components/core/Header';
 import { LazyCommandPalette } from '@/components/core/LazyCommandPalette';
 import { I18nProvider } from '@/components/core/I18nProvider';
-import { InactivityGuard } from '@/components/core/InactivityGuard';
+import { LazyInactivityGuard } from '@/components/core/LazyInactivityGuard';
+import { LazyNeuronBackground } from '@/components/ui/LazyNeuronBackground';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,7 +32,8 @@ export default async function DashboardLayout({
 
   return (
     <I18nProvider locale={locale} translations={translations}>
-      <div className="min-h-screen bg-gray-950">
+      <div className="min-h-screen bg-gray-950 relative">
+        <LazyNeuronBackground nodeCount={40} connectionDistance={150} overlayOpacity={0.96} />
         <Header
           appName={process.env.NEXT_PUBLIC_APP_NAME ?? 'Ainova Cloud Intelligence'}
           username={session.fullName || session.username}
@@ -42,7 +44,7 @@ export default async function DashboardLayout({
           {children}
         </main>
         <LazyCommandPalette />
-        <InactivityGuard />
+        <LazyInactivityGuard />
       </div>
     </I18nProvider>
   );

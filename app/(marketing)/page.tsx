@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { LazyNeuronBackground } from '@/components/ui/LazyNeuronBackground';
+import { LanguageSwitcher } from '@/components/core/LanguageSwitcher';
 
 export default function LandingPage() {
   const { t } = useTranslation();
@@ -49,19 +51,27 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
+      {/* Neuron animated background */}
+      <LazyNeuronBackground nodeCount={80} connectionDistance={200} overlayOpacity={0.92} />
+
+      {/* Top nav bar */}
+      <nav className="fixed top-0 w-full z-50 bg-gray-950/60 backdrop-blur-xl border-b border-white/5">
+        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+          <span className="text-lg font-bold tracking-wider bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            ACI
+          </span>
+          <div className="flex items-center gap-4">
+            <a href="/login" className="text-sm text-gray-400 hover:text-white transition-colors">
+              {t('landing.footer_signin')}
+            </a>
+            <LanguageSwitcher />
+          </div>
+        </div>
+      </nav>
+
       {/* Hero */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden pt-14">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-purple-900/20" />
-        <motion.div
-          className="absolute top-20 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-1/4 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl"
-          animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 6, repeat: Infinity }}
-        />
 
         <div className="relative max-w-6xl mx-auto px-6 py-24 text-center">
           <motion.div

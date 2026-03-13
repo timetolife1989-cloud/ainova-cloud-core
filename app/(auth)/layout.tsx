@@ -1,5 +1,7 @@
 import { getLocale, getTranslationsForLocale } from '@/lib/i18n';
 import { I18nProvider } from '@/components/core/I18nProvider';
+import { LazyNeuronBackground } from '@/components/ui/LazyNeuronBackground';
+import { LanguageSwitcher } from '@/components/core/LanguageSwitcher';
 
 export default async function AuthLayout({
   children,
@@ -20,7 +22,11 @@ export default async function AuthLayout({
 
   return (
     <I18nProvider locale={locale} translations={translations}>
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center relative">
+        <LazyNeuronBackground nodeCount={50} connectionDistance={160} overlayOpacity={0.94} />
+        <div className="fixed top-4 right-4 z-50">
+          <LanguageSwitcher locale={locale} />
+        </div>
         {children}
       </div>
     </I18nProvider>
