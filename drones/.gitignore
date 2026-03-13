@@ -1,0 +1,13 @@
+# Environment (NEVER commit credentials)
+.env
+.vllm_pid
+vllm_server.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Output data (optional — uncomment if you want to track results in git)
+# output/
