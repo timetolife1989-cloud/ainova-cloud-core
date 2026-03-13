@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File | null;
 
     if (!file) {
-      return NextResponse.json({ success: false, error: 'Nincs fájl' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'api.error.no_file' }, { status: 400 });
     }
 
     // Egyedi fájlnév generálás

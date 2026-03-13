@@ -73,13 +73,13 @@ export async function POST(request: NextRequest) {
     if (!auth.valid) return auth.response;
 
     const id = parseInt(searchParams.get('id') ?? '0', 10);
-    if (!id) return Response.json({ error: 'Hiányzó id' }, { status: 400 });
+    if (!id) return Response.json({ error: 'api.error.missing_id' }, { status: 400 });
 
     const rows = await getDb().query(
       'SELECT * FROM mod_sap_connections WHERE id = @p0',
       [{ name: 'p0', type: 'int', value: id }]
     );
-    if (!rows.length) return Response.json({ error: 'Nem található' }, { status: 404 });
+    if (!rows.length) return Response.json({ error: 'error.not_found' }, { status: 404 });
 
     const row = rows[0] as Record<string, unknown>;
     const connector = createSapConnector({
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const parsed = CreateConnectionSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: 'Érvénytelen adat', details: parsed.error.flatten() }, { status: 400 });
+    return Response.json({ error: 'error.validation', details: parsed.error.flatten() }, { status: 400 });
   }
 
   const d = parsed.data;
@@ -157,7 +157,7 @@ export async function DELETE(request: NextRequest) {
   if (!csrf.valid) return csrf.response;
 
   const id = parseInt(new URL(request.url).searchParams.get('id') ?? '0', 10);
-  if (!id) return Response.json({ error: 'Hiányzó id' }, { status: 400 });
+  if (!id) return Response.json({ error: 'api.error.missing_id' }, { status: 400 });
 
   await getDb().query(
     'DELETE FROM mod_sap_connections WHERE id = @p0',

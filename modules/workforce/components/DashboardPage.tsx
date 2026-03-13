@@ -788,10 +788,10 @@ export default function WorkforceDashboardPage() {
           <div className="bg-gray-900 border border-amber-500/50 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
             <h3 className="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">
               <span className="text-2xl">⚠️</span>
-              Már létező adat
+              {t('workforce.overwrite_title')}
             </h3>
             <p className="text-gray-300 mb-3">
-              Erre a napra és műszakra (<strong className="text-amber-200">{form.date}</strong> — {form.shift}) már van rögzített adat!
+              {t('workforce.overwrite_message', { date: form.date, shift: form.shift })}
             </p>
             {existingInfo && (
               <div className="p-3 rounded-xl bg-gray-800/80 border border-amber-500/20 mb-4 text-sm">

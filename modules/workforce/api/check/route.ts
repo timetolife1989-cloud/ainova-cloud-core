@@ -45,12 +45,12 @@ export async function GET(request: NextRequest) {
       count: rows.length,
       lastRecord: {
         id: rows[0].id,
-        savedBy: rows[0].recorded_by ?? 'Ismeretlen',
+        savedBy: rows[0].recorded_by ?? 'unknown',
         savedAt: rows[0].updated_at ?? rows[0].created_at,
       },
     });
   } catch (err) {
     console.error('[Workforce API] Check error:', err);
-    return Response.json({ error: 'Hiba az ellenőrzés során' }, { status: 500 });
+    return Response.json({ error: 'api.error.check' }, { status: 500 });
   }
 }

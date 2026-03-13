@@ -16,6 +16,14 @@ export default async function DashboardPage() {
 
   const modules = await getActiveModules(session.role);
 
+  // Pre-resolve module titles/subtitles
+  const moduleTitles: Record<string, string> = {};
+  const moduleSubtitles: Record<string, string> = {};
+  for (const mod of modules) {
+    moduleTitles[mod.id] = await t(mod.id + '.title');
+    moduleSubtitles[mod.id] = await t(mod.id + '.subtitle');
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <DashboardSectionHeader
@@ -47,8 +55,8 @@ export default async function DashboardPage() {
           {modules.map((mod) => (
             <MenuTile
               key={mod.id}
-              title={mod.name}
-              description={mod.description}
+              title={moduleTitles[mod.id]}
+              description={moduleSubtitles[mod.id]}
               icon={mod.icon}
               href={mod.href}
               color={mod.color}

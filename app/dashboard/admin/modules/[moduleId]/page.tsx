@@ -135,7 +135,7 @@ export default function ModuleSettingsPage() {
   if (!module.adminSettings || module.adminSettings.length === 0) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <DashboardSectionHeader title={module.name} subtitle={t('admin.modules.settings_title')} />
+        <DashboardSectionHeader title={t(moduleId + '.title')} subtitle={t('admin.modules.settings_title')} />
         <div className="mt-6 bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
           <p className="text-gray-400">{t('admin.modules.no_settings')}</p>
           <Link href="/dashboard/admin/modules" className="text-indigo-400 hover:underline mt-4 inline-block">
@@ -160,7 +160,7 @@ export default function ModuleSettingsPage() {
           {module.adminSettings.map(setting => (
             <div key={setting.key}>
               <label className="block text-sm font-medium text-gray-300 mb-1">
-                {setting.label}
+                {t('manifest.' + setting.key)}
               </label>
               {setting.description && (
                 <p className="text-xs text-gray-500 mb-2">{setting.description}</p>
@@ -206,7 +206,7 @@ export default function ModuleSettingsPage() {
                   className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100"
                 >
                   {setting.options.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    <option key={opt.value} value={opt.value}>{t('manifest_opt.' + setting.key + '.' + opt.value) || opt.label}</option>
                   ))}
                 </select>
               )}

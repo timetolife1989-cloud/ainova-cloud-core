@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const parsed = SyncRequestSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: 'Érvénytelen kérés', details: parsed.error.flatten() }, { status: 400 });
+    return Response.json({ error: 'error.validation', details: parsed.error.flatten() }, { status: 400 });
   }
 
   const d = parsed.data;

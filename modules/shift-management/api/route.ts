@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     console.error('[ShiftMgmt API] GET error:', err);
-    return Response.json({ error: 'Hiba' }, { status: 500 });
+    return Response.json({ error: 'error.server' }, { status: 500 });
   }
 }
 
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       [{ name: 'p0', type: 'nvarchar', value: workerName }, { name: 'p1', type: 'nvarchar', value: assignmentDate }]
     );
     if (existing.length > 0) {
-      return Response.json({ error: 'Ez a dolgozó már be van osztva erre a napra' }, { status: 409 });
+      return Response.json({ error: 'api.error.worker_already_assigned' }, { status: 409 });
     }
 
     const result = await getDb().query<{ id: number }>(
@@ -86,6 +86,6 @@ export async function POST(request: NextRequest) {
     return Response.json({ ok: true, id: result[0]?.id }, { status: 201 });
   } catch (err) {
     console.error('[ShiftMgmt API] POST error:', err);
-    return Response.json({ error: 'Hiba' }, { status: 500 });
+    return Response.json({ error: 'error.server' }, { status: 500 });
   }
 }

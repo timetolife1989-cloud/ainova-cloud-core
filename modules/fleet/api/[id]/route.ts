@@ -29,7 +29,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
   const vehicleId = parseInt(id, 10);
   if (isNaN(vehicleId)) {
-    return Response.json({ error: 'Érvénytelen azonosító' }, { status: 400 });
+    return Response.json({ error: 'api.error.invalid_id' }, { status: 400 });
   }
 
   try {
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     );
 
     if (vehicles.length === 0) {
-      return Response.json({ error: 'Nem található' }, { status: 404 });
+      return Response.json({ error: 'error.not_found' }, { status: 404 });
     }
 
     const v = vehicles[0];
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     });
   } catch (err) {
     console.error('[Fleet API] GET by ID error:', err);
-    return Response.json({ error: 'Hiba' }, { status: 500 });
+    return Response.json({ error: 'error.server' }, { status: 500 });
   }
 }
 
@@ -96,13 +96,13 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
   const vehicleId = parseInt(id, 10);
   if (isNaN(vehicleId)) {
-    return Response.json({ error: 'Érvénytelen azonosító' }, { status: 400 });
+    return Response.json({ error: 'api.error.invalid_id' }, { status: 400 });
   }
 
   const body = await request.json() as unknown;
   const parsed = AddTripSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
   }
 
   const { tripDate, driverName, startKm, endKm, distance, purpose } = parsed.data;
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return Response.json({ ok: true, id: result[0]?.id }, { status: 201 });
   } catch (err) {
     console.error('[Fleet API] POST trip error:', err);
-    return Response.json({ error: 'Hiba a létrehozáskor' }, { status: 500 });
+    return Response.json({ error: 'api.error.data_create' }, { status: 500 });
   }
 }
 
@@ -150,13 +150,13 @@ export async function PUT(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
   const vehicleId = parseInt(id, 10);
   if (isNaN(vehicleId)) {
-    return Response.json({ error: 'Érvénytelen azonosító' }, { status: 400 });
+    return Response.json({ error: 'api.error.invalid_id' }, { status: 400 });
   }
 
   const body = await request.json() as unknown;
   const parsed = UpdateVehicleSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
   }
 
   const { vehicleName, vehicleType, isActive, notes } = parsed.data;
@@ -199,6 +199,6 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     return Response.json({ ok: true });
   } catch (err) {
     console.error('[Fleet API] PUT error:', err);
-    return Response.json({ error: 'Hiba a módosításkor' }, { status: 500 });
+    return Response.json({ error: 'api.error.data_update' }, { status: 500 });
   }
 }

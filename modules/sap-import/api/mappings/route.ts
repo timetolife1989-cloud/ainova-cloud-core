@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const parsed = MappingSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: 'Érvénytelen adat', details: parsed.error.flatten() }, { status: 400 });
+    return Response.json({ error: 'error.validation', details: parsed.error.flatten() }, { status: 400 });
   }
 
   const d = parsed.data;
@@ -114,12 +114,12 @@ export async function PUT(request: NextRequest) {
   if (!csrf.valid) return csrf.response;
 
   const id = parseInt(new URL(request.url).searchParams.get('id') ?? '0', 10);
-  if (!id) return Response.json({ error: 'Hiányzó id' }, { status: 400 });
+  if (!id) return Response.json({ error: 'api.error.missing_id' }, { status: 400 });
 
   const body = await request.json();
   const parsed = MappingSchema.partial().safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: 'Érvénytelen adat', details: parsed.error.flatten() }, { status: 400 });
+    return Response.json({ error: 'error.validation', details: parsed.error.flatten() }, { status: 400 });
   }
 
   const d = parsed.data;
@@ -155,7 +155,7 @@ export async function DELETE(request: NextRequest) {
   if (!csrf.valid) return csrf.response;
 
   const id = parseInt(new URL(request.url).searchParams.get('id') ?? '0', 10);
-  if (!id) return Response.json({ error: 'Hiányzó id' }, { status: 400 });
+  if (!id) return Response.json({ error: 'api.error.missing_id' }, { status: 400 });
 
   await getDb().query(
     'DELETE FROM mod_sap_field_mappings WHERE id = @p0',

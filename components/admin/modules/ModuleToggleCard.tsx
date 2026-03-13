@@ -45,9 +45,9 @@ export function ModuleToggleCard({
   const blockReason = isLicenseLocked
     ? t('admin.modules.license_required')
     : isActive && dependents.length > 0
-      ? t('admin.modules.active_dependents', { deps: dependents.map(m => m.name).join(', ') })
+      ? t('admin.modules.active_dependents', { deps: dependents.map(m => t(m.id + '.title')).join(', ') })
       : !isActive && missingDeps.length > 0
-        ? t('admin.modules.required_modules', { deps: missingDeps.map(id => allModules.find(m => m.id === id)?.name ?? id).join(', ') })
+        ? t('admin.modules.required_modules', { deps: missingDeps.map(id => allModules.find(m => m.id === id) ? t(id + '.title') : id).join(', ') })
         : null;
 
   const handleToggle = async () => {
@@ -79,7 +79,7 @@ export function ModuleToggleCard({
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-sm text-gray-100">{module.name}</span>
+              <span className="font-semibold text-sm text-gray-100">{t(module.id + '.title')}</span>
               {module.version && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-700 text-gray-400">
                   v{module.version}
@@ -87,22 +87,22 @@ export function ModuleToggleCard({
               )}
               {isActive && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-900 text-indigo-300">
-                  Aktív
+                  {t('admin.modules.active_badge')}
                 </span>
               )}
               {isLicenseLocked && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-900/50 text-red-400 flex items-center gap-1">
-                  <LucideIcons.Lock className="w-3 h-3" /> Licenc szükséges
+                  <LucideIcons.Lock className="w-3 h-3" /> {t('admin.modules.license_needed')}
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">{module.description}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{t(module.id + '.subtitle')}</p>
 
             {/* Dependencies info */}
             {(module.dependsOn ?? []).length > 0 && (
               <p className="text-[10px] text-gray-600 mt-1">
-                Igényli: {(module.dependsOn ?? [])
-                  .map(id => allModules.find(m => m.id === id)?.name ?? id)
+                {t('admin.modules.depends_on')}: {(module.dependsOn ?? [])
+                  .map(id => allModules.find(m => m.id === id) ? t(id + '.title') : id)
                   .join(', ')}
               </p>
             )}
@@ -123,7 +123,7 @@ export function ModuleToggleCard({
         <button
           onClick={() => void handleToggle()}
           disabled={isBlocked || loading}
-          title={blockReason ?? (isActive ? 'Kikapcsolás' : 'Bekapcsolás')}
+          title={blockReason ?? (isActive ? t('admin.modules.disable') : t('admin.modules.enable'))}
           className={`relative flex-shrink-0 w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${
             loading
               ? 'opacity-50 cursor-wait'

@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   const userLimitOk = await canCreateUser();
   if (!userLimitOk) {
     return Response.json(
-      { error: 'Elérte a maximális felhasználó számot a jelenlegi licenccsomagban.' },
+      { error: 'license.user_limit' },
       { status: 403 }
     );
   }
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json() as unknown;
   const parsed = CreateUserSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
   }
 
   const { username, fullName, email, role, password } = parsed.data;

@@ -45,7 +45,7 @@ export async function PUT(request: NextRequest) {
 
   const parsed = Schema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: 'Érvénytelen kérés' }, { status: 400 });
+    return Response.json({ error: 'error.validation' }, { status: 400 });
   }
 
   const { moduleId, enable } = parsed.data;
@@ -55,7 +55,7 @@ export async function PUT(request: NextRequest) {
     const allowed = await isModuleAllowed(moduleId);
     if (!allowed) {
       return Response.json(
-        { error: 'Ez a modul nem elérhető a jelenlegi licenccsomagban. Vegye fel a kapcsolatot a szoftver szállítóval.' },
+        { error: 'license.module_not_allowed' },
         { status: 403 }
       );
     }

@@ -201,7 +201,7 @@ export async function GET(request: NextRequest) {
       }
 
       default:
-        return ApiErrors.badRequest('Érvénytelen type paraméter');
+        return ApiErrors.badRequest('api.error.invalid_type');
     }
 
     return NextResponse.json({ success: true, type, data: result.recordset });

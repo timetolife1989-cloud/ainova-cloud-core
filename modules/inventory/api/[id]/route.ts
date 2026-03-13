@@ -15,14 +15,14 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
   const { id } = await context.params;
   const itemId = parseInt(id, 10);
-  if (isNaN(itemId)) return Response.json({ error: 'Érvénytelen azonosító' }, { status: 400 });
+  if (isNaN(itemId)) return Response.json({ error: 'api.error.invalid_id' }, { status: 400 });
 
   try {
     const items = await getDb().query<{ id: number; sku: string; item_name: string; category: string | null; current_qty: number; min_qty: number; location: string | null }>(
       'SELECT id, sku, item_name, category, current_qty, min_qty, location FROM inventory_items WHERE id = @p0',
       [{ name: 'p0', type: 'int', value: itemId }]
     );
-    if (items.length === 0) return Response.json({ error: 'Nem található' }, { status: 404 });
+    if (items.length === 0) return Response.json({ error: 'error.not_found' }, { status: 404 });
 
     const movements = await getDb().query<{ id: number; movement_type: string; quantity: number; reference: string | null; notes: string | null; created_by: string | null; created_at: Date }>(
       'SELECT TOP 30 id, movement_type, quantity, reference, notes, created_by, created_at FROM inventory_movements WHERE item_id = @p0 ORDER BY created_at DESC',
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     });
   } catch (err) {
     console.error('[Inventory API] GET item error:', err);
-    return Response.json({ error: 'Hiba' }, { status: 500 });
+    return Response.json({ error: 'error.server' }, { status: 500 });
   }
 }
 
@@ -61,11 +61,11 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   const { id } = await context.params;
   const itemId = parseInt(id, 10);
-  if (isNaN(itemId)) return Response.json({ error: 'Érvénytelen azonosító' }, { status: 400 });
+  if (isNaN(itemId)) return Response.json({ error: 'api.error.invalid_id' }, { status: 400 });
 
   const body = await request.json() as unknown;
   const parsed = MovementSchema.safeParse(body);
-  if (!parsed.success) return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+  if (!parsed.success) return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
 
   const { movementType, quantity, reference, notes } = parsed.data;
 
@@ -97,6 +97,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return Response.json({ ok: true }, { status: 201 });
   } catch (err) {
     console.error('[Inventory API] POST movement error:', err);
-    return Response.json({ error: 'Hiba' }, { status: 500 });
+    return Response.json({ error: 'error.server' }, { status: 500 });
   }
 }

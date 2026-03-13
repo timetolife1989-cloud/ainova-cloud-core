@@ -38,7 +38,7 @@ async function handleModuleRequest(
   const allowed = await isModuleAllowed(moduleId);
   if (!allowed) {
     return NextResponse.json(
-      { error: 'Ez a modul nem elérhető a jelenlegi licenccsomagban.' },
+      { error: 'license.module_not_allowed' },
       { status: 403 }
     );
   }
@@ -47,7 +47,7 @@ async function handleModuleRequest(
   const activeIds = await getActiveModuleIds();
   if (!activeIds.includes(moduleId)) {
     return NextResponse.json(
-      { error: 'Ez a modul nincs aktiválva.' },
+      { error: 'api.error.module_not_active' },
       { status: 404 }
     );
   }

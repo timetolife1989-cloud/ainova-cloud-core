@@ -177,7 +177,7 @@ export default function FileImportDashboardPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <DashboardSectionHeader title="Fájl Import" subtitle="Excel és CSV fájlok importálása" />
+      <DashboardSectionHeader title={t('file_import.title')} subtitle={t('file_import.subtitle')} />
 
       {/* Upload area */}
       <div className="mt-6 bg-gray-900 border border-gray-800 rounded-xl p-6">

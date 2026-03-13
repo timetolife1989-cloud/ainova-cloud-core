@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     console.error('[OEE API] GET error:', err);
-    return Response.json({ error: 'Hiba' }, { status: 500 });
+    return Response.json({ error: 'error.server' }, { status: 500 });
   }
 }
 
@@ -122,6 +122,6 @@ export async function POST(request: NextRequest) {
     return Response.json({ ok: true, id: result[0]?.id }, { status: 201 });
   } catch (err) {
     console.error('[OEE API] POST error:', err);
-    return Response.json({ error: 'Hiba' }, { status: 500 });
+    return Response.json({ error: 'error.server' }, { status: 500 });
   }
 }

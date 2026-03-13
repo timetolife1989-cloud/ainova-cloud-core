@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       const file = formData.get('file') as File | null;
 
       if (!file) {
-        return Response.json({ error: 'Nincs fájl' }, { status: 400 });
+        return Response.json({ error: 'api.error.no_file' }, { status: 400 });
       }
 
       const filePath = await saveUploadedFile(file);
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       });
     } catch (err) {
       console.error('[Import API] Upload error:', err);
-      return Response.json({ error: 'Hiba a fájl feltöltésekor' }, { status: 500 });
+      return Response.json({ error: 'api.error.file_upload' }, { status: 500 });
     }
   }
 
@@ -39,39 +39,39 @@ export async function POST(request: NextRequest) {
   const { action, filePath, configId } = body;
 
   if (!action) {
-    return Response.json({ error: 'action szükséges' }, { status: 400 });
+    return Response.json({ error: 'api.error.action_required' }, { status: 400 });
   }
 
   switch (action) {
     case 'detect': {
       if (!filePath) {
-        return Response.json({ error: 'filePath szükséges' }, { status: 400 });
+        return Response.json({ error: 'api.error.filepath_required' }, { status: 400 });
       }
       try {
         const result = await detectFileType(filePath);
         return Response.json(result);
       } catch (err) {
         console.error('[Import API] Detect error:', err);
-        return Response.json({ error: 'Hiba a fájl elemzésekor' }, { status: 500 });
+        return Response.json({ error: 'api.error.file_detect' }, { status: 500 });
       }
     }
 
     case 'headers': {
       if (!filePath) {
-        return Response.json({ error: 'filePath szükséges' }, { status: 400 });
+        return Response.json({ error: 'api.error.filepath_required' }, { status: 400 });
       }
       try {
         const headers = await readFileHeaders(filePath);
         return Response.json({ headers });
       } catch (err) {
         console.error('[Import API] Headers error:', err);
-        return Response.json({ error: 'Hiba a fejléc olvasásakor' }, { status: 500 });
+        return Response.json({ error: 'api.error.file_headers' }, { status: 500 });
       }
     }
 
     case 'process': {
       if (!filePath || !configId) {
-        return Response.json({ error: 'filePath és configId szükséges' }, { status: 400 });
+        return Response.json({ error: 'api.error.filepath_configid_required' }, { status: 400 });
       }
       try {
         const result = await processImport(filePath, configId, auth.username);
@@ -82,11 +82,11 @@ export async function POST(request: NextRequest) {
         return Response.json(result);
       } catch (err) {
         console.error('[Import API] Process error:', err);
-        return Response.json({ error: 'Hiba az import végrehajtásakor' }, { status: 500 });
+        return Response.json({ error: 'api.error.import_process' }, { status: 500 });
       }
     }
 
     default:
-      return Response.json({ error: `Ismeretlen action: ${action}` }, { status: 400 });
+      return Response.json({ error: 'api.error.unknown_action' }, { status: 400 });
   }
 }

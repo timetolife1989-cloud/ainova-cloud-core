@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json() as unknown;
   const parsed = CreateRoleSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
   }
 
   const { roleCode, roleLabel, description, color, icon, priority, permissions } = parsed.data;
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     return Response.json({ ok: true, id: roleId }, { status: 201 });
   } catch (err) {
     console.error('[Roles API] Create error:', err);
-    return Response.json({ error: 'Hiba a role létrehozásakor' }, { status: 500 });
+    return Response.json({ error: 'api.error.role_create' }, { status: 500 });
   }
 }
 
@@ -99,7 +99,7 @@ export async function PUT(request: NextRequest) {
   const body = await request.json() as unknown;
   const parsed = UpdateRoleSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
   }
 
   const { id, roleLabel, description, color, icon, priority, permissions } = parsed.data;
@@ -170,7 +170,7 @@ export async function PUT(request: NextRequest) {
     return Response.json({ ok: true });
   } catch (err) {
     console.error('[Roles API] Update error:', err);
-    return Response.json({ error: 'Hiba a role módosításakor' }, { status: 500 });
+    return Response.json({ error: 'api.error.role_update' }, { status: 500 });
   }
 }
 
@@ -186,7 +186,7 @@ export async function DELETE(request: NextRequest) {
   const body = await request.json() as unknown;
   const parsed = DeleteRoleSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: 'error.validation' }, { status: 400 });
   }
 
   const { id } = parsed.data;
@@ -199,11 +199,11 @@ export async function DELETE(request: NextRequest) {
     );
 
     if (roles.length === 0) {
-      return Response.json({ error: 'Role nem található' }, { status: 404 });
+      return Response.json({ error: 'api.error.role_not_found' }, { status: 404 });
     }
 
     if (roles[0].is_builtin) {
-      return Response.json({ error: 'Beépített role nem törölhető' }, { status: 403 });
+      return Response.json({ error: 'api.error.role_builtin' }, { status: 403 });
     }
 
     // Check if any users have this role
@@ -213,7 +213,7 @@ export async function DELETE(request: NextRequest) {
     );
 
     if ((users[0]?.cnt ?? 0) > 0) {
-      return Response.json({ error: 'Vannak felhasználók ezzel a szerepkörrel' }, { status: 409 });
+      return Response.json({ error: 'api.error.role_has_users' }, { status: 409 });
     }
 
     // Delete (CASCADE will handle role_permissions)
@@ -226,6 +226,6 @@ export async function DELETE(request: NextRequest) {
     return Response.json({ ok: true });
   } catch (err) {
     console.error('[Roles API] Delete error:', err);
-    return Response.json({ error: 'Hiba a role törlésekor' }, { status: 500 });
+    return Response.json({ error: 'api.error.role_delete' }, { status: 500 });
   }
 }

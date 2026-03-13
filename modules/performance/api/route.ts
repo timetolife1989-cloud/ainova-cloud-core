@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
     return Response.json({ items, page, pageSize });
   } catch (err) {
     console.error('[Performance API] GET error:', err);
-    return Response.json({ error: 'Hiba az adatok lekérésekor' }, { status: 500 });
+    return Response.json({ error: 'api.error.data_get' }, { status: 500 });
   }
 }
 
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json() as unknown;
   const parsed = CreateSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
   }
 
   const { entryDate, workerName, teamName, taskCode, taskName, quantity, normTime, actualTime, notes } = parsed.data;
@@ -142,6 +142,6 @@ export async function POST(request: NextRequest) {
     return Response.json({ ok: true, id: result[0]?.id }, { status: 201 });
   } catch (err) {
     console.error('[Performance API] POST error:', err);
-    return Response.json({ error: 'Hiba a létrehozáskor' }, { status: 500 });
+    return Response.json({ error: 'api.error.data_create' }, { status: 500 });
   }
 }

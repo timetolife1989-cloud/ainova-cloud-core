@@ -13,7 +13,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const session = await checkSession(request);
   if (!session.valid) return session.response;
   if (session.role !== 'admin') {
-    return Response.json({ error: 'Csak admin állíthat vissza jelszót' }, { status: 403 });
+    return Response.json({ error: 'api.error.admin_only' }, { status: 403 });
   }
 
   const csrf = checkCsrf(request);
@@ -22,12 +22,12 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
   const userId = parseInt(id, 10);
   if (isNaN(userId)) {
-    return Response.json({ error: 'Érvénytelen azonosító' }, { status: 400 });
+    return Response.json({ error: 'api.error.invalid_id' }, { status: 400 });
   }
 
   const existing = await getAuth().getUserById(userId);
   if (!existing) {
-    return Response.json({ error: 'Felhasználó nem található' }, { status: 404 });
+    return Response.json({ error: 'api.error.user_not_found' }, { status: 404 });
   }
 
   // Generate a random 12-character password (no ambiguous chars)

@@ -32,15 +32,15 @@ export async function POST(request: NextRequest) {
   const file = formData.get('logo');
 
   if (!file || !(file instanceof File)) {
-    return Response.json({ error: 'Nincs fájl csatolva' }, { status: 400 });
+    return Response.json({ error: 'api.error.logo_no_file' }, { status: 400 });
   }
 
   if (!ALLOWED_TYPES.includes(file.type)) {
-    return Response.json({ error: 'Csak JPG, PNG, SVG és WebP fájlok engedélyezettek' }, { status: 400 });
+    return Response.json({ error: 'api.error.logo_invalid_type' }, { status: 400 });
   }
 
   if (file.size > MAX_UPLOAD_SIZE_BYTES) {
-    return Response.json({ error: 'A fájl mérete nem haladhatja meg a 2 MB-ot' }, { status: 400 });
+    return Response.json({ error: 'api.error.logo_too_large' }, { status: 400 });
   }
 
   const uploadDir = process.env.UPLOAD_DIR ?? path.join(process.cwd(), 'public', 'uploads');

@@ -62,7 +62,7 @@ function labelForKey(key: string, period: Period): string {
     case 'weekly':
       return key.replace('-W', '/W');
     case 'monthly': {
-      const months = ['Jan', 'Feb', 'Már', 'Ápr', 'Máj', 'Jún', 'Júl', 'Aug', 'Sze', 'Okt', 'Nov', 'Dec'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const m = parseInt(key.slice(5), 10) - 1;
       return `${months[m]} ${key.slice(0, 4)}`;
     }

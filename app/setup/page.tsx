@@ -9,17 +9,17 @@ const STEPS: Step[] = ['welcome', 'admin', 'branding', 'modules', 'license', 'co
 
 // STEP_INFO will be generated dynamically using translations
 
-const AVAILABLE_MODULES = [
-  { id: 'workforce', name: 'Létszám & Jelenlét', tier: 'basic' },
-  { id: 'tracking', name: 'Gyártás követés', tier: 'basic' },
-  { id: 'fleet', name: 'Gépjármű nyilvántartás', tier: 'basic' },
-  { id: 'file-import', name: 'Fájl import', tier: 'basic' },
-  { id: 'reports', name: 'Kimutatások', tier: 'basic' },
-  { id: 'performance', name: 'Teljesítmény KPI-k', tier: 'professional' },
-  { id: 'scheduling', name: 'Kapacitás tervezés', tier: 'professional' },
-  { id: 'delivery', name: 'Szállítás menedzsment', tier: 'professional' },
-  { id: 'inventory', name: 'Készlet nyilvántartás', tier: 'professional' },
-];
+const AVAILABLE_MODULE_IDS = [
+  { id: 'workforce', tier: 'basic' },
+  { id: 'tracking', tier: 'basic' },
+  { id: 'fleet', tier: 'basic' },
+  { id: 'file-import', tier: 'basic' },
+  { id: 'reports', tier: 'basic' },
+  { id: 'performance', tier: 'professional' },
+  { id: 'scheduling', tier: 'professional' },
+  { id: 'delivery', tier: 'professional' },
+  { id: 'inventory', tier: 'professional' },
+] as const;
 
 export default function SetupPage() {
   const [currentStep, setCurrentStep] = useState<Step>('welcome');
@@ -88,7 +88,7 @@ export default function SetupPage() {
           body = { step: 'admin', username: adminUser, password: adminPass, fullName: adminName, email: adminEmail || undefined };
           break;
         case 'branding':
-          if (!appName.trim()) { setError(t('setup.company_name') + ' kötelező'); setLoading(false); return; }
+          if (!appName.trim()) { setError(t('setup.company_name') + ' ' + t('common.required')); setLoading(false); return; }
           body = { step: 'branding', appName, locale };
           break;
         case 'modules':
@@ -181,12 +181,12 @@ export default function SetupPage() {
           <div className="space-y-4">
             {currentStep === 'welcome' && (
               <div className="text-center space-y-4">
-                <p className="text-gray-300">This wizard will help you set up Ainova Cloud Intelligence.</p>
+                <p className="text-gray-300">{t('setup.welcome_desc')}</p>
                 <div className="grid grid-cols-2 gap-3 text-left">
-                  <div className="bg-gray-950 rounded-lg p-3"><p className="text-xs text-gray-500">Step 1</p><p className="text-sm text-white">Create admin account</p></div>
-                  <div className="bg-gray-950 rounded-lg p-3"><p className="text-xs text-gray-500">Step 2</p><p className="text-sm text-white">Company name & language</p></div>
-                  <div className="bg-gray-950 rounded-lg p-3"><p className="text-xs text-gray-500">Step 3</p><p className="text-sm text-white">Select modules</p></div>
-                  <div className="bg-gray-950 rounded-lg p-3"><p className="text-xs text-gray-500">Step 4</p><p className="text-sm text-white">Enter license</p></div>
+                  <div className="bg-gray-950 rounded-lg p-3"><p className="text-xs text-gray-500">{t('setup.step_n', { n: '1' })}</p><p className="text-sm text-white">{t('setup.step1_desc')}</p></div>
+                  <div className="bg-gray-950 rounded-lg p-3"><p className="text-xs text-gray-500">{t('setup.step_n', { n: '2' })}</p><p className="text-sm text-white">{t('setup.step2_desc')}</p></div>
+                  <div className="bg-gray-950 rounded-lg p-3"><p className="text-xs text-gray-500">{t('setup.step_n', { n: '3' })}</p><p className="text-sm text-white">{t('setup.step3_desc')}</p></div>
+                  <div className="bg-gray-950 rounded-lg p-3"><p className="text-xs text-gray-500">{t('setup.step_n', { n: '4' })}</p><p className="text-sm text-white">{t('setup.step4_desc')}</p></div>
                 </div>
               </div>
             )}
@@ -195,7 +195,7 @@ export default function SetupPage() {
               <>
                 <div><label className="block text-sm text-gray-400 mb-1">{t('setup.username')} *</label>
                   <input type="text" value={adminUser} onChange={e => setAdminUser(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100" /></div>
-                <div><label className="block text-sm text-gray-400 mb-1">{t('setup.password')} * (min. 8 karakter)</label>
+                <div><label className="block text-sm text-gray-400 mb-1">{t('setup.password')} * ({t('setup.password_hint')})</label>
                   <input type="password" value={adminPass} onChange={e => setAdminPass(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100" /></div>
                 <div className="grid grid-cols-2 gap-4">
                   <div><label className="block text-sm text-gray-400 mb-1">{t('setup.full_name')}</label>
@@ -212,7 +212,7 @@ export default function SetupPage() {
                   <input type="text" value={appName} onChange={e => setAppName(e.target.value)} placeholder="e.g. ACME Manufacturing" className="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100" /></div>
                 <div><label className="block text-sm text-gray-400 mb-1">{t('setup.language')}</label>
                   <select value={locale} onChange={e => setLocale(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100">
-                    <option value="hu">Hungarian</option>
+                    <option value="hu">Magyar</option>
                     <option value="en">English</option>
                     <option value="de">Deutsch</option>
                   </select></div>
@@ -221,13 +221,13 @@ export default function SetupPage() {
 
             {currentStep === 'modules' && (
               <div className="space-y-2">
-                {AVAILABLE_MODULES.map(m => (
+                {AVAILABLE_MODULE_IDS.map(m => (
                   <label key={m.id} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer ${
                     selectedModules.includes(m.id) ? 'bg-blue-900/20 border-blue-700' : 'bg-gray-950 border-gray-800'
                   }`}>
                     <input type="checkbox" checked={selectedModules.includes(m.id)} onChange={() => toggleModule(m.id)} className="rounded" />
                     <div className="flex-1">
-                      <p className="text-white text-sm">{m.name}</p>
+                      <p className="text-white text-sm">{t(`setup.module_${m.id.replace('-', '_')}`)}</p>
                     </div>
                     <span className={`text-xs px-2 py-0.5 rounded ${
                       m.tier === 'basic' ? 'bg-gray-800 text-gray-400' : 'bg-blue-900/50 text-blue-300'
@@ -239,9 +239,9 @@ export default function SetupPage() {
 
             {currentStep === 'license' && (
               <>
-                <div><label className="block text-sm text-gray-400 mb-1">License Key (optional)</label>
+                <div><label className="block text-sm text-gray-400 mb-1">{t('setup.license_key')} ({t('setup.license_optional_short')})</label>
                   <input type="text" value={licenseKey} onChange={e => setLicenseKey(e.target.value)} placeholder="XXXX-XXXX-XXXX-XXXX" className="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 font-mono" /></div>
-                <p className="text-xs text-gray-500">If no license key is provided, Basic package features will be available.</p>
+                <p className="text-xs text-gray-500">{t('setup.license_no_key_hint')}</p>
               </>
             )}
 
@@ -250,8 +250,8 @@ export default function SetupPage() {
                 <div className="inline-flex p-4 bg-green-900/30 rounded-full">
                   <CheckCircle className="w-12 h-12 text-green-400" />
                 </div>
-                <p className="text-gray-300">Ainova Cloud Intelligence has been successfully configured!</p>
-                <p className="text-sm text-gray-500">Click the "Launch" button to proceed to login.</p>
+                <p className="text-gray-300">{t('setup.complete_desc')}</p>
+                <p className="text-sm text-gray-500">{t('setup.complete_hint')}</p>
               </div>
             )}
           </div>
@@ -283,7 +283,7 @@ export default function SetupPage() {
         {/* Already have an account? */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
-            Már van fiókod?{' '}
+            {t('setup.already_have_account')}{' '}
             <a href="/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
               {t('auth.login')} →
             </a>

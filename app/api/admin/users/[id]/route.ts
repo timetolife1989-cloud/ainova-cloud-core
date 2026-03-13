@@ -16,12 +16,12 @@ export async function GET(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
   const userId = parseInt(id, 10);
   if (isNaN(userId)) {
-    return Response.json({ error: 'Érvénytelen azonosító' }, { status: 400 });
+    return Response.json({ error: 'api.error.invalid_id' }, { status: 400 });
   }
 
   const user = await getAuth().getUserById(userId);
   if (!user) {
-    return Response.json({ error: 'Felhasználó nem található' }, { status: 404 });
+    return Response.json({ error: 'api.error.user_not_found' }, { status: 404 });
   }
 
   return Response.json({ ok: true, user });
@@ -38,18 +38,18 @@ export async function PUT(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
   const userId = parseInt(id, 10);
   if (isNaN(userId)) {
-    return Response.json({ error: 'Érvénytelen azonosító' }, { status: 400 });
+    return Response.json({ error: 'api.error.invalid_id' }, { status: 400 });
   }
 
   const existing = await getAuth().getUserById(userId);
   if (!existing) {
-    return Response.json({ error: 'Felhasználó nem található' }, { status: 404 });
+    return Response.json({ error: 'api.error.user_not_found' }, { status: 404 });
   }
 
   const body = await request.json() as unknown;
   const parsed = UpdateUserSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
   }
 
   const { fullName, email, role, isActive } = parsed.data;
@@ -75,17 +75,17 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
   const userId = parseInt(id, 10);
   if (isNaN(userId)) {
-    return Response.json({ error: 'Érvénytelen azonosító' }, { status: 400 });
+    return Response.json({ error: 'api.error.invalid_id' }, { status: 400 });
   }
 
   // Prevent self-deactivation
   if (userId === auth.userId) {
-    return Response.json({ error: 'Saját magadat nem deaktiválhatod' }, { status: 400 });
+    return Response.json({ error: 'api.error.cannot_deactivate_self' }, { status: 400 });
   }
 
   const existing = await getAuth().getUserById(userId);
   if (!existing) {
-    return Response.json({ error: 'Felhasználó nem található' }, { status: 404 });
+    return Response.json({ error: 'api.error.user_not_found' }, { status: 404 });
   }
 
   await getAuth().updateUser(userId, { isActive: false });

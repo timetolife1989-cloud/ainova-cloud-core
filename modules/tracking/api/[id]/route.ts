@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
   const itemId = parseInt(id, 10);
   if (isNaN(itemId)) {
-    return Response.json({ error: 'Érvénytelen azonosító' }, { status: 400 });
+    return Response.json({ error: 'api.error.invalid_id' }, { status: 400 });
   }
 
   try {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     );
 
     if (rows.length === 0) {
-      return Response.json({ error: 'Nem található' }, { status: 404 });
+      return Response.json({ error: 'error.not_found' }, { status: 404 });
     }
 
     const r = rows[0];
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     });
   } catch (err) {
     console.error('[Tracking API] GET by ID error:', err);
-    return Response.json({ error: 'Hiba' }, { status: 500 });
+    return Response.json({ error: 'error.server' }, { status: 500 });
   }
 }
 
@@ -70,13 +70,13 @@ export async function PUT(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
   const itemId = parseInt(id, 10);
   if (isNaN(itemId)) {
-    return Response.json({ error: 'Érvénytelen azonosító' }, { status: 400 });
+    return Response.json({ error: 'api.error.invalid_id' }, { status: 400 });
   }
 
   const body = await request.json() as unknown;
   const parsed = UpdateSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
   }
 
   const { status, ...rest } = parsed.data;
@@ -166,7 +166,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     return Response.json({ ok: true });
   } catch (err) {
     console.error('[Tracking API] PUT error:', err);
-    return Response.json({ error: 'Hiba a módosításkor' }, { status: 500 });
+    return Response.json({ error: 'api.error.data_update' }, { status: 500 });
   }
 }
 
@@ -180,7 +180,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
   const itemId = parseInt(id, 10);
   if (isNaN(itemId)) {
-    return Response.json({ error: 'Érvénytelen azonosító' }, { status: 400 });
+    return Response.json({ error: 'api.error.invalid_id' }, { status: 400 });
   }
 
   try {
@@ -192,6 +192,6 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     return Response.json({ ok: true });
   } catch (err) {
     console.error('[Tracking API] DELETE error:', err);
-    return Response.json({ error: 'Hiba a törléskor' }, { status: 500 });
+    return Response.json({ error: 'api.error.data_delete' }, { status: 500 });
   }
 }

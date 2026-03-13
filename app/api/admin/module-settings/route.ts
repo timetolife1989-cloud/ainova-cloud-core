@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   const moduleId = searchParams.get('moduleId');
 
   if (!moduleId) {
-    return Response.json({ error: 'moduleId szükséges' }, { status: 400 });
+    return Response.json({ error: 'api.error.module_id_required' }, { status: 400 });
   }
 
   const settings = await getAllModuleSettings(moduleId);
@@ -37,7 +37,7 @@ export async function PUT(request: NextRequest) {
   const body = await request.json() as unknown;
   const parsed = UpdateSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
   }
 
   const { moduleId, key, value } = parsed.data;
@@ -47,6 +47,6 @@ export async function PUT(request: NextRequest) {
     return Response.json({ ok: true });
   } catch (err) {
     console.error('[ModuleSettings API] Update error:', err);
-    return Response.json({ error: 'Hiba a beállítás mentésekor' }, { status: 500 });
+    return Response.json({ error: 'api.error.setting_save' }, { status: 500 });
   }
 }

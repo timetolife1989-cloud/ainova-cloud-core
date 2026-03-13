@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json() as unknown;
   const parsed = CreateUnitSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
   }
 
   const { unitCode, unitLabel, unitType, symbol, decimals } = parsed.data;
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     return Response.json({ ok: true, id: result[0]?.id }, { status: 201 });
   } catch (err) {
     console.error('[Units API] Create error:', err);
-    return Response.json({ error: 'Hiba a mértékegység létrehozásakor' }, { status: 500 });
+    return Response.json({ error: 'api.error.unit_create' }, { status: 500 });
   }
 }
 
@@ -79,7 +79,7 @@ export async function PUT(request: NextRequest) {
   const body = await request.json() as unknown;
   const parsed = UpdateUnitSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
   }
 
   const { id, unitLabel, symbol, decimals, isActive } = parsed.data;
@@ -123,7 +123,7 @@ export async function PUT(request: NextRequest) {
     return Response.json({ ok: true });
   } catch (err) {
     console.error('[Units API] Update error:', err);
-    return Response.json({ error: 'Hiba a mértékegység módosításakor' }, { status: 500 });
+    return Response.json({ error: 'api.error.unit_update' }, { status: 500 });
   }
 }
 
@@ -142,7 +142,7 @@ export async function DELETE(request: NextRequest) {
   const body = await request.json() as unknown;
   const parsed = DeleteUnitSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: 'error.validation' }, { status: 400 });
   }
 
   const { id } = parsed.data;
@@ -155,11 +155,11 @@ export async function DELETE(request: NextRequest) {
     );
 
     if (units.length === 0) {
-      return Response.json({ error: 'Mértékegység nem található' }, { status: 404 });
+      return Response.json({ error: 'api.error.unit_not_found' }, { status: 404 });
     }
 
     if (units[0].is_builtin) {
-      return Response.json({ error: 'Beépített mértékegység nem törölhető' }, { status: 403 });
+      return Response.json({ error: 'api.error.unit_builtin' }, { status: 403 });
     }
 
     await getDb().query(
@@ -171,6 +171,6 @@ export async function DELETE(request: NextRequest) {
     return Response.json({ ok: true });
   } catch (err) {
     console.error('[Units API] Delete error:', err);
-    return Response.json({ error: 'Hiba a mértékegység törlésekor' }, { status: 500 });
+    return Response.json({ error: 'api.error.unit_delete' }, { status: 500 });
   }
 }

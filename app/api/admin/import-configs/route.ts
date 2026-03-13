@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     return Response.json({ configs });
   } catch (err) {
     console.error('[ImportConfigs API] GET error:', err);
-    return Response.json({ error: 'Hiba a konfigurációk lekérésekor' }, { status: 500 });
+    return Response.json({ error: 'api.error.config_get' }, { status: 500 });
   }
 }
 
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json() as unknown;
   const parsed = CreateConfigSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
   }
 
   const { configName, moduleId, fileType, targetTable, columnMapping, filters, unitId, detectRules } = parsed.data;
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     return Response.json({ ok: true, id: result[0]?.id }, { status: 201 });
   } catch (err) {
     console.error('[ImportConfigs API] POST error:', err);
-    return Response.json({ error: 'Hiba a konfiguráció létrehozásakor' }, { status: 500 });
+    return Response.json({ error: 'api.error.config_create' }, { status: 500 });
   }
 }
 
@@ -144,7 +144,7 @@ export async function PUT(request: NextRequest) {
   const body = await request.json() as unknown;
   const parsed = UpdateConfigSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'error.validation' }, { status: 400 });
   }
 
   const { id, configName, moduleId, fileType, targetTable, columnMapping, filters, unitId, detectRules, isActive } = parsed.data;
@@ -210,7 +210,7 @@ export async function PUT(request: NextRequest) {
     return Response.json({ ok: true });
   } catch (err) {
     console.error('[ImportConfigs API] PUT error:', err);
-    return Response.json({ error: 'Hiba a konfiguráció módosításakor' }, { status: 500 });
+    return Response.json({ error: 'api.error.config_update' }, { status: 500 });
   }
 }
 
@@ -229,7 +229,7 @@ export async function DELETE(request: NextRequest) {
   const body = await request.json() as unknown;
   const parsed = DeleteConfigSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ error: 'Érvénytelen adatok' }, { status: 400 });
+    return Response.json({ error: 'error.validation' }, { status: 400 });
   }
 
   const { id } = parsed.data;
@@ -243,6 +243,6 @@ export async function DELETE(request: NextRequest) {
     return Response.json({ ok: true });
   } catch (err) {
     console.error('[ImportConfigs API] DELETE error:', err);
-    return Response.json({ error: 'Hiba a konfiguráció törlésekor' }, { status: 500 });
+    return Response.json({ error: 'api.error.config_delete' }, { status: 500 });
   }
 }
