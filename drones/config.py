@@ -20,7 +20,7 @@ class Config:
 
     # vLLM Server (local on RunPod)
     VLLM_BASE_URL: str = os.getenv("VLLM_BASE_URL", "http://localhost:8000/v1")
-    VLLM_MODEL: str = os.getenv("VLLM_MODEL", "meta-llama/Llama-3.1-70B-Instruct")
+    VLLM_MODEL: str = os.getenv("VLLM_MODEL", "meta-llama/Llama-3.1-405B-Instruct")
 
     # Session
     SESSION_ID: str = os.getenv("SESSION_ID", f"session_{datetime.now().strftime('%Y-%m-%d_%H%M')}")

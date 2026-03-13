@@ -13,20 +13,29 @@ echo "============================================"
 DIR=/workspace/ainova-cloud-core/drones
 LOG=/workspace/drone_progress.log
 
-# 0. Wait for GPU driver to be ready (RunPod sometimes needs a moment)
+# 0. Wait for GPU driver to be ready (supports both NVIDIA and AMD)
 echo ">>> [0/6] Waiting for GPU..."
 GPUWAIT=0
-while ! nvidia-smi > /dev/null 2>&1; do
+GPU_VENDOR=""
+while true; do
+    if nvidia-smi > /dev/null 2>&1; then
+        GPU_VENDOR="nvidia"
+        echo "  GPU OK (NVIDIA): $(nvidia-smi -L | head -1)"
+        break
+    elif rocm-smi > /dev/null 2>&1; then
+        GPU_VENDOR="amd"
+        echo "  GPU OK (AMD): $(rocm-smi --showproductname 2>/dev/null | grep -i 'card\|GPU' | head -1)"
+        break
+    fi
     sleep 5
     GPUWAIT=$((GPUWAIT + 5))
     if [ $GPUWAIT -ge 120 ]; then
         echo "ERROR: GPU not available after 120s"
-        echo "$(date '+%H:%M') | ERROR: GPU driver not ready" > $LOG
+        echo "$(date '+%H:%M') | ERROR: GPU driver not ready (checked nvidia-smi + rocm-smi)" > $LOG
         sleep infinity
         exit 1
     fi
 done
-echo "  GPU OK: $(nvidia-smi -L | head -1)"
 
 # 1. Clone / update code
 echo ">>> [1/6] Code..."
@@ -45,13 +54,22 @@ SUPABASE_URL=${SUPABASE_URL:-}
 SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY:-}
 HF_TOKEN=${HF_TOKEN:-}
 VLLM_BASE_URL=http://localhost:8000/v1
-VLLM_MODEL=${VLLM_MODEL:-meta-llama/Llama-3.1-70B-Instruct}
+VLLM_MODEL=${VLLM_MODEL:-meta-llama/Llama-3.1-405B-Instruct}
 EOF
 
-# 3. Install dependencies (use --no-deps for vllm to avoid torch conflicts)
+# 3. Install dependencies
 echo ">>> [3/6] Python packages..."
 pip install -q httpx rich supabase trafilatura playwright click python-dotenv beautifulsoup4 lxml pydantic 2>&1 | tail -3
-pip install -q vllm --no-build-isolation 2>&1 | tail -3
+
+# vLLM install — ROCm or CUDA depending on GPU
+if [ "$GPU_VENDOR" = "amd" ]; then
+    echo "  AMD GPU detected — installing vLLM with ROCm..."
+    pip install -q vllm 2>&1 | tail -3
+else
+    echo "  NVIDIA GPU detected — installing vLLM with CUDA..."
+    pip install -q vllm --no-build-isolation 2>&1 | tail -3
+fi
+
 playwright install chromium 2>&1 | tail -1
 
 # 4. HuggingFace login
@@ -65,14 +83,20 @@ fi
 echo ">>> [5/6] vLLM server..."
 if [ -f $DIR/.vllm_pid ]; then kill $(cat $DIR/.vllm_pid) 2>/dev/null; sleep 2; fi
 
-MODEL=${VLLM_MODEL:-meta-llama/Llama-3.1-70B-Instruct}
-GPU_COUNT=$(nvidia-smi -L 2>/dev/null | wc -l)
+MODEL=${VLLM_MODEL:-meta-llama/Llama-3.1-405B-Instruct}
+
+# Detect GPU count (NVIDIA or AMD)
+if [ "$GPU_VENDOR" = "amd" ]; then
+    GPU_COUNT=$(rocm-smi --showid 2>/dev/null | grep -c 'GPU' || echo 2)
+else
+    GPU_COUNT=$(nvidia-smi -L 2>/dev/null | wc -l)
+fi
 GPU_COUNT=${GPU_COUNT:-2}
 
 nohup python -m vllm.entrypoints.openai.api_server \
     --model "$MODEL" \
     --tensor-parallel-size $GPU_COUNT \
-    --gpu-memory-utilization 0.90 \
+    --gpu-memory-utilization 0.92 \
     --max-model-len 32768 \
     --dtype auto \
     --port 8000 \
