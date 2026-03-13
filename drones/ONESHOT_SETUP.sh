@@ -93,19 +93,22 @@ while [ $WAITED -lt 1800 ]; do
     if curl -s http://localhost:8000/health > /dev/null 2>&1; then
         echo "$(date '+%H:%M') | MODEL READY — starting ALL drones" >> $LOG
 
-        # Run all 3 drones sequentially
-        echo "$(date '+%H:%M') | === DRONE 1/3: tech_scout ===" >> $LOG
+        # Run all 4 drones sequentially
+        echo "$(date '+%H:%M') | === DRONE 1/4: tech_scout ===" >> $LOG
         python run.py --drone tech_scout >> $LOG 2>&1
 
-        echo "$(date '+%H:%M') | === DRONE 2/3: industry_scout ===" >> $LOG
+        echo "$(date '+%H:%M') | === DRONE 2/4: industry_scout ===" >> $LOG
         python run.py --drone industry_scout >> $LOG 2>&1
 
-        echo "$(date '+%H:%M') | === DRONE 3/3: competitor_scout ===" >> $LOG
+        echo "$(date '+%H:%M') | === DRONE 3/4: competitor_scout ===" >> $LOG
         python run.py --drone competitor_scout >> $LOG 2>&1
+
+        echo "$(date '+%H:%M') | === DRONE 4/4: translation_scout ===" >> $LOG
+        python run.py --drone translation_scout >> $LOG 2>&1
 
         echo "" >> $LOG
         echo "$(date '+%H:%M') | ============================================" >> $LOG
-        echo "$(date '+%H:%M') | ALL DRONES FINISHED" >> $LOG
+        echo "$(date '+%H:%M') | ALL 4 DRONES FINISHED" >> $LOG
         echo "$(date '+%H:%M') | Results: output/ folder + Supabase" >> $LOG
         echo "$(date '+%H:%M') | ============================================" >> $LOG
         echo "" >> $LOG
