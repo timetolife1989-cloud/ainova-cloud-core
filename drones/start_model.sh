@@ -12,7 +12,9 @@ set -e
 
 # Load .env
 if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+    set +e
+    export $(grep -v '^#' .env | grep -v '^$' | xargs) 2>/dev/null
+    set -e
 fi
 
 MODEL="${VLLM_MODEL:-meta-llama/Llama-3.1-70B-Instruct}"

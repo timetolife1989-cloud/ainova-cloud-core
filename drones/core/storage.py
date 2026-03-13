@@ -8,18 +8,28 @@ import os
 from datetime import datetime, timezone
 
 from rich.console import Console
-from supabase import create_client, Client
 
 from config import Config
 
 console = Console()
 
 
+def _safe_json(obj):
+    """Ensure an object is JSON-serializable by round-tripping through json.dumps."""
+    return json.loads(json.dumps(obj, default=str, ensure_ascii=False))
+
+
 class Storage:
     """Handles saving drone results to Supabase and local files."""
 
     def __init__(self):
-        self.supabase: Client = create_client(Config.SUPABASE_URL, Config.SUPABASE_SERVICE_KEY)
+        self.supabase = None
+        try:
+            from supabase import create_client
+            if Config.SUPABASE_SERVICE_KEY:
+                self.supabase = create_client(Config.SUPABASE_URL, Config.SUPABASE_SERVICE_KEY)
+        except Exception as e:
+            console.print(f"[yellow]Supabase client init failed: {e}. Local-only mode.[/yellow]")
         self.session_id = Config.SESSION_ID
         self._ensure_output_dirs()
 
@@ -31,6 +41,9 @@ class Storage:
 
     def start_session(self, model_used: str, gpu_config: str = "2x RTX PRO 6000"):
         """Record the start of a drone session."""
+        if not self.supabase:
+            console.print(f"[yellow]Session started (local only): {self.session_id}[/yellow]")
+            return
         try:
             self.supabase.table("drone_sessions").insert({
                 "id": self.session_id,
@@ -44,6 +57,9 @@ class Storage:
 
     def end_session(self, total_results: int, cost_usd: float | None = None):
         """Record the end of a drone session."""
+        if not self.supabase:
+            console.print(f"[yellow]Session ended (local only): {self.session_id} ({total_results} results)[/yellow]")
+            return
         try:
             self.supabase.table("drone_sessions").update({
                 "ended_at": datetime.now(timezone.utc).isoformat(),
@@ -80,12 +96,16 @@ class Storage:
         success = True
 
         # Save to Supabase
-        try:
-            self.supabase.table("drone_results").insert(result_data).execute()
-            console.print(f"  [green]Supabase OK[/green] — {title[:60]}")
-        except Exception as e:
-            console.print(f"  [red]Supabase FAIL[/red] — {e}")
-            success = False
+        if self.supabase:
+            try:
+                sb_data = {**result_data, "content": _safe_json(result_data["content"])}
+                self.supabase.table("drone_results").insert(sb_data).execute()
+                console.print(f"  [green]Supabase OK[/green] — {title[:60]}")
+            except Exception as e:
+                console.print(f"  [red]Supabase FAIL[/red] — {e}")
+                success = False
+        else:
+            console.print(f"  [dim]Supabase skipped (local only)[/dim]")
 
         # Save to local JSON
         try:
@@ -123,6 +143,8 @@ class Storage:
 
     def get_result_count(self) -> int:
         """Get total results for current session."""
+        if not self.supabase:
+            return 0
         try:
             resp = (
                 self.supabase.table("drone_results")

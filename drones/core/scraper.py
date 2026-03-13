@@ -49,7 +49,15 @@ class WebScraper:
         return random.choice(Config.USER_AGENTS)
 
     async def search_google(self, query: str, num_results: int = 5) -> list[dict]:
-        """Search Google and return a list of {title, url, snippet}."""
+        """Search Google and return a list of {title, url, snippet}. Falls back to DuckDuckGo."""
+        results = await self._search_google_impl(query, num_results)
+        if not results:
+            console.print(f"  [yellow]Google returned 0 results, trying DuckDuckGo...[/yellow]")
+            results = await self._search_duckduckgo(query, num_results)
+        return results
+
+    async def _search_google_impl(self, query: str, num_results: int = 5) -> list[dict]:
+        """Internal Google search implementation."""
         results = []
         context = await self._browser.new_context(
             user_agent=self._random_ua(),
@@ -62,24 +70,57 @@ class WebScraper:
             await page.goto(search_url, wait_until="domcontentloaded", timeout=15000)
             await page.wait_for_timeout(random.randint(1000, 2500))
 
-            # Extract search results
+            # Extract search results — try multiple selector strategies
             items = await page.query_selector_all("div.g")
+            if not items:
+                items = await page.query_selector_all("div[data-hveid] a[href^='http']")
+
             for item in items[:num_results]:
                 try:
                     title_el = await item.query_selector("h3")
-                    link_el = await item.query_selector("a")
-                    snippet_el = await item.query_selector("div[data-sncf], div.VwiC3b")
+                    link_el = await item.query_selector("a[href^='http']")
+                    snippet_el = await item.query_selector("div[data-sncf], div.VwiC3b, span.st, div[style*='line']")
 
                     title = await title_el.inner_text() if title_el else ""
                     url = await link_el.get_attribute("href") if link_el else ""
                     snippet = await snippet_el.inner_text() if snippet_el else ""
 
-                    if url and url.startswith("http"):
+                    if url and url.startswith("http") and "google.com" not in url:
                         results.append({"title": title, "url": url, "snippet": snippet})
                 except Exception:
                     continue
         except Exception as e:
             console.print(f"[red]Google search error for '{query}': {e}[/red]")
+        finally:
+            await context.close()
+
+        return results
+
+    async def _search_duckduckgo(self, query: str, num_results: int = 5) -> list[dict]:
+        """DuckDuckGo fallback search (no CAPTCHA, more permissive)."""
+        results = []
+        context = await self._browser.new_context(
+            user_agent=self._random_ua(),
+            viewport={"width": 1920, "height": 1080},
+        )
+        page = await context.new_page()
+
+        try:
+            search_url = f"https://html.duckduckgo.com/html/?q={quote_plus(query)}"
+            await page.goto(search_url, wait_until="domcontentloaded", timeout=15000)
+            await page.wait_for_timeout(random.randint(800, 1500))
+
+            links = await page.query_selector_all("a.result__a")
+            for link in links[:num_results]:
+                try:
+                    title = await link.inner_text()
+                    url = await link.get_attribute("href")
+                    if url and url.startswith("http"):
+                        results.append({"title": title, "url": url, "snippet": ""})
+                except Exception:
+                    continue
+        except Exception as e:
+            console.print(f"[red]DuckDuckGo search error: {e}[/red]")
         finally:
             await context.close()
 

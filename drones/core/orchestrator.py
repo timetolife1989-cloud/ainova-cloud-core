@@ -23,9 +23,10 @@ class Orchestrator:
     def __init__(self):
         self.llm = LLMClient()
         self.scraper = WebScraper()
-        self.storage = Storage()
+        self.storage = None
         self.total_results = 0
         self.start_time = None
+        self.supabase_ok = False
 
     async def initialize(self):
         """Start all services and verify they are working."""
@@ -39,14 +40,24 @@ class Orchestrator:
             raise RuntimeError("vLLM server not available")
         console.print("[green]OK[/green]")
 
-        # Check Supabase
+        # Init storage
+        console.print("Initializing storage...", end=" ")
+        self.storage = Storage()
+        console.print("[green]OK[/green]")
+
+        # Check Supabase connectivity
         console.print("Checking Supabase...", end=" ")
-        try:
-            self.storage.supabase.table("drone_sessions").select("id").limit(1).execute()
-            console.print("[green]OK[/green]")
-        except Exception as e:
-            console.print(f"[red]FAILED — {e}[/red]")
-            console.print("[yellow]Will save locally only.[/yellow]")
+        if self.storage.supabase:
+            try:
+                self.storage.supabase.table("drone_sessions").select("id").limit(1).execute()
+                self.supabase_ok = True
+                console.print("[green]OK[/green]")
+            except Exception as e:
+                console.print(f"[red]FAILED — {e}[/red]")
+                console.print("[yellow]Will save locally only.[/yellow]")
+                self.supabase_ok = False
+        else:
+            console.print("[yellow]Not configured — local-only mode[/yellow]")
 
         # Start browser
         console.print("Starting browser...", end=" ")
@@ -123,14 +134,21 @@ class Orchestrator:
         estimated_cost = hours * 3.78  # $3.78/hr for 2x RTX PRO 6000
 
         # End session in Supabase
-        self.storage.end_session(
-            total_results=self.total_results,
-            cost_usd=round(estimated_cost, 2),
-        )
+        if self.storage:
+            self.storage.end_session(
+                total_results=self.total_results,
+                cost_usd=round(estimated_cost, 2),
+            )
 
         # Close browser
-        await self.scraper.stop()
-        self.llm.close()
+        try:
+            await self.scraper.stop()
+        except Exception:
+            pass
+        try:
+            self.llm.close()
+        except Exception:
+            pass
 
         console.print(Panel(
             f"[bold green]ALL DRONES COMPLETED[/bold green]\n\n"

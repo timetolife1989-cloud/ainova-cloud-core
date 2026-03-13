@@ -65,6 +65,12 @@ fi
 # 4. Login to HuggingFace (needed for Llama download)
 # ----------------------------------------------------------
 echo "[4/4] Logging in to HuggingFace..."
+# Source .env if it exists (so HF_TOKEN is available)
+if [ -f .env ]; then
+    set +e
+    export $(grep -v '^#' .env | grep -v '^$' | xargs) 2>/dev/null
+    set -e
+fi
 if [ -n "$HF_TOKEN" ]; then
     huggingface-cli login --token "$HF_TOKEN" 2>/dev/null || \
     python -c "from huggingface_hub import login; login(token='$HF_TOKEN')" 2>/dev/null || \

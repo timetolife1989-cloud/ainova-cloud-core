@@ -71,12 +71,23 @@ class LLMClient:
         try:
             return json.loads(raw)
         except json.JSONDecodeError:
-            # Try to find JSON block in the response
+            # Try to strip markdown code fences first
+            import re
+            fence_match = re.search(r'```(?:json)?\s*\n?(\{.*?\})\s*\n?```', raw, re.DOTALL)
+            if fence_match:
+                try:
+                    return json.loads(fence_match.group(1))
+                except json.JSONDecodeError:
+                    pass
+            # Fallback: find outermost { } block
             start = raw.find("{")
             end = raw.rfind("}") + 1
             if start != -1 and end > start:
-                return json.loads(raw[start:end])
-            raise ValueError(f"Could not parse JSON from LLM response: {raw[:200]}")
+                try:
+                    return json.loads(raw[start:end])
+                except json.JSONDecodeError:
+                    pass
+            raise ValueError(f"Could not parse JSON from LLM response: {raw[:300]}")
 
     def is_healthy(self) -> bool:
         """Check if the vLLM server is running and healthy."""
