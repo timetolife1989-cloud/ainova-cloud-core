@@ -13,6 +13,21 @@ echo "============================================"
 DIR=/workspace/ainova-cloud-core/drones
 LOG=/workspace/drone_progress.log
 
+# 0. Wait for GPU driver to be ready (RunPod sometimes needs a moment)
+echo ">>> [0/6] Waiting for GPU..."
+GPUWAIT=0
+while ! nvidia-smi > /dev/null 2>&1; do
+    sleep 5
+    GPUWAIT=$((GPUWAIT + 5))
+    if [ $GPUWAIT -ge 120 ]; then
+        echo "ERROR: GPU not available after 120s"
+        echo "$(date '+%H:%M') | ERROR: GPU driver not ready" > $LOG
+        sleep infinity
+        exit 1
+    fi
+done
+echo "  GPU OK: $(nvidia-smi -L | head -1)"
+
 # 1. Clone / update code
 echo ">>> [1/6] Code..."
 cd /workspace
@@ -33,14 +48,16 @@ VLLM_BASE_URL=http://localhost:8000/v1
 VLLM_MODEL=${VLLM_MODEL:-meta-llama/Llama-3.1-70B-Instruct}
 EOF
 
-# 3. Install dependencies
+# 3. Install dependencies (use --no-deps for vllm to avoid torch conflicts)
 echo ">>> [3/6] Python packages..."
-pip install -q httpx rich supabase trafilatura playwright click python-dotenv 2>&1 | tail -3
+pip install -q httpx rich supabase trafilatura playwright click python-dotenv beautifulsoup4 lxml pydantic 2>&1 | tail -3
+pip install -q vllm --no-build-isolation 2>&1 | tail -3
 playwright install chromium 2>&1 | tail -1
 
 # 4. HuggingFace login
 echo ">>> [4/6] HuggingFace..."
 if [ -n "$HF_TOKEN" ]; then
+    pip install -q huggingface-hub 2>/dev/null
     huggingface-cli login --token "$HF_TOKEN" 2>/dev/null || true
 fi
 
@@ -55,7 +72,7 @@ GPU_COUNT=${GPU_COUNT:-2}
 nohup python -m vllm.entrypoints.openai.api_server \
     --model "$MODEL" \
     --tensor-parallel-size $GPU_COUNT \
-    --gpu-memory-utilization 0.95 \
+    --gpu-memory-utilization 0.90 \
     --max-model-len 32768 \
     --dtype auto \
     --port 8000 \
@@ -74,10 +91,22 @@ echo "$(date '+%H:%M') | Waiting for model..." > $LOG
 WAITED=0
 while [ $WAITED -lt 1800 ]; do
     if curl -s http://localhost:8000/health > /dev/null 2>&1; then
-        echo "$(date '+%H:%M') | MODEL READY — starting drones in loop mode" >> $LOG
-        python run.py --loop >> $LOG 2>&1
-        echo "$(date '+%H:%M') | Drones finished" >> $LOG
+        echo "$(date '+%H:%M') | MODEL READY — starting drones" >> $LOG
+        python run.py >> $LOG 2>&1
+        echo "$(date '+%H:%M') | Drones finished — all results saved" >> $LOG
+        # Keep container alive so you can inspect results
+        echo "$(date '+%H:%M') | DONE. Pod stays alive for inspection. Stop it manually to save cost." >> $LOG
+        sleep infinity
         exit 0
+    fi
+    sleep 15
+    WAITED=$((WAITED + 15))
+    echo "$(date '+%H:%M') | Loading model... (${WAITED}s)" >> $LOG
+done
+echo "$(date '+%H:%M') | ERROR: model did not start in 30 minutes" >> $LOG
+echo "Check: cat /workspace/ainova-cloud-core/drones/vllm.log" >> $LOG
+# Keep alive for debugging
+sleep infinity
     fi
     sleep 15
     WAITED=$((WAITED + 15))

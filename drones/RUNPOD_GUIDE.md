@@ -33,14 +33,30 @@ git push
 1. Menj: https://www.runpod.io/console/pods
 2. Kattints: **+ Deploy**
 3. Beállítások:
-   - **GPU:** 2x RTX PRO 6000 (48GB each)
+   - **GPU:** 2x RTX PRO 6000 (96GB each — Blackwell)
+   - **Template:** "Nova cloud dev" (VAGY manuálisan alább)
    - **Container Image:** `runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04`
-   - **Container Disk:** 100 GB
-   - **Volume Disk:** 0 GB (nincs szükség most)
-   - **Expose HTTP Ports:** 8888, 8000
+   - **Container Disk:** 30 GB
+   - **Volume Disk:** 0 GB (nincs szükség — minden memóriában + Supabase-re megy)
+   - **Expose HTTP Ports:** 8000
    - **Expose TCP Ports:** 22
+   - **Environment Variables:**
+     ```
+     HF_TOKEN=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
+     VLLM_AUTH_KEY=NovaCloud2026
+     VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
+     SUPABASE_URL=https://nfancsrufcvmulrxnfxx.supabase.co
+     SUPABASE_SERVICE_KEY=eyJ...service-key...
+     ```
+   - **Container Start Command:**
+     ```bash
+     bash -c "echo 'nameserver 1.1.1.1' > /etc/resolv.conf && cd /workspace && git clone https://github.com/timetolife1989-cloud/ainova-cloud-core.git 2>/dev/null; cd /workspace/ainova-cloud-core/drones && bash ONESHOT_SETUP.sh && sleep infinity"
+     ```
 4. Kattints: **Deploy On-Demand**
 5. Várj amíg a pod `Running` állapotba kerül (~1-2 perc)
+
+> **FONTOS:** A Container Start Command végén `sleep infinity` van, hogy a pod ne álljon le.
+> A `ONESHOT_SETUP.sh` háttérben indítja a vLLM-et és a drónokat — NEM kell kézzel semmit csinálni.
 
 ### 4. lépés: Csatlakozás a Pod-hoz
 

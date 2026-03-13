@@ -5,17 +5,30 @@ Research and collect actionable technical solutions that can be immediately impl
 
 ## About ACI
 - **Stack:** Next.js 16 (App Router), React 19, TypeScript 5.9, Tailwind CSS 4
-- **Database:** MSSQL (primary), PostgreSQL (Supabase), SQLite (adapter pattern)
-- **Auth:** Session-based (bcryptjs), optional JWT
-- **Architecture:** Modular plugin system with 18 modules (workforce, OEE, PLC connector, digital twin, etc.)
+- **Database:** PostgreSQL (Supabase Cloud) — adapter pattern supports MSSQL/SQLite too
+- **Auth:** Session-based (bcryptjs), CSRF protection, RBAC with permission matrix
+- **Architecture:** Modular plugin system with 17 modules (workforce, OEE, PLC connector, digital twin, SAP import, etc.)
 - **Deployment:** Docker, Vercel (frontend), Supabase (DB)
-- **i18n:** Multi-language (HU, EN, DE) with JSON files + DB overrides
+- **i18n:** Multi-language (HU, EN, DE) — 1076+ keys, all real translations, client-side instant switching via useTranslation hook + I18nProvider
+- **UI:** Dark theme, glass/blur effects, Framer Motion animations, neuron canvas particle background, Tailwind CSS 4
+- **Performance:** Dynamic imports (next/dynamic ssr:false) for heavy components, lazy loading
 
-## Current Critical Problems (PRIORITIZE THESE)
-1. **SLOW language switching** — When user switches from HU to EN, it takes SECONDS. Must be INSTANT.
-2. **Overall slow UI** — The app feels sluggish. Need React/Next.js performance optimizations.
-3. **Poor design** — The UI looks unprofessional. Need modern manufacturing dashboard design patterns.
-4. **i18n implementation** — Current approach loads translations on every request. Need client-side caching.
+## Already Solved (DO NOT research these)
+1. ~~SLOW language switching~~ — SOLVED: client-side i18n with preloaded translations, instant switching
+2. ~~Missing language selector~~ — SOLVED: LanguageSwitcher component on landing, login, and dashboard
+3. ~~No mobile navigation~~ — SOLVED: hamburger menu with slide-in sidebar
+4. ~~Lazy loading~~ — SOLVED: LazyNeuronBackground, LazyInactivityGuard, LazyCommandPalette
+5. ~~SAP i18n key mismatches~~ — SOLVED: all 53 keys aligned across HU/EN/DE
+
+## Current Priority Problems (FOCUS ON THESE)
+1. **Zero test coverage** — Only 2 test files exist. Need testing strategy for auth, API routes, DB adapters, modules.
+2. **CSRF gaps** — 3 POST routes missing checkCsrf protection (admin/roles, admin/import, setup).
+3. **No custom 404/error pages** — Missing not-found.tsx and global-error.tsx.
+4. **PLC/IoT connector stubs** — S7, OPC-UA, MQTT, Modbus drivers are empty skeletons.
+5. **SAP connector stubs** — 7 TODO stubs, no actual implementation.
+6. **Missing accessibility** — No aria-labels on many interactive elements.
+7. **No monitoring/APM** — No error tracking, no performance monitoring.
+8. **Multi-tenant architecture** — No row-level security, no tenant isolation yet.
 
 ## Research Guidelines
 - Focus on **actionable code snippets** that can be copy-pasted or adapted
