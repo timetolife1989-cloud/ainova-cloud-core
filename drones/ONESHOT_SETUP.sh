@@ -37,48 +37,48 @@ nohup python -m vllm.entrypoints.openai.api_server \
     > vllm.log 2>&1 &
 
 echo $! > .vllm_pid
-echo ""
-echo "============================================"
-echo "  SETUP KÉSZ! Modell betöltés indult."
-echo "  Most automatikusan várok amíg kész lesz..."
-echo "  Ez 5-15 percet vesz igénybe."
-echo "  NE ZÁRD BE A TERMINÁLT!"
-echo "============================================"
-echo ""
 
-# Automatikus várakozás a modellre
+# Háttér script ami megvárja a modellt és futtatja a drónokat
+# Ez túléli a terminál bezárást!
+cat > /workspace/ainova-cloud-core/drones/autorun.sh << 'SCRIPT'
+#!/bin/bash
+cd /workspace/ainova-cloud-core/drones
+LOG=/workspace/ainova-cloud-core/drones/drone_progress.log
+echo "[$(date)] Várakozás a modellre..." > $LOG
+
 MAX_WAIT=1200
 WAITED=0
 while [ $WAITED -lt $MAX_WAIT ]; do
     if curl -s http://localhost:8000/health > /dev/null 2>&1; then
-        echo ""
-        echo "============================================"
-        echo "  MODELL KÉSZ! Drónok indulnak..."
-        echo "============================================"
-        echo ""
-        python run.py --all
-        echo ""
-        echo "============================================"
-        echo "  DRÓNOK KÉSZ!"
-        echo "  Eredmények mentése Git-be..."
-        echo "============================================"
+        echo "[$(date)] MODELL KÉSZ! Drónok indulnak..." >> $LOG
+        python run.py --all >> $LOG 2>&1
+        echo "[$(date)] DRÓNOK KÉSZ! Git push..." >> $LOG
         cd /workspace/ainova-cloud-core
         git add drones/output/ 2>/dev/null
         git commit -m "data: drone results $(date +%Y-%m-%d_%H%M)" 2>/dev/null
         git push 2>/dev/null
-        echo ""
-        echo "============================================"
-        echo "  MINDEN KÉSZ!"
-        echo "  ÁLLÍTSD LE A POD-OT A RUNPOD OLDALON!"
-        echo "============================================"
+        echo "[$(date)] MINDEN KÉSZ! ÁLLÍTSD LE A POD-OT!" >> $LOG
         exit 0
     fi
     sleep 15
     WAITED=$((WAITED + 15))
-    MINS=$((WAITED / 60))
-    SECS=$((WAITED % 60))
-    echo "  Várakozás... (${MINS}m ${SECS}s)"
+    echo "[$(date)] Várakozás... (${WAITED}s)" >> $LOG
 done
+echo "[$(date)] HIBA: modell 20 perc után sem indult el" >> $LOG
+SCRIPT
 
-echo "HIBA: A modell 20 perc után sem indult el."
-echo "Nézd a logot: cat /workspace/ainova-cloud-core/drones/vllm.log"
+chmod +x /workspace/ainova-cloud-core/drones/autorun.sh
+nohup bash /workspace/ainova-cloud-core/drones/autorun.sh > /dev/null 2>&1 &
+
+echo ""
+echo "============================================"
+echo "  MINDEN ELINDULT A HÁTTÉRBEN!"
+echo "  NYUGODTAN ZÁRD BE A TERMINÁLT."
+echo "  A drónok ~2.5 óra múlva készek."
+echo ""
+echo "  Állapot ellenőrzés (bármikor visszajössz):"
+echo "    cat /workspace/ainova-cloud-core/drones/drone_progress.log"
+echo ""
+echo "  Supabase-en élőben látod az eredményeket:"
+echo "    https://supabase.com/dashboard"
+echo "============================================"
