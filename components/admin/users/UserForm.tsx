@@ -136,7 +136,7 @@ export function UserForm({ user }: UserFormProps) {
           onChange={(e) => setFullName(e.target.value)}
           maxLength={200}
           className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-600/50"
-          placeholder="pl. Kovács János"
+          placeholder={t('admin.users.placeholder_name')}
         />
       </div>
 

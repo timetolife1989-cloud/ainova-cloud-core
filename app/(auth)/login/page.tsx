@@ -2,8 +2,11 @@
 
 import { LoginContainer } from '@/components/login/LoginContainer';
 import { motion } from 'framer-motion';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="relative w-full max-w-md px-6">
       {/* Background effects matching landing page */}
@@ -37,7 +40,7 @@ export default function LoginPage() {
 
         <div className="text-center">
           <h1 className="text-2xl font-bold tracking-wider text-white">AINOVA CLOUD INTELLIGENCE</h1>
-          <p className="text-xs text-gray-500 mt-1 tracking-widest uppercase">Manufacturing Management Platform</p>
+          <p className="text-xs text-gray-500 mt-1 tracking-widest uppercase">{t('branding.tagline')}</p>
         </div>
       </div>
 
@@ -46,7 +49,7 @@ export default function LoginPage() {
       {/* Footer link */}
       <div className="mt-8 text-center">
         <a href="/" className="text-sm text-gray-500 hover:text-blue-400 transition-colors">
-          &larr; Back to homepage
+          {t('common.back_to_homepage')}
         </a>
       </div>
     </div>

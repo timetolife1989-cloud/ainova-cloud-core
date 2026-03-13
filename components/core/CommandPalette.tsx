@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface SearchResult {
   id: string;
@@ -13,22 +14,23 @@ interface SearchResult {
   icon?: string;
 }
 
-const STATIC_PAGES: SearchResult[] = [
-  { id: 'dash', title: 'Dashboard', href: '/dashboard', category: 'Navigation', icon: '🏠' },
-  { id: 'admin', title: 'Admin Panel', href: '/dashboard/admin', category: 'Navigation', icon: '⚙️' },
-  { id: 'users', title: 'Felhasználók', href: '/dashboard/admin/users', category: 'Admin', icon: '👥' },
-  { id: 'roles', title: 'Szerepkörök', href: '/dashboard/admin/roles', category: 'Admin', icon: '🔐' },
-  { id: 'modules', title: 'Modulok', href: '/dashboard/admin/modules', category: 'Admin', icon: '📦' },
-  { id: 'settings', title: 'Beállítások', href: '/dashboard/admin/settings', category: 'Admin', icon: '🎨' },
-  { id: 'license', title: 'Licenc', href: '/dashboard/admin/license', category: 'Admin', icon: '📄' },
-  { id: 'audit', title: 'Audit Napló', href: '/dashboard/admin/audit-log', category: 'Admin', icon: '📋' },
-  { id: 'diag', title: 'Diagnosztika', href: '/dashboard/admin/diagnostics', category: 'Admin', icon: '🔧' },
-  { id: 'units', title: 'Mértékegységek', href: '/dashboard/admin/units', category: 'Admin', icon: '📏' },
-  { id: 'locale', title: 'Nyelv & Formátumok', href: '/dashboard/admin/locale', category: 'Admin', icon: '🌐' },
-  { id: 'import', title: 'Import Konfigurációk', href: '/dashboard/admin/import-configs', category: 'Admin', icon: '📥' },
-];
-
 export function CommandPalette() {
+  const { t } = useTranslation();
+
+  const STATIC_PAGES: SearchResult[] = useMemo(() => [
+    { id: 'dash', title: t('cmd.dashboard'), href: '/dashboard', category: t('cmd.cat_navigation'), icon: '🏠' },
+    { id: 'admin', title: t('cmd.admin_panel'), href: '/dashboard/admin', category: t('cmd.cat_navigation'), icon: '⚙️' },
+    { id: 'users', title: t('cmd.users'), href: '/dashboard/admin/users', category: t('cmd.cat_admin'), icon: '👥' },
+    { id: 'roles', title: t('cmd.roles'), href: '/dashboard/admin/roles', category: t('cmd.cat_admin'), icon: '🔐' },
+    { id: 'modules', title: t('cmd.modules'), href: '/dashboard/admin/modules', category: t('cmd.cat_admin'), icon: '📦' },
+    { id: 'settings', title: t('cmd.settings'), href: '/dashboard/admin/settings', category: t('cmd.cat_admin'), icon: '🎨' },
+    { id: 'license', title: t('cmd.license'), href: '/dashboard/admin/license', category: t('cmd.cat_admin'), icon: '📄' },
+    { id: 'audit', title: t('cmd.audit_log'), href: '/dashboard/admin/audit-log', category: t('cmd.cat_admin'), icon: '📋' },
+    { id: 'diag', title: t('cmd.diagnostics'), href: '/dashboard/admin/diagnostics', category: t('cmd.cat_admin'), icon: '🔧' },
+    { id: 'units', title: t('cmd.units'), href: '/dashboard/admin/units', category: t('cmd.cat_admin'), icon: '📏' },
+    { id: 'locale', title: t('cmd.locale'), href: '/dashboard/admin/locale', category: t('cmd.cat_admin'), icon: '🌐' },
+    { id: 'import', title: t('cmd.import_configs'), href: '/dashboard/admin/import-configs', category: t('cmd.cat_admin'), icon: '📥' },
+  ], [t]);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -93,7 +95,7 @@ export function CommandPalette() {
           const data = await res.json();
           const apiResults: SearchResult[] = (data.results ?? []).map((r: SearchResult) => ({
             ...r,
-            category: r.category ?? 'Modul',
+            category: r.category ?? t('cmd.cat_module'),
           }));
           setResults([...filtered, ...apiResults].slice(0, 12));
         } else {
@@ -159,7 +161,7 @@ export function CommandPalette() {
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Keresés oldalak, modulok között..."
+                  placeholder={t('cmd.search_placeholder')}
                   className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-sm"
                 />
                 <kbd className="hidden sm:inline-block px-1.5 py-0.5 bg-gray-800 text-gray-500 rounded text-[10px] font-mono">ESC</kbd>
@@ -169,7 +171,7 @@ export function CommandPalette() {
               <div className="max-h-[320px] overflow-y-auto py-2">
                 {results.length === 0 ? (
                   <div className="px-4 py-6 text-center text-gray-500 text-sm">
-                    Nincs találat &quot;{query}&quot; keresésre
+                    {t('cmd.no_results', { query })}
                   </div>
                 ) : (
                   results.map((result, idx) => (
@@ -193,9 +195,9 @@ export function CommandPalette() {
 
               {/* Footer */}
               <div className="px-4 py-2 border-t border-gray-800 flex items-center gap-4 text-[10px] text-gray-600">
-                <span>↑↓ navigáció</span>
-                <span>↵ megnyitás</span>
-                <span>esc bezárás</span>
+                <span>{t('cmd.nav_up_down')}</span>
+                <span>{t('cmd.nav_open')}</span>
+                <span>{t('cmd.nav_close')}</span>
               </div>
             </div>
           </motion.div>

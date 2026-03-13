@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import { useTranslation } from '@/hooks/useTranslation';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { Save, ArrowLeft, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
@@ -23,6 +24,7 @@ interface ModuleInfo {
 }
 
 export default function ModuleSettingsPage() {
+  const { t } = useTranslation();
   const params = useParams();
   const moduleId = params.moduleId as string;
 
@@ -96,7 +98,7 @@ export default function ModuleSettingsPage() {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Hiba történt');
+      setError(e instanceof Error ? e.message : t('common.error_occurred'));
     } finally {
       setSaving(false);
     }
@@ -121,9 +123,9 @@ export default function ModuleSettingsPage() {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
-          <p className="text-gray-400">Modul nem található: {moduleId}</p>
+          <p className="text-gray-400">{t('admin.module_settings.module_not_found')}: {moduleId}</p>
           <Link href="/dashboard/admin/modules" className="text-indigo-400 hover:underline mt-4 inline-block">
-            Vissza a modulokhoz
+            {t('admin.module_settings.back_to_modules')}
           </Link>
         </div>
       </div>
@@ -133,11 +135,11 @@ export default function ModuleSettingsPage() {
   if (!module.adminSettings || module.adminSettings.length === 0) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <DashboardSectionHeader title={module.name} subtitle="Modul beállítások" />
+        <DashboardSectionHeader title={module.name} subtitle={t('admin.modules.settings_title')} />
         <div className="mt-6 bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
-          <p className="text-gray-400">Ennek a modulnak nincsenek konfigurálható beállításai.</p>
+          <p className="text-gray-400">{t('admin.modules.no_settings')}</p>
           <Link href="/dashboard/admin/modules" className="text-indigo-400 hover:underline mt-4 inline-block">
-            Vissza a modulokhoz
+            {t('admin.module_settings.back_to_modules')}
           </Link>
         </div>
       </div>
@@ -150,7 +152,7 @@ export default function ModuleSettingsPage() {
         <Link href="/dashboard/admin/modules" className="p-2 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white">
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <DashboardSectionHeader title={module.name} subtitle="Modul beállítások" />
+        <DashboardSectionHeader title={module.name} subtitle={t('admin.modules.settings_title')} />
       </div>
 
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
@@ -241,7 +243,7 @@ export default function ModuleSettingsPage() {
 
         {success && (
           <div className="mt-4 p-3 bg-green-900/30 border border-green-800 rounded-lg text-green-300 text-sm">
-            Beállítások mentve!
+            {t('admin.modules.settings_saved')}
           </div>
         )}
 
@@ -252,7 +254,7 @@ export default function ModuleSettingsPage() {
             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
-            {saving ? 'Mentés...' : 'Mentés'}
+            {saving ? t('common.saving') : t('common.save')}
           </button>
         </div>
       </div>

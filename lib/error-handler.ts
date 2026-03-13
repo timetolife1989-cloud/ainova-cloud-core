@@ -23,12 +23,12 @@ export function sanitizeErrorMessage(
 
     // Database errors — don't reveal schema or table names
     if (message.includes('table') || message.includes('column') || message.includes('constraint')) {
-      return 'Adatbázis hiba történt';
+      return 'error.database';
     }
 
     // SQL errors — don't reveal query details
     if (message.includes('sql') || message.includes('query')) {
-      return 'Adatbázis hiba történt';
+      return 'error.database';
     }
 
     // Network errors — don't reveal server details
@@ -37,7 +37,7 @@ export function sanitizeErrorMessage(
       message.includes('econnrefused') ||
       message.includes('etimedout')
     ) {
-      return 'Hálózati hiba történt';
+      return 'error.network';
     }
 
     // File system errors — don't reveal paths
@@ -46,16 +46,16 @@ export function sanitizeErrorMessage(
       message.includes('eacces') ||
       message.includes('eperm')
     ) {
-      return 'Fájl hozzáférési hiba történt';
+      return 'error.file_access';
     }
 
     // Authentication errors — don't reveal whether the user exists
     if (message.includes('user not found') || message.includes('invalid credentials')) {
-      return 'Hibás felhasználónév vagy jelszó';
+      return 'error.invalid_credentials';
     }
   }
 
-  return 'Váratlan hiba történt';
+  return 'error.unexpected';
 }
 
 /**

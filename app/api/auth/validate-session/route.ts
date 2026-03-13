@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
   if (!sessionId) {
     return NextResponse.json(
-      { error: 'Nincs bejelentkezve' },
+      { error: 'auth.error.not_logged_in' },
       { status: 401 }
     );
   }
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.error('[API] /auth/validate-session error:', err);
     return NextResponse.json(
-      { error: 'Munkamenet ellenőrzése sikertelen' },
+      { error: 'auth.error.session_check_failed' },
       { status: 500 }
     );
   }
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
   // 3. Session invalid or expired
   if (!session) {
     return NextResponse.json(
-      { error: 'Érvénytelen vagy lejárt munkamenet' },
+      { error: 'auth.error.session_invalid' },
       { status: 401 }
     );
   }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { Globe, Check, RefreshCw } from 'lucide-react';
 
@@ -27,6 +28,7 @@ const PREVIEW_KEYS = [
 ];
 
 export default function LocalePage() {
+  const { t } = useTranslation();
   const [currentLocale, setCurrentLocale] = useState<string>('hu');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -82,7 +84,7 @@ export default function LocalePage() {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <DashboardSectionHeader title="Nyelv & Formátumok" subtitle="Nyelv beállítások" />
+        <DashboardSectionHeader title={t('admin.locale.title')} subtitle={t('admin.locale.subtitle')} />
         <div className="animate-pulse space-y-4 mt-6">
           <div className="h-32 bg-gray-800 rounded-xl" />
           <div className="h-48 bg-gray-800 rounded-xl" />
@@ -93,11 +95,11 @@ export default function LocalePage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <DashboardSectionHeader title="Nyelv & Formátumok" subtitle="Nyelv, dátum formátum beállítások" />
+      <DashboardSectionHeader title={t('admin.locale.title')} subtitle={t('admin.locale.subtitle_full')} />
 
       {/* Locale selector */}
       <div className="mt-6">
-        <h3 className="text-sm font-medium text-gray-400 mb-3">Rendszer nyelve</h3>
+        <h3 className="text-sm font-medium text-gray-400 mb-3">{t('admin.locale.system_language')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {LOCALES.map(locale => (
             <button
@@ -126,7 +128,7 @@ export default function LocalePage() {
       {/* Preview panel */}
       <div className="mt-8">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-medium text-gray-400">Előnézet</h3>
+          <h3 className="text-sm font-medium text-gray-400">{t('admin.locale.preview')}</h3>
           <button
             onClick={fetchLocale}
             className="p-1.5 hover:bg-gray-800 rounded-lg text-gray-500 hover:text-gray-300"
@@ -139,8 +141,8 @@ export default function LocalePage() {
           <table className="w-full text-sm">
             <thead className="bg-gray-950 text-gray-400 text-xs uppercase">
               <tr>
-                <th className="px-4 py-3 text-left">Kulcs</th>
-                <th className="px-4 py-3 text-left">Fordítás</th>
+                <th className="px-4 py-3 text-left">{t('admin.locale.col_key')}</th>
+                <th className="px-4 py-3 text-left">{t('admin.locale.col_translation')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800">
@@ -161,10 +163,10 @@ export default function LocalePage() {
           <Globe className="w-5 h-5 text-indigo-400 mt-0.5" />
           <div className="text-sm text-gray-400">
             <p className="mb-2">
-              A nyelv váltása az egész rendszerre vonatkozik. A változtatás után az oldal újratöltődik.
+              {t('admin.locale.language_note')}
             </p>
             <p>
-              Egyedi fordítások hozzáadásához használd a <code className="text-gray-300 bg-gray-800 px-1 rounded">core_translations</code> táblát.
+              {t('admin.locale.custom_translations_note')}
             </p>
           </div>
         </div>

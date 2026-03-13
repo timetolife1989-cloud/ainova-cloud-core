@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { Shield, Lock, Plus, Save, Trash2, AlertTriangle } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
@@ -32,6 +33,7 @@ interface RolesResponse {
 }
 
 export default function RolesPage() {
+  const { t } = useTranslation();
   const [data, setData] = useState<RolesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedRole, setSelectedRole] = useState<RoleInfo | null>(null);
@@ -144,7 +146,7 @@ export default function RolesPage() {
 
   const handleDelete = async () => {
     if (!selectedRole || selectedRole.isBuiltin) return;
-    if (!confirm(`Biztosan törölni szeretnéd a "${selectedRole.roleLabel}" szerepkört?`)) return;
+    if (!confirm(t('admin.roles.confirm_delete', { role: selectedRole.roleLabel }))) return;
 
     setSaving(true);
     setError(null);
@@ -183,7 +185,7 @@ export default function RolesPage() {
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <DashboardSectionHeader title="Szerepkörök & Jogok" subtitle="Szerepkörök kezelése, jogosultság mátrix" />
+        <DashboardSectionHeader title={t('admin.roles.title')} subtitle={t('admin.roles.subtitle')} />
         <div className="animate-pulse space-y-4 mt-6">
           <div className="h-64 bg-gray-800 rounded-xl" />
         </div>
@@ -193,12 +195,12 @@ export default function RolesPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <DashboardSectionHeader title="Szerepkörök & Jogok" subtitle="Szerepkörök kezelése, jogosultság mátrix" />
+      <DashboardSectionHeader title={t('admin.roles.title')} subtitle={t('admin.roles.subtitle')} />
 
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Role list */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-          <h3 className="text-sm font-medium text-gray-400 mb-3">Szerepkörök</h3>
+          <h3 className="text-sm font-medium text-gray-400 mb-3">{t('admin.roles.roles_heading')}</h3>
           <div className="space-y-2">
             {data?.roles.map(role => {
               const IconComp = (LucideIcons[role.icon as keyof typeof LucideIcons] ?? LucideIcons.User) as React.ComponentType<{ className?: string }>;
@@ -235,7 +237,7 @@ export default function RolesPage() {
             }`}
           >
             <Plus className="w-4 h-4" />
-            <span className="text-sm">Új szerepkör</span>
+            <span className="text-sm">{t('admin.roles.new_role')}</span>
           </button>
         </div>
 
@@ -246,7 +248,7 @@ export default function RolesPage() {
               <div className="space-y-4 mb-6">
                 {isCreating && (
                   <div>
-                    <label className="block text-xs font-medium text-gray-400 mb-1">Kód (egyedi azonosító)</label>
+                    <label className="block text-xs font-medium text-gray-400 mb-1">{t('admin.roles.code_label')}</label>
                     <input
                       type="text"
                       value={newRoleCode}
@@ -258,7 +260,7 @@ export default function RolesPage() {
                 )}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-400 mb-1">Megnevezés</label>
+                    <label className="block text-xs font-medium text-gray-400 mb-1">{t('admin.roles.name_label')}</label>
                     <input
                       type="text"
                       value={editLabel}
@@ -267,7 +269,7 @@ export default function RolesPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-400 mb-1">Prioritás</label>
+                    <label className="block text-xs font-medium text-gray-400 mb-1">{t('admin.roles.priority_label')}</label>
                     <input
                       type="number"
                       value={editPriority}
@@ -277,7 +279,7 @@ export default function RolesPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">Leírás</label>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">{t('admin.roles.description_label')}</label>
                   <input
                     type="text"
                     value={editDescription}
@@ -288,11 +290,11 @@ export default function RolesPage() {
               </div>
 
               <h4 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
-                <Shield className="w-4 h-4" /> Jogosultságok
+                <Shield className="w-4 h-4" /> {t('admin.roles.permissions_heading')}
               </h4>
 
               {selectedRole?.roleCode === 'admin' && (
-                <p className="text-xs text-yellow-500 mb-3">Az admin szerepkör automatikusan minden jogosultsággal rendelkezik.</p>
+                <p className="text-xs text-yellow-500 mb-3">{t('admin.roles.admin_has_all_perms')}</p>
               )}
 
               <div className="space-y-4 max-h-80 overflow-y-auto">
@@ -338,7 +340,7 @@ export default function RolesPage() {
                   className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
                 >
                   <Save className="w-4 h-4" />
-                  {saving ? 'Mentés...' : 'Mentés'}
+                  {saving ? t('common.saving') : t('common.save')}
                 </button>
                 {selectedRole && !selectedRole.isBuiltin && (
                   <button
@@ -347,7 +349,7 @@ export default function RolesPage() {
                     className="flex items-center gap-2 px-4 py-2 bg-red-900/50 hover:bg-red-900 text-red-300 rounded-lg text-sm font-medium disabled:opacity-50"
                   >
                     <Trash2 className="w-4 h-4" />
-                    Törlés
+                    {t('common.delete')}
                   </button>
                 )}
               </div>
@@ -355,7 +357,7 @@ export default function RolesPage() {
           ) : (
             <div className="text-center py-12 text-gray-500">
               <Shield className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p>Válassz egy szerepkört a szerkesztéshez</p>
+              <p>{t('admin.roles.select_role')}</p>
             </div>
           )}
         </div>

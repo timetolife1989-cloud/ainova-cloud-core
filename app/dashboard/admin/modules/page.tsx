@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Package } from 'lucide-react';
 import { ModuleToggleCard } from '@/components/admin/modules/ModuleToggleCard';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { ModuleDefinition } from '@/lib/modules/registry';
 
 interface ModulesResponse {
@@ -16,6 +17,7 @@ interface ModulesResponse {
 }
 
 export default function ModulesPage() {
+  const { t } = useTranslation();
   const [data, setData] = useState<ModulesResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -54,7 +56,7 @@ export default function ModulesPage() {
     const body = await res.json() as { ok?: boolean; activeIds?: string[]; error?: string };
 
     if (!res.ok || body.error) {
-      throw new Error(body.error ?? 'Hiba a modul kapcsolásakor');
+      throw new Error(body.error ?? t('admin.modules.error_toggle'));
     }
 
     // Update local state with server response

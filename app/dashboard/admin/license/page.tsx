@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { Key, Shield, Users, Calendar, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 
@@ -23,6 +24,7 @@ const TIER_CONFIG: Record<string, { label: string; color: string; border: string
 };
 
 export default function LicensePage() {
+  const { t } = useTranslation();
   const [license, setLicense] = useState<LicenseData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +32,7 @@ export default function LicensePage() {
   useEffect(() => {
     fetch('/api/admin/license')
       .then(res => {
-        if (!res.ok) throw new Error('Hiba a licenc adatok betöltésekor');
+        if (!res.ok) throw new Error(t('admin.license.error_loading'));
         return res.json() as Promise<LicenseData>;
       })
       .then(setLicense)
@@ -41,7 +43,7 @@ export default function LicensePage() {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <DashboardSectionHeader title="Licenc" subtitle="Csomag szint és engedélyezett modulok" />
+        <DashboardSectionHeader title={t('admin.license.title')} subtitle={t('admin.license.subtitle')} />
         <div className="animate-pulse space-y-4 mt-6">
           <div className="h-32 bg-gray-800 rounded-xl" />
           <div className="h-48 bg-gray-800 rounded-xl" />
@@ -53,10 +55,10 @@ export default function LicensePage() {
   if (error || !license) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <DashboardSectionHeader title="Licenc" subtitle="Csomag szint és engedélyezett modulok" />
+        <DashboardSectionHeader title={t('admin.license.title')} subtitle={t('admin.license.subtitle')} />
         <div className="mt-6 bg-red-900/30 border border-red-800 rounded-xl p-6 text-red-300">
           <AlertTriangle className="w-5 h-5 inline mr-2" />
-          {error ?? 'Ismeretlen hiba'}
+           {error ?? t('admin.license.unknown_error')}
         </div>
       </div>
     );
@@ -64,19 +66,19 @@ export default function LicensePage() {
 
   const tierCfg = TIER_CONFIG[license.tier] ?? TIER_CONFIG.basic;
   const modulesDisplay = license.modulesAllowed.includes('*')
-    ? ['Minden modul engedélyezve']
+    ? [t('admin.license.all_modules')]
     : license.modulesAllowed;
   const featuresDisplay = license.featuresAllowed.includes('*')
-    ? ['Minden feature engedélyezve']
+    ? [t('admin.license.all_features')]
     : license.featuresAllowed;
 
   const expiresFormatted = license.expiresAt
     ? new Date(license.expiresAt).toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' })
-    : 'Lifetime';
+    : t('admin.license.lifetime');
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <DashboardSectionHeader title="Licenc" subtitle="Csomag szint és engedélyezett modulok" />
+      <DashboardSectionHeader title={t('admin.license.title')} subtitle={t('admin.license.subtitle')} />
 
       <div className="mt-6 space-y-6">
         {/* Tier + Status kártya */}
@@ -91,7 +93,7 @@ export default function LicensePage() {
                   {tierCfg.label}
                 </span>
                 <p className="text-gray-400 text-sm mt-1">
-                  {license.customerName ?? 'Nincs megadva'}
+                   {license.customerName ?? t('admin.license.not_set')}
                 </p>
               </div>
             </div>
@@ -99,17 +101,17 @@ export default function LicensePage() {
               {license.isActive && !license.isExpired ? (
                 <div className="flex items-center gap-2 text-green-400">
                   <CheckCircle className="w-5 h-5" />
-                  <span className="font-medium">Aktív</span>
+                   <span className="font-medium">{t('admin.license.status_active')}</span>
                 </div>
               ) : license.isExpired ? (
                 <div className="flex items-center gap-2 text-red-400">
                   <XCircle className="w-5 h-5" />
-                  <span className="font-medium">Lejárt</span>
+                  <span className="font-medium">{t('admin.license.status_expired')}</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 text-yellow-400">
                   <AlertTriangle className="w-5 h-5" />
-                  <span className="font-medium">Inaktív</span>
+                  <span className="font-medium">{t('admin.license.status_inactive')}</span>
                 </div>
               )}
             </div>
@@ -121,17 +123,17 @@ export default function LicensePage() {
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
             <div className="flex items-center gap-3 mb-3">
               <Users className="w-5 h-5 text-blue-400" />
-              <h3 className="text-white font-medium">Max felhasználó</h3>
+              <h3 className="text-white font-medium">{t('admin.license.max_users')}</h3>
             </div>
             <p className="text-2xl font-bold text-white">
-              {license.maxUsers <= 0 ? 'Korlátlan' : license.maxUsers}
+              {license.maxUsers <= 0 ? t('admin.license.unlimited') : license.maxUsers}
             </p>
           </div>
 
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
             <div className="flex items-center gap-3 mb-3">
               <Calendar className="w-5 h-5 text-blue-400" />
-              <h3 className="text-white font-medium">Lejárat</h3>
+              <h3 className="text-white font-medium">{t('admin.license.expiry')}</h3>
             </div>
             <p className="text-2xl font-bold text-white">{expiresFormatted}</p>
           </div>
@@ -141,7 +143,7 @@ export default function LicensePage() {
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-5 h-5 text-blue-400" />
-            <h3 className="text-white font-medium">Engedélyezett modulok</h3>
+            <h3 className="text-white font-medium">{t('admin.license.allowed_modules')}</h3>
           </div>
           <div className="flex flex-wrap gap-2">
             {modulesDisplay.map((mod) => (
@@ -150,7 +152,7 @@ export default function LicensePage() {
               </span>
             ))}
             {modulesDisplay.length === 0 && (
-              <p className="text-gray-500 text-sm">Nincs engedélyezett modul</p>
+              <p className="text-gray-500 text-sm">{t('admin.license.no_modules')}</p>
             )}
           </div>
         </div>
@@ -160,7 +162,7 @@ export default function LicensePage() {
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
             <div className="flex items-center gap-3 mb-4">
               <Shield className="w-5 h-5 text-purple-400" />
-              <h3 className="text-white font-medium">Extra feature-ök</h3>
+              <h3 className="text-white font-medium">{t('admin.license.extra_features')}</h3>
             </div>
             <div className="flex flex-wrap gap-2">
               {featuresDisplay.map((feat) => (

@@ -51,7 +51,7 @@ export const HTTP_STATUS = {
 export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
   if (typeof error === 'string') return error;
-  return 'Ismeretlen hiba történt';
+  return 'error.unknown';
 }
 
 /**
@@ -95,16 +95,16 @@ export function apiSuccess<T>(
 // =====================================================
 
 export const ApiErrors = {
-  unauthorized:   () => apiError('Nincs bejelentkezve',          HTTP_STATUS.UNAUTHORIZED),
-  invalidSession: () => apiError('Érvénytelen munkamenet',       HTTP_STATUS.UNAUTHORIZED),
-  forbidden:      (message = 'Nincs jogosultság') => apiError(message, HTTP_STATUS.FORBIDDEN),
-  notFound:       (resource = 'Erőforrás') => apiError(`${resource} nem található`, HTTP_STATUS.NOT_FOUND),
+  unauthorized:   () => apiError('error.not_logged_in',          HTTP_STATUS.UNAUTHORIZED),
+  invalidSession: () => apiError('error.invalid_session',         HTTP_STATUS.UNAUTHORIZED),
+  forbidden:      (message = 'error.no_permission') => apiError(message, HTTP_STATUS.FORBIDDEN),
+  notFound:       (resource = 'resource') => apiError(`error.not_found`, HTTP_STATUS.NOT_FOUND),
   badRequest:     (message: string) => apiError(message, HTTP_STATUS.BAD_REQUEST),
   conflict:       (message: string) => apiError(message, HTTP_STATUS.CONFLICT),
   internal: (error: unknown, context?: string) => {
     const message = getErrorMessage(error);
     console.error(`[API Error]${context ? ` ${context}:` : ''}`, error);
-    return apiError('Szerver hiba történt', HTTP_STATUS.INTERNAL_ERROR, { details: message });
+    return apiError('error.server_error', HTTP_STATUS.INTERNAL_ERROR, { details: message });
   },
 } as const;
 
@@ -178,7 +178,7 @@ export function checkCsrf(
   if (!validateCsrfToken(cookieToken, headerToken)) {
     return {
       valid: false,
-      response: apiError('Érvénytelen CSRF token', HTTP_STATUS.FORBIDDEN, { code: 'CSRF_INVALID' }),
+      response: apiError('error.invalid_csrf', HTTP_STATUS.FORBIDDEN, { code: 'CSRF_INVALID' }),
     };
   }
 

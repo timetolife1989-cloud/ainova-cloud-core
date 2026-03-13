@@ -89,7 +89,7 @@ async function ensurePermissionsExist(moduleId: string, permissions: string[]): 
          VALUES (@p0, @p1, @p2, 0)`,
         [
           { name: 'p0', type: 'nvarchar', value: perm },
-          { name: 'p1', type: 'nvarchar', value: `${moduleId} modul jogosultság` },
+          { name: 'p1', type: 'nvarchar', value: `${moduleId} module permission` },
           { name: 'p2', type: 'nvarchar', value: moduleId },
         ]
       );
@@ -108,7 +108,7 @@ export function getAllModules(): ModuleDefinition[] {
 export const ADMIN_MODULE: ModuleDefinition = {
   id: 'admin',
   name: 'Admin Panel',
-  description: 'Felhasználók, modulok, beállítások',
+  description: 'admin.registry.admin_desc',
   icon: 'Settings',
   href: '/dashboard/admin',
   color: 'bg-slate-700',

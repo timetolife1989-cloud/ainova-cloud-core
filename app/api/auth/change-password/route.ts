@@ -21,12 +21,12 @@ import { BCRYPT_ROUNDS } from '@/lib/constants';
 const ChangePasswordSchema = z.object({
   currentPassword: z
     .string()
-    .min(1, 'A jelenlegi jelszó nem lehet üres')
-    .max(500, 'A jelszó túl hosszú'),
+    .min(1, 'auth.cp_err_current_required')
+    .max(500, 'auth.error.password_too_long'),
   newPassword: z
     .string()
-    .min(8, 'Az új jelszónak legalább 8 karakter hosszúnak kell lennie')
-    .max(500, 'A jelszó túl hosszú'),
+    .min(8, 'auth.cp_err_min_length')
+    .max(500, 'auth.error.password_too_long'),
 });
 
 // -----------------------------------------------------------------------
@@ -50,14 +50,14 @@ export async function POST(request: NextRequest) {
     rawBody = await request.json();
   } catch {
     return NextResponse.json(
-      { error: 'Érvénytelen JSON formátum' },
+      { error: 'auth.error.invalid_json' },
       { status: 400 }
     );
   }
 
   const parsed = ChangePasswordSchema.safeParse(rawBody);
   if (!parsed.success) {
-    const firstError = parsed.error.issues[0]?.message ?? 'Érvénytelen bemenet';
+    const firstError = parsed.error.issues[0]?.message ?? 'auth.error.invalid_input';
     return NextResponse.json({ error: firstError }, { status: 400 });
   }
 
@@ -70,14 +70,14 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error('[API] /auth/change-password getPasswordHash error:', err);
     return NextResponse.json(
-      { error: 'Szerver hiba történt' },
+      { error: 'auth.error.server_error' },
       { status: 500 }
     );
   }
 
   if (!currentHash) {
     return NextResponse.json(
-      { error: 'Felhasználó nem található' },
+      { error: 'auth.error.user_not_found' },
       { status: 404 }
     );
   }
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
   const isValid = await bcrypt.compare(currentPassword, currentHash);
   if (!isValid) {
     return NextResponse.json(
-      { error: 'A jelenlegi jelszó helytelen' },
+      { error: 'auth.error.invalid_current_password' },
       { status: 401 }
     );
   }
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error('[API] /auth/change-password updatePasswordHash error:', err);
     return NextResponse.json(
-      { error: 'Szerver hiba történt' },
+      { error: 'auth.error.server_error' },
       { status: 500 }
     );
   }

@@ -20,7 +20,7 @@ async function getAdminMenuItems(): Promise<AdminMenuItem[]> {
     { title: await t('admin.settings'),             description: await t('admin.settings_desc'),        icon: 'Palette',        href: '/dashboard/admin/settings',       order: 40 },
     { title: await t('admin.locale'),               description: await t('admin.locale_desc'),          icon: 'Globe',          href: '/dashboard/admin/locale',         order: 50 },
     { title: await t('admin.units'),                description: await t('admin.units_desc'),           icon: 'Ruler',          href: '/dashboard/admin/units',          order: 60 },
-    { title: 'Import Konfigurációk',                description: 'Excel/CSV import beállítások, oszlop hozzárendelés', icon: 'FileSpreadsheet', href: '/dashboard/admin/import-configs', order: 70 },
+    { title: await t('admin.import.title'),              description: await t('admin.import.desc'), icon: 'FileSpreadsheet', href: '/dashboard/admin/import-configs', order: 70 },
     { title: await t('admin.diagnostics'),          description: await t('admin.diagnostics_desc'),      icon: 'Activity',       href: '/dashboard/admin/diagnostics',    order: 80 },
     { title: await t('admin.audit_log'),            description: await t('admin.audit_log_desc'),       icon: 'FileText',       href: '/dashboard/admin/audit-log',      order: 90 },
     { title: await t('admin.license'),              description: await t('admin.license_desc'),         icon: 'Key',            href: '/dashboard/admin/license',        order: 100 },
@@ -34,11 +34,14 @@ export default async function AdminPage() {
   
   const coreAdminMenu = await getAdminMenuItems();
   
+  const settingsSuffix = await t('admin.modules.settings_suffix');
+  const configSuffix = await t('admin.modules.config_suffix');
+  
   const moduleAdminItems: AdminMenuItem[] = allModules
     .filter(m => activeIds.includes(m.id) && m.adminSettings && m.adminSettings.length > 0)
     .map((m, i) => ({
-      title: `${m.name} Beállítások`,
-      description: `${m.name} modul konfiguráció`,
+      title: `${m.name} ${settingsSuffix}`,
+      description: `${m.name} ${configSuffix}`,
       icon: m.icon,
       href: `/dashboard/admin/modules/${m.id}`,
       order: 200 + i,

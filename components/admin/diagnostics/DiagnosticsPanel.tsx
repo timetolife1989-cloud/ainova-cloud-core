@@ -14,6 +14,7 @@ import {
   Server,
   Cloud,
 } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -72,19 +73,19 @@ function StatCard({ icon, label, children }: StatCardProps) {
 
 // ── DB status badge ───────────────────────────────────────────────────────────
 
-function DbStatusBadge({ status, responseMs }: { status: 'connected' | 'error'; responseMs: number | null }) {
+function DbStatusBadge({ status, responseMs, connectedLabel, errorLabel }: { status: 'connected' | 'error'; responseMs: number | null; connectedLabel: string; errorLabel: string }) {
   if (status === 'connected') {
     return (
       <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
         <CheckCircle className="w-4 h-4" />
-        Kapcsolódva{responseMs !== null ? ` (${responseMs} ms)` : ''}
+        {connectedLabel}{responseMs !== null ? ` (${responseMs} ms)` : ''}
       </span>
     );
   }
   return (
     <span className="flex items-center gap-1.5 text-red-400 font-medium">
       <XCircle className="w-4 h-4" />
-      Hiba
+      {errorLabel}
     </span>
   );
 }
@@ -106,6 +107,7 @@ function SkeletonCard() {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function DiagnosticsPanel() {
+  const { t, locale } = useTranslation();
   const [data, setData]       = useState<DiagnosticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState<string | null>(null);
@@ -119,7 +121,7 @@ export function DiagnosticsPanel() {
       const json = await res.json() as DiagnosticsData;
       setData(json);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ismeretlen hiba');
+      setError(err instanceof Error ? err.message : t('admin.license.unknown_error'));
     } finally {
       setLoading(false);
     }
@@ -141,8 +143,8 @@ export function DiagnosticsPanel() {
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <Activity className="w-4 h-4" />
           {data
-            ? <>Utolsó ellenőrzés: {new Date(data.timestamp).toLocaleTimeString('hu-HU')}</>
-            : loading ? 'Betöltés…' : 'Nincs adat'}
+            ? <>Utolsó ellenőrzés: {new Date(data.timestamp).toLocaleTimeString(locale)}</>
+            : loading ? t('common.loading') : t('common.no_data')}
         </div>
         <button
           onClick={() => void fetchData()}
@@ -150,7 +152,7 @@ export function DiagnosticsPanel() {
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700 text-sm text-gray-300 hover:bg-gray-700 disabled:opacity-50 transition-colors"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          Frissítés
+          {t('common.refresh')}
         </button>
       </div>
 
@@ -158,7 +160,7 @@ export function DiagnosticsPanel() {
       {error && (
         <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-950/60 border border-red-700 text-red-300 text-sm">
           <XCircle className="w-4 h-4 flex-shrink-0" />
-          Nem sikerült betölteni a diagnosztikai adatokat: {error}
+          {t('admin.diag.error_loading')}: {error}
         </div>
       )}
 
@@ -170,34 +172,34 @@ export function DiagnosticsPanel() {
       ) : data ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* DB Connection */}
-          <StatCard icon={<Database className="w-5 h-5" />} label="Adatbázis kapcsolat">
-            <DbStatusBadge status={data.db.status} responseMs={data.db.responseMs} />
+          <StatCard icon={<Database className="w-5 h-5" />} label={t('admin.diag.db_connection')}>
+            <DbStatusBadge status={data.db.status} responseMs={data.db.responseMs} connectedLabel={t('admin.diag.db_connected')} errorLabel={t('admin.diag.db_error')} />
           </StatCard>
 
           {/* Users */}
-          <StatCard icon={<Users className="w-5 h-5" />} label="Felhasználók">
+          <StatCard icon={<Users className="w-5 h-5" />} label={t('admin.diag.users_label')}>
             <span className="font-semibold text-indigo-300">{data.users.active}</span>
-            <span className="text-gray-400"> aktív / </span>
+            <span className="text-gray-400"> {t('admin.diag.active_of_total')} / </span>
             <span>{data.users.total}</span>
-            <span className="text-gray-400"> összes</span>
+            <span className="text-gray-400"> {t('admin.diag.of_total')}</span>
           </StatCard>
 
           {/* Active sessions */}
-          <StatCard icon={<Clock className="w-5 h-5" />} label="Aktív munkamenetek">
+          <StatCard icon={<Clock className="w-5 h-5" />} label={t('admin.diag.active_sessions')}>
             <span className="font-semibold">{data.sessions.active}</span>
-            <span className="text-gray-400 ml-1">munkamenet</span>
+            <span className="text-gray-400 ml-1">{t('admin.diag.sessions_label')}</span>
           </StatCard>
 
           {/* Settings */}
-          <StatCard icon={<Settings className="w-5 h-5" />} label="Beállítások">
+          <StatCard icon={<Settings className="w-5 h-5" />} label={t('admin.diag.settings_label')}>
             <span className="font-semibold">{data.settings.count}</span>
-            <span className="text-gray-400 ml-1">bejegyzés</span>
+            <span className="text-gray-400 ml-1">{t('admin.diag.entries')}</span>
           </StatCard>
 
           {/* Active modules */}
-          <StatCard icon={<Layers className="w-5 h-5" />} label="Aktív modulok">
+          <StatCard icon={<Layers className="w-5 h-5" />} label={t('admin.diag.active_modules')}>
             {data.modules.count === 0 ? (
-              <span className="text-gray-500">Nincs aktív modul</span>
+              <span className="text-gray-500">{t('admin.diag.no_active_module')}</span>
             ) : (
               <div className="flex flex-wrap gap-1 mt-1">
                 {data.modules.active.map(id => (
@@ -216,7 +218,7 @@ export function DiagnosticsPanel() {
           <StatCard icon={<Server className="w-5 h-5" />} label="Node.js">
             <div className="space-y-0.5">
               <div>
-                <span className="text-gray-400">Verzió: </span>
+                <span className="text-gray-400">{t('admin.diag.version')}: </span>
                 <span className="font-mono">{data.node.version}</span>
               </div>
               <div>

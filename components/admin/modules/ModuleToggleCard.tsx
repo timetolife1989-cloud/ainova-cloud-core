@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import * as LucideIcons from 'lucide-react';
 import type { ModuleDefinition } from '@/lib/modules/registry';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface ModuleToggleCardProps {
   module: ModuleDefinition;
@@ -21,6 +22,7 @@ export function ModuleToggleCard({
   onToggle,
   licensedModules,
 }: ModuleToggleCardProps) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,11 +43,11 @@ export function ModuleToggleCard({
   const isBlocked  = isActive ? !canDisable : !canEnable;
 
   const blockReason = isLicenseLocked
-    ? 'Licenc szükséges'
+    ? t('admin.modules.license_required')
     : isActive && dependents.length > 0
-      ? `Aktív függő modulok: ${dependents.map(m => m.name).join(', ')}`
+      ? t('admin.modules.active_dependents', { deps: dependents.map(m => m.name).join(', ') })
       : !isActive && missingDeps.length > 0
-        ? `Szükséges modulok: ${missingDeps.map(id => allModules.find(m => m.id === id)?.name ?? id).join(', ')}`
+        ? t('admin.modules.required_modules', { deps: missingDeps.map(id => allModules.find(m => m.id === id)?.name ?? id).join(', ') })
         : null;
 
   const handleToggle = async () => {
@@ -55,7 +57,7 @@ export function ModuleToggleCard({
     try {
       await onToggle(module.id, !isActive);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Hiba történt');
+      setError(e instanceof Error ? e.message : t('common.error_occurred'));
     } finally {
       setLoading(false);
     }

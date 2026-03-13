@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { Ruler, Plus, Pencil, Trash2, X, Lock, AlertTriangle } from 'lucide-react';
 
@@ -15,19 +16,24 @@ interface UnitInfo {
   isActive: boolean;
 }
 
-const UNIT_TYPES = [
-  { value: 'time', label: 'Idő' },
-  { value: 'count', label: 'Mennyiség' },
-  { value: 'weight', label: 'Súly' },
-  { value: 'currency', label: 'Pénznem' },
-  { value: 'ratio', label: 'Arány' },
-  { value: 'length', label: 'Hossz' },
-  { value: 'volume', label: 'Térfogat' },
-  { value: 'distance', label: 'Távolság' },
-  { value: 'custom', label: 'Egyéb' },
-];
+const UNIT_TYPE_KEYS: Record<string, string> = {
+  time: 'admin.units.type_time',
+  count: 'admin.units.type_quantity',
+  weight: 'admin.units.type_weight',
+  currency: 'admin.units.type_currency',
+  ratio: 'admin.units.type_ratio',
+  length: 'admin.units.type_length',
+  volume: 'admin.units.type_volume',
+  distance: 'admin.units.type_distance',
+  custom: 'admin.units.type_other',
+};
 
 export default function UnitsPage() {
+  const { t } = useTranslation();
+  const UNIT_TYPES = useMemo(() =>
+    Object.entries(UNIT_TYPE_KEYS).map(([value, key]) => ({ value, label: t(key) })),
+    [t]
+  );
   const [units, setUnits] = useState<UnitInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('');
@@ -103,7 +109,7 @@ export default function UnitsPage() {
           }),
         });
         const body = await res.json() as { ok?: boolean; error?: string };
-        if (!res.ok) throw new Error(body.error ?? 'Hiba');
+        if (!res.ok) throw new Error(body.error ?? t('common.error'));
       } else {
         const res = await fetch('/api/admin/units', {
           method: 'POST',
@@ -117,13 +123,13 @@ export default function UnitsPage() {
           }),
         });
         const body = await res.json() as { ok?: boolean; error?: string };
-        if (!res.ok) throw new Error(body.error ?? 'Hiba');
+        if (!res.ok) throw new Error(body.error ?? t('common.error'));
       }
 
       setModalOpen(false);
       await fetchUnits();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Hiba történt');
+      setError(e instanceof Error ? e.message : t('common.error_occurred'));
     } finally {
       setSaving(false);
     }
@@ -131,7 +137,7 @@ export default function UnitsPage() {
 
   const handleDelete = async (unit: UnitInfo) => {
     if (unit.isBuiltin) return;
-    if (!confirm(`Biztosan törölni szeretnéd a "${unit.unitLabel}" mértékegységet?`)) return;
+    if (!confirm(t('admin.units.confirm_delete', { unit: unit.unitLabel }))) return;
 
     try {
       const res = await fetch('/api/admin/units', {
@@ -140,10 +146,10 @@ export default function UnitsPage() {
         body: JSON.stringify({ id: unit.id }),
       });
       const body = await res.json() as { ok?: boolean; error?: string };
-      if (!res.ok) throw new Error(body.error ?? 'Hiba');
+      if (!res.ok) throw new Error(body.error ?? t('common.error'));
       await fetchUnits();
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Hiba történt');
+      alert(e instanceof Error ? e.message : t('common.error_occurred'));
     }
   };
 
@@ -154,7 +160,7 @@ export default function UnitsPage() {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <DashboardSectionHeader title="Mértékegységek" subtitle="Mértékegységek kezelése" />
+        <DashboardSectionHeader title={t('admin.units.title')} subtitle={t('admin.units.subtitle')} />
         <div className="animate-pulse space-y-3 mt-6">
           {[1, 2, 3].map(i => <div key={i} className="h-12 bg-gray-800 rounded-lg" />)}
         </div>
@@ -164,7 +170,7 @@ export default function UnitsPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <DashboardSectionHeader title="Mértékegységek" subtitle="Mértékegységek kezelése (perc, darab, kg, egyedi)" />
+      <DashboardSectionHeader title={t('admin.units.title')} subtitle={t('admin.units.subtitle_full')} />
 
       <div className="mt-6 flex items-center justify-between gap-4 flex-wrap">
         <div className="flex gap-2 flex-wrap">
@@ -174,7 +180,7 @@ export default function UnitsPage() {
               filter === '' ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-600'
             }`}
           >
-            Összes
+            {t('admin.units.tab_all')}
           </button>
           {UNIT_TYPES.map(t => (
             <button
@@ -192,7 +198,7 @@ export default function UnitsPage() {
           onClick={openCreate}
           className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium"
         >
-          <Plus className="w-4 h-4" /> Új mértékegység
+          <Plus className="w-4 h-4" /> {t('admin.units.new_unit')}
         </button>
       </div>
 
@@ -200,12 +206,12 @@ export default function UnitsPage() {
         <table className="w-full text-sm">
           <thead className="bg-gray-950 text-gray-400 text-xs uppercase">
             <tr>
-              <th className="px-4 py-3 text-left">Kód</th>
-              <th className="px-4 py-3 text-left">Név</th>
-              <th className="px-4 py-3 text-left">Típus</th>
-              <th className="px-4 py-3 text-center">Szimbólum</th>
-              <th className="px-4 py-3 text-center">Tizedes</th>
-              <th className="px-4 py-3 text-center">Műveletek</th>
+              <th className="px-4 py-3 text-left">{t('admin.units.th_code')}</th>
+              <th className="px-4 py-3 text-left">{t('admin.units.th_name')}</th>
+              <th className="px-4 py-3 text-left">{t('admin.units.th_type')}</th>
+              <th className="px-4 py-3 text-center">{t('admin.units.th_symbol')}</th>
+              <th className="px-4 py-3 text-center">{t('admin.units.th_decimals')}</th>
+              <th className="px-4 py-3 text-center">{t('admin.units.th_actions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
@@ -219,13 +225,13 @@ export default function UnitsPage() {
                 <td className="px-4 py-3 text-center">
                   <div className="flex items-center justify-center gap-2">
                     {unit.isBuiltin ? (
-                      <span title="Beépített"><Lock className="w-4 h-4 text-gray-600" /></span>
+                      <span title={t('common.built_in')}><Lock className="w-4 h-4 text-gray-600" /></span>
                     ) : (
                       <>
-                        <button onClick={() => openEdit(unit)} className="p-1 hover:bg-gray-700 rounded" title="Szerkesztés">
+                        <button onClick={() => openEdit(unit)} className="p-1 hover:bg-gray-700 rounded" title={t('common.edit')}>
                           <Pencil className="w-4 h-4 text-gray-400" />
                         </button>
-                        <button onClick={() => handleDelete(unit)} className="p-1 hover:bg-gray-700 rounded" title="Törlés">
+                        <button onClick={() => handleDelete(unit)} className="p-1 hover:bg-gray-700 rounded" title={t('common.delete')}>
                           <Trash2 className="w-4 h-4 text-red-400" />
                         </button>
                       </>
@@ -238,7 +244,7 @@ export default function UnitsPage() {
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                   <Ruler className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                  Nincs találat
+                  {t('common.no_results')}
                 </td>
               </tr>
             )}
@@ -252,7 +258,7 @@ export default function UnitsPage() {
           <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-white">
-                {editingUnit ? 'Mértékegység szerkesztése' : 'Új mértékegység'}
+                {editingUnit ? t('admin.units.edit_unit') : t('admin.units.new_unit')}
               </h3>
               <button onClick={() => setModalOpen(false)} className="p-1 hover:bg-gray-800 rounded">
                 <X className="w-5 h-5 text-gray-400" />
@@ -261,7 +267,7 @@ export default function UnitsPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Kód</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1">{t('admin.units.label_code')}</label>
                 <input
                   type="text"
                   value={formCode}
@@ -272,7 +278,7 @@ export default function UnitsPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Név</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1">{t('admin.units.label_name')}</label>
                 <input
                   type="text"
                   value={formLabel}
@@ -282,7 +288,7 @@ export default function UnitsPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Típus</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1">{t('admin.units.label_type')}</label>
                 <select
                   value={formType}
                   onChange={e => setFormType(e.target.value)}
@@ -296,7 +302,7 @@ export default function UnitsPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">Szimbólum</label>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">{t('admin.units.label_symbol')}</label>
                   <input
                     type="text"
                     value={formSymbol}
@@ -306,7 +312,7 @@ export default function UnitsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">Tizedesek</label>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">{t('admin.units.label_decimals')}</label>
                   <input
                     type="number"
                     value={formDecimals}
@@ -330,14 +336,14 @@ export default function UnitsPage() {
                 onClick={() => setModalOpen(false)}
                 className="px-4 py-2 text-gray-400 hover:text-gray-300 text-sm"
               >
-                Mégse
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving || !formCode || !formLabel}
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
               >
-                {saving ? 'Mentés...' : 'Mentés'}
+                {saving ? t('common.saving') : t('common.save')}
               </button>
             </div>
           </div>
