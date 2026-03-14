@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getAuth } from '@/lib/auth';
+import { getCachedSession } from '@/lib/auth/cached-session';
 import { getActiveModules } from '@/lib/modules/registry';
 import { MenuTile } from '@/components/core/MenuTile';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
@@ -13,7 +13,7 @@ export default async function DashboardPage() {
   const sessionId = cookieStore.get('sessionId')?.value;
   if (!sessionId) redirect('/login');
 
-  const session = await getAuth().validateSession(sessionId);
+  const session = await getCachedSession(sessionId);
   if (!session) redirect('/login');
 
   const modules = await getActiveModules(session.role);

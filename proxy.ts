@@ -175,6 +175,12 @@ export function proxy(request: NextRequest) {
       // Redirect bots away from authenticated areas
       return NextResponse.redirect(new URL('/', request.url));
     }
+
+    // Edge auth check: redirect immediately if no session cookie
+    const sessionId = request.cookies.get('sessionId')?.value;
+    if (!sessionId) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
   }
 
   return NextResponse.next();

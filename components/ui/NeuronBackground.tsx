@@ -51,6 +51,16 @@ function pickFrom(arr: [number, number, number][]): [number, number, number] {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+/** Check if OffscreenCanvas + Worker rendering is supported */
+function supportsOffscreenCanvas(): boolean {
+  try {
+    return typeof OffscreenCanvas !== 'undefined' &&
+      typeof HTMLCanvasElement.prototype.transferControlToOffscreen === 'function';
+  } catch {
+    return false;
+  }
+}
+
 export function NeuronBackground({
   nodeCount = 80,
   connectionDistance = 200,
@@ -62,13 +72,14 @@ export function NeuronBackground({
   const rafRef = useRef<number>(0);
   const sizeRef = useRef({ w: 0, h: 0 });
   const timeRef = useRef(0);
+  const workerRef = useRef<Worker | null>(null);
+  const offscreenRef = useRef(false);
 
   const initNodes = useCallback((w: number, h: number) => {
     const nodes: Node[] = [];
     const now = performance.now();
 
     for (let i = 0; i < nodeCount; i++) {
-      // 30% deep, 40% mid, 30% front
       const layerRoll = Math.random();
       const layer = layerRoll < 0.3 ? 0 : layerRoll < 0.7 ? 1 : 2;
 
@@ -99,23 +110,66 @@ export function NeuronBackground({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    // Try OffscreenCanvas + Worker path
+    if (supportsOffscreenCanvas()) {
+      try {
+        const offscreen = canvas.transferControlToOffscreen();
+        const worker = new Worker('/neuron-worker.js');
+        worker.postMessage({
+          type: 'init',
+          canvas: offscreen,
+          nodeCount,
+          connectionDistance,
+          width: w,
+          height: h,
+          dpr,
+        }, [offscreen]);
+
+        workerRef.current = worker;
+        offscreenRef.current = true;
+
+        function onResize() {
+          const nw = window.innerWidth;
+          const nh = window.innerHeight;
+          const ndpr = Math.min(window.devicePixelRatio || 1, 2);
+          worker.postMessage({ type: 'resize', width: nw, height: nh, dpr: ndpr });
+        }
+
+        window.addEventListener('resize', onResize);
+
+        return () => {
+          worker.postMessage({ type: 'stop' });
+          worker.terminate();
+          window.removeEventListener('resize', onResize);
+        };
+      } catch {
+        // Fallback to main-thread rendering
+      }
+    }
+
+    // ── Main-thread fallback ──
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
     function resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      canvas!.width = w * dpr;
-      canvas!.height = h * dpr;
-      canvas!.style.width = `${w}px`;
-      canvas!.style.height = `${h}px`;
-      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const rdpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rw = window.innerWidth;
+      const rh = window.innerHeight;
+      canvas!.width = rw * rdpr;
+      canvas!.height = rh * rdpr;
+      canvas!.style.width = `${rw}px`;
+      canvas!.style.height = `${rh}px`;
+      ctx!.setTransform(rdpr, 0, 0, rdpr, 0, 0);
 
       if (sizeRef.current.w === 0) {
-        initNodes(w, h);
+        initNodes(rw, rh);
       }
-      sizeRef.current = { w, h };
+      sizeRef.current = { w: rw, h: rh };
     }
 
     resize();

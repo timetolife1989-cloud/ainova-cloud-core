@@ -1,8 +1,9 @@
 // Ainova Cloud Intelligence — Service Worker (PWA)
-const CACHE_NAME = 'ainova-v2';
+const CACHE_NAME = 'ainova-v3';
 const STATIC_ASSETS = [
   '/manifest.json',
   '/login',
+  '/offline.html',
 ];
 
 self.addEventListener('install', (event) => {
@@ -25,12 +26,33 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET, API calls, SSE, and dashboard pages (must be fresh for locale)
+  // Skip non-GET, API calls, SSE
   if (request.method !== 'GET') return;
   if (url.pathname.startsWith('/api/')) return;
-  if (url.pathname.startsWith('/dashboard')) return;
 
-  // Stale-while-revalidate for pages
+  // Cache-first for static assets (immutable hashed files)
+  if (url.pathname.startsWith('/_next/static/') || url.pathname.match(/\.(js|css|woff2?|ttf|svg|png|ico|webp)$/)) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(async (cache) => {
+        const cached = await cache.match(request);
+        if (cached) return cached;
+        const response = await fetch(request);
+        if (response.ok) cache.put(request, response.clone());
+        return response;
+      }).catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // Dashboard pages — always network-first, offline fallback
+  if (url.pathname.startsWith('/dashboard')) {
+    event.respondWith(
+      fetch(request).catch(() => caches.match('/offline.html'))
+    );
+    return;
+  }
+
+  // Other pages — stale-while-revalidate
   event.respondWith(
     caches.open(CACHE_NAME).then(async (cache) => {
       const cached = await cache.match(request);
@@ -41,7 +63,7 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(() => cached);
+        .catch(() => cached || caches.match('/offline.html'));
 
       return cached || fetchPromise;
     })

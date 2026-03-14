@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getAuth } from '@/lib/auth';
+import { getCachedSession } from '@/lib/auth/cached-session';
 import { getLocale, getTranslationsForLocale } from '@/lib/i18n';
 import { HudFrame } from '@/components/core/HudFrame';
 import { LazyCommandPalette } from '@/components/core/LazyCommandPalette';
@@ -22,7 +22,7 @@ export default async function DashboardLayout({
     redirect('/login');
   }
 
-  const session = await getAuth().validateSession(sessionId);
+  const session = await getCachedSession(sessionId);
   if (!session) {
     redirect('/login');
   }
