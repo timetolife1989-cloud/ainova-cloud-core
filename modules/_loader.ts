@@ -16,6 +16,8 @@ import '@/modules/tracking/manifest';
 import '@/modules/fleet/manifest';
 import '@/modules/file-import/manifest';
 import '@/modules/reports/manifest';
+import '@/modules/purchasing/manifest';
+import '@/modules/pos/manifest';
 
 // === PROFESSIONAL csomag ===
 import '@/modules/performance/manifest';
