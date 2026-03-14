@@ -134,8 +134,15 @@ function convertSqlSyntax(sqlStr: string): string {
   s = s.replace(/OFFSET\s+(\d+)\s+ROWS\s+FETCH\s+NEXT\s+(\d+)\s+ROWS\s+ONLY/gi,
     (_match, offset, limit) => `LIMIT ${limit} OFFSET ${offset}`);
 
-  // OUTPUT INSERTED.id → RETURNING id
-  s = s.replace(/OUTPUT\s+INSERTED\.(\w+)/gi, 'RETURNING $1');
+  // OUTPUT INSERTED.col → move RETURNING col to end of statement
+  // MSSQL: INSERT INTO t (...) OUTPUT INSERTED.id VALUES (...)
+  // PG:    INSERT INTO t (...) VALUES (...) RETURNING id
+  const outputMatch = s.match(/OUTPUT\s+INSERTED\.(\w+)/i);
+  if (outputMatch) {
+    const returningCol = outputMatch[1];
+    s = s.replace(/\s*OUTPUT\s+INSERTED\.\w+\s*/gi, ' ');
+    s = s.trimEnd().replace(/;?\s*$/, '') + ` RETURNING ${returningCol}`;
+  }
 
   // IF NOT EXISTS (SELECT 1 FROM table WHERE ...) INSERT INTO table (...) VALUES (...)
   // → INSERT INTO table (...) VALUES (...) ON CONFLICT DO NOTHING

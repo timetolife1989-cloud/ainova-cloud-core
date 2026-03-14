@@ -5,6 +5,7 @@ import { getAllModules, getActiveModuleIds, validateModuleToggle } from '@/lib/m
 import { setSetting } from '@/lib/settings';
 import { getLicense, isModuleAllowed } from '@/lib/license';
 import { z } from 'zod';
+import '@/modules/_loader';
 
 // GET /api/admin/modules — returns all registered modules + which are active
 export async function GET(request: NextRequest) {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkSession } from '@/lib/api-utils';
 import { isModuleAllowed } from '@/lib/license';
 import { getActiveModuleIds } from '@/lib/modules/registry';
+import '@/modules/_loader';
 
 interface Props {
   params: Promise<{ moduleId: string; path: string[] }>;
@@ -71,6 +72,17 @@ async function handleModuleRequest(
         } catch {
           // continue to fallback
         }
+      }
+    }
+
+    // Strategy 3: numeric segment + sub-path (e.g. path=['1','pdf'] → [id]/pdf/route)
+    if (!handler && path.length >= 2 && /^\d+$/.test(path[0])) {
+      const restPath = path.slice(1).join('/');
+      try {
+        handler = await import(`@/modules/${moduleId}/api/[id]/${restPath}/route`);
+        routeParams = { id: path[0] };
+      } catch {
+        // continue to fallback
       }
     }
 
