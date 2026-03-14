@@ -23,6 +23,7 @@ import '@/modules/pos/manifest';
 import '@/modules/recipes/manifest';
 import '@/modules/appointments/manifest';
 import '@/modules/projects/manifest';
+import '@/modules/e-commerce/manifest';
 
 // === PROFESSIONAL csomag ===
 import '@/modules/crm/manifest';
@@ -33,6 +34,7 @@ import '@/modules/delivery/manifest';
 import '@/modules/inventory/manifest';
 import '@/modules/invoicing/manifest';
 import '@/modules/sap-import/manifest';
+import '@/modules/api-gateway/manifest';
 
 // === ENTERPRISE csomag ===
 import '@/modules/oee/manifest';
