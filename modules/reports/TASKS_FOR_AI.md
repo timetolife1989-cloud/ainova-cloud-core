@@ -14,8 +14,8 @@
 ## Még hátralévő feladatok
 
 ### P1 — i18n & Lokalizáció
-- [ ] Frontend: Chart típus nevek lokalizálása (`bar`, `line`, `pie`, `area`)
-- [ ] Frontend: Form label-ek i18n kulcsokra cserélése
+- [x] Frontend: DashboardPage i18n konvertálva (hu/en/de)
+- [ ] Frontend: Chart típus nevek lokalizálása (részleges)
 
 ### P2 — Funkció bővítés
 - [ ] Backend: Riport adat lekérdezés endpoint (source_table + config alapján dinamikus query)

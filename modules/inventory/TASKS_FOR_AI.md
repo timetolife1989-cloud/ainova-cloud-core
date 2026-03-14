@@ -14,9 +14,8 @@
 ## Még hátralévő feladatok
 
 ### P1 — i18n & Lokalizáció
-- [ ] Frontend: Kategória nevek lokalizálása
-- [ ] Frontend: Mozgás típus nevek lokalizálása (`in`, `out`)
-- [ ] Frontend: Form label-ek i18n kulcsokra cserélése
+- [x] Frontend: DashboardPage i18n konvertálva (hu/en/de)
+- [ ] Frontend: Kategória nevek lokalizálása (részleges)
 
 ### P2 — Funkció bővítés
 - [ ] Backend: Mozgás (movement) CRUD API endpoint (`/api/modules/inventory/movements`)

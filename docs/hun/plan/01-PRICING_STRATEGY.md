@@ -11,23 +11,23 @@
 
 ## 0. ÁRKÉPZÉSI AUDIT — JELENLEGI KAOTIKUS ÁLLAPOT
 
-### 🔴 PROBLÉMA: 4 EGYMÁSNAK ELLENTMONDÓ ÁRJEGYZÉK a kódbázisban
+### ✅ MEGOLDVA: Korábban 4 egymásnak ellentmondó árjegyzék volt — 2026.03.15-re MIND FRISSÍTVE
 
-| Forrás | Fájl | Basic | Prof. | Enterprise |
-|--------|------|-------|-------|------------|
-| **Landing page (ÉLŐ KÓD)** | `app/(marketing)/page.tsx` L29-48 | **€299/hó** | **€599/hó** | **€1.199/hó** |
-| Bryan Overview | `docs/BRYAN_ACI_OVERVIEW.md` L22-24 | ~€80/hó | ~€150/hó | ~€300/hó |
-| Bryan Marketing | `docs/AINOVA_OVERVIEW_FOR_BRYAN.md` L325-327 | €49/hó | €149/hó | €499/hó |
-| Korábbi Market Analysis | `docs/archive/MARKET_ANALYSIS_v1_OBSOLETE.md` | 29.900 Ft (~€80) | 59.900 Ft | 119.900 Ft |
+| Forrás | Fájl | Starter | Basic | Prof. | Enterprise | Státusz |
+|--------|------|---------|-------|-------|------------|---------|
+| **Landing page (ÉLŐ KÓD)** | `app/(marketing)/page.tsx` | — | **€299/hó** | **€599/hó** | **€1.199/hó** | ✅ Igazság |
+| Bryan Overview | `docs/BRYAN_ACI_OVERVIEW.md` | €99/hó | €299/hó | €599/hó | €1.199/hó | ✅ Frissítve |
+| Bryan Marketing | `docs/AINOVA_OVERVIEW_FOR_BRYAN.md` | €99/hó | €299/hó | €599/hó | €1.199/hó | ✅ Frissítve |
+| Korábbi Market Analysis | `docs/archive/MARKET_ANALYSIS_v1_OBSOLETE.md` | — | 29.900 Ft | 59.900 Ft | 119.900 Ft | 📂 Archív |
 
 **A landing page az igazság** — az a kód ami megy élesben. Tehát az aktuális meghirdetett árak:
+- **Starter: €99/hó** (~39.000 Ft) — Hiányzik a landing page-ről (TODO)
 - **Basic: €299/hó** (~117.000 Ft)
 - **Professional: €599/hó** (~235.000 Ft)
 - **Enterprise: €1.199/hó** (~470.000 Ft)
 
-### Teendő más dokumentumokban:
-- `docs/BRYAN_ACI_OVERVIEW.md` → frissíteni kell az aktuális árakra VAGY archiválni
-- `docs/AINOVA_OVERVIEW_FOR_BRYAN.md` → frissíteni kell VAGY archiválni
+### Hátralévő teendő:
+- Landing page: Starter kártya hozzáadása (jelenleg csak 3 tier jelenik meg)
 - **LN-01** feladat (lásd [05-ROADMAP.md](./05-ROADMAP.md)): Minden ár-referenciát egyetlen helyre centralizálni
 
 ---
@@ -268,10 +268,10 @@ Tab-ok, amelyekre kattintva a pricing kártyákon a modullisták a szektornak me
 | **P-02** | Landing page: "€" dupla szimbólum bug javítás (L196) | `app/(marketing)/page.tsx` | 🔴 | [02-KNOWN_BUGS.md](./02-KNOWN_BUGS.md) §BUG-01 |
 | **P-03** | Landing page: "Get Started" → "Érdeklődöm" / "Ajánlatot kérek" | `app/(marketing)/page.tsx`, i18n | 🟡 | — |
 | **P-04** | Landing page: "Az árak tájékoztató jellegűek" footer | `app/(marketing)/page.tsx`, i18n | 🟡 | — |
-| **P-05** | `tiers.ts`: Starter tier hozzáadása | `lib/license/tiers.ts` | 🔴 | [05-ROADMAP.md](./05-ROADMAP.md) §A2 |
-| **P-06** | `tiers.ts`: `invoicing` hozzáadás professional-hoz | `lib/license/tiers.ts` | 🔴 | [02-KNOWN_BUGS.md](./02-KNOWN_BUGS.md) §BUG-03 |
-| **P-07** | `tiers.ts`: `digital-twin` hozzáadás enterprise-hoz | `lib/license/tiers.ts` | 🔴 | [02-KNOWN_BUGS.md](./02-KNOWN_BUGS.md) §BUG-03 |
-| **P-08** | Bryan dokumentumok archiválása VAGY ár-frissítés | `docs/BRYAN_*.md` | 🟡 | — |
+| **P-05** | ~~`tiers.ts`: Starter tier hozzáadása~~ | `lib/license/tiers.ts` | ✅ KÉSZ | Phase 1 |
+| **P-06** | ~~`tiers.ts`: `invoicing` hozzáadás starter-hez~~ | `lib/license/tiers.ts` | ✅ KÉSZ | Phase 1 |
+| **P-07** | ~~`tiers.ts`: `digital-twin` hozzáadás enterprise-hoz~~ | `lib/license/tiers.ts` | ✅ KÉSZ | Phase 1 |
+| **P-08** | ~~Bryan dokumentumok archiválása VAGY ár-frissítés~~ | `docs/BRYAN_*.md` | ✅ KÉSZ | — |
 | **P-09** | Szektor-tab a landing page pricing szekción | `app/(marketing)/page.tsx` | 🟢 | [05-ROADMAP.md](./05-ROADMAP.md) §C1 |
 | **P-10** | Implementációs díj szekció a landing page-en | `app/(marketing)/page.tsx`, i18n | 🟢 | [05-ROADMAP.md](./05-ROADMAP.md) §C1 |
 

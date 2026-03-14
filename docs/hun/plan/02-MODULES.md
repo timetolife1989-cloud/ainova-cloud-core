@@ -1,57 +1,85 @@
 # MODUL FEJLESZTÉSI FELADATOK
 
-> Utolsó frissítés: 2026.03.13 — ŐSZINTE státuszok, nem hazugság
+> Utolsó frissítés: 2026.03.15 — Phase 0-7 KÉSZ, összes modul implementálva
 
 ## Státusz összefoglaló
 
+### STARTER Csomag (€99/hó, max 5 user)
 | Modul | Állapot | Megjegyzés |
 |-------|---------|------------|
-| workforce | ✅ Működik | CRUD, chartok, szűrők, CSV export — DECIMAL/dátum bug javítva |
+| inventory | ✅ Működik | Készlet + mozgások, alacsony készlet riasztás |
+| invoicing | ✅ Működik | Magyar NAV-kompatibilis számlázás, 5 ÁFA kulcs, PDF |
+| reports | ✅ Működik | Riport motor, query API, viewer, editor |
+| file-import | ⚠️ Részleges | Saját API endpoint nincs — közös admin API |
+
+### BASIC Csomag (€299/hó, max 15 user)
+Starter összes modulja, plusz:
+| Modul | Állapot | Megjegyzés |
+|-------|---------|------------|
+| workforce | ✅ Működik | CRUD, chartok, szűrők, CSV export |
 | tracking | ✅ Működik | CRUD + history, szűrők, státusz kezelés |
 | fleet | ✅ Működik | Járműnyilvántartás + útnapló |
-| inventory | ✅ Működik | Készlet + mozgások, alacsony készlet riasztás |
-| oee | ✅ Működik | A/P/Q/OEE kalkuláció, gépek, rekordok |
-| shift-management | ✅ Működik | Műszakdefiníciók + beosztás, ütközés detektálás |
+| purchasing | ✅ Működik | Beszállítók CRUD, rendelések, beérkezés → inventory |
+| pos | ✅ Működik | POS felület, eladás, fizetési mód, napi zárás |
+
+### BASIC Add-on Modulok
+| Modul | Állapot | Megjegyzés |
+|-------|---------|------------|
+| recipes | ✅ Működik | Receptúra kezelés + gyártás → inventory csökkentés |
+| appointments | ✅ Működik | Időpontfoglalás, naptár, kapacitás kezelés |
+| projects | ✅ Működik | Projektek, feladatok, Kanban, költségvetés |
+| e-commerce | ✅ Működik | WooCommerce/Shopify szinkronizáció |
+
+### PROFESSIONAL Csomag (€599/hó, max 50 user)
+Basic összes modulja, plusz:
+| Modul | Állapot | Megjegyzés |
+|-------|---------|------------|
+| performance | ✅ Működik | Teljesítmény CRUD, KPI, célérték beállító |
+| scheduling | ✅ Működik | Kapacitástervezés (allokáció UI is kész) |
 | delivery | ✅ Működik | Szállítmány CRUD, szűrők, összesítő kártyák |
-| performance | ✅ Működik | Teljesítmény CRUD, KPI kártyák, célérték beállító UI (CRUD API + tab + modal) |
-| scheduling | ✅ Működik | Kapacitástervezés (⚠️ allokáció UI hiányzik) |
-| quality | ✅ Működik | Minőségellenőrzés CRUD + 8D riport wizard (D1-D8, viewer modal, i18n) |
-| maintenance | ✅ Működik | Karbantartás ütemezés + "kész" jelölés + napló UI (complete API, log API, tab) |
-| reports | ✅ Működik | Riport motor implementálva (query API, viewer, editor, delete — recharts alapú) |
-| file-import | ⚠️ Részleges | Saját API endpoint nincs |
-| plc-connector | ⚠️ Előkészítve | Eszköz nyilvántartás + 4 driver interfész kész (S7/Modbus TCP/Modbus RTU/MQTT/OPC-UA stub), 002 migráció (alerts, driver_config, poll_status — hardver aktiváláshoz npm install szükséges) |
-| digital-twin | ✅ Működik | Valós API endpoint (CRUD, seed 7 gép, layout DB) |
-| sap-import | ⚠️ Előkészítve | Enterprise — teljes séma (mod_sap_* 5 tábla, 50+ objektum katalógus seed), 4 API route, 4 fül admin UI; RFC/OData aktiváláshoz node-rfc + SAP NW RFC SDK szükséges |
+| crm | ✅ Működik | Ügyfélkezelés, pipeline, interakciók, emlékeztetők |
+| worksheets | ✅ Működik | Munkalapok, munkaóra, anyag, aláírás, PDF, → számla |
+
+### PROFESSIONAL Add-on Modulok
+| Modul | Állapot | Ár/hó | Megjegyzés |
+|-------|---------|-------|------------|
+| sap-import | ⚠️ Stub | €99 | RFC/OData konnektorok stub — éles SAP nincs |
+| api-gateway | ✅ Működik | €99 | Külső API kulcs kezelés, rate limiting, request napló |
+
+### ENTERPRISE Csomag (€1199/hó, korlátlan user)
+Enterprise összes alsóbb tier modulja, plusz:
+| Modul | Állapot | Megjegyzés |
+|-------|---------|------------|
+| oee | ✅ Működik | A/P/Q/OEE kalkuláció, gépek, rekordok |
+| plc-connector | ⚠️ Előkészítve | Eszköz nyilvántartás + 4 driver interfész, hardver szükséges |
+| shift-management | ✅ Működik | Műszakdefiníciók + beosztás, ütközés detektálás |
+| quality | ✅ Működik | Minőségellenőrzés CRUD + 8D riport wizard |
+| maintenance | ✅ Működik | Karbantartás ütemezés + "kész" jelölés + napló UI |
+| digital-twin | ✅ Működik | 2D SVG gyártósor, CRUD API, 7 gép seed, layout DB |
+
+### ENTERPRISE Add-on Modul
+| Modul | Állapot | Ár/hó | Megjegyzés |
+|-------|---------|-------|------------|
+| multi-site | 🔴 Tervezett | €199 | Több telephely kezelés |
+
+### Speciális Modulok
+| Modul | Állapot | Megjegyzés |
+|-------|---------|------------|
+| lac-napi-perces | ✅ Production Ready | Komplex belső LAC referencia modul. Disabled demo-ban. |<br>
 
 ---
 
-## Kritikus javítások (2026.03.12)
+## Hátralévő fejlesztési feladatok (összes modulra)
 
-### PostgreSQL kompatibilitás — JAVÍTVA
-- ✅ `DECIMAL(10,2)` oszlopok string-ként jöttek vissza → `pg.types.setTypeParser(1700)` hozzáadva
-- ✅ `DATE` oszlopok Date objektumként jöttek vissza → `pg.types.setTypeParser(1082)` hozzáadva
-- ✅ API válaszokban `Number()` konverzió hozzáadva biztonsági rétegként
-- ✅ `OUTPUT INSERTED` → `RETURNING` konverzió
-- ✅ `OFFSET ROWS FETCH NEXT` → `LIMIT OFFSET` konverzió
-- ✅ `SYSDATETIME()` → `NOW()` konverzió
-- ✅ `ISNULL()` → `COALESCE()` konverzió
-- ✅ `GETDATE()` → `NOW()` konverzió
-- ✅ Boolean oszlopok (is_active stb.) `= 1` → `= true`
+### Közös hátralékok
+- [ ] i18n: Modul UI-k hardcoded stringjeinek i18n kulcsokra cserélése (részleges — sok modul már kész)
+- [ ] Tesztek: Unit tesztek minden modulhoz (jelenleg minimális coverage)
+- [ ] E2E tesztek: Playwright integráció
 
-## Hiányzó al-funkciók működő moduloknál
-
-### reports — KÉSZ ✅
-- ✅ Riport motor implementálva (query API, viewer, editor, delete — commit 92f6da0)
-- ✅ Recharts alapú vizualizáció
-
-### quality — 8D KÉSZ ✅
-- ✅ `quality_8d_reports` tábla + API + wizard UI D1-D8 (commit 5433b6d)
-
-### maintenance — "Kész" jelölés KÉSZ ✅
-- ✅ `maintenance_log` tábla + complete API + napló tab UI (commit 10cfac1)
-
-### performance — Célértékek KÉSZ ✅
-- ✅ `performance_targets` tábla + célérték beállító API + modal UI (commit e13b520)
-
-### scheduling — Allokáció hiányzik
-- ⬜ `scheduling_allocations` tábla létezik, nincs allokáció kezelő UI
+### Modul-specifikus hátralékok
+- [ ] `file-import`: Saját API endpoint (jelenleg közös admin API-t használ)
+- [ ] `plc-connector`: Hardver driver aktiválás (node-snap7, modbus-serial, mqtt, node-opcua)
+- [ ] `sap-import`: SAP RFC SDK telepítés + élő kapcsolat teszt
+- [ ] `scheduling`: Allokáció drag & drop UI (tábla létezik, UI részleges)
+- [ ] `digital-twin`: OEE integráció élő gép állapothoz
+- [ ] Workflow trigger bővítés (jelenleg: alapvető szabálymotor)

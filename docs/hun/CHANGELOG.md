@@ -2,6 +2,47 @@
 
 Minden jelentős változás dokumentálva van ebben a fájlban.
 
+## [1.5.0] - 2026-03-15
+
+### Phase 0: Stabilizáció
+- 17/17 ismert hiba javítva (SQL injection, i18n, session, hydration stb.)
+- checkCsrf szinkron, getDb szinkron, AdminSettingDef.default mindig string
+- proxy.ts (Next.js 16 — middleware.ts build failure)
+
+### Phase 1: Starter tier + Landing page
+- 4-tier licenc modell: Starter (€99) / Basic (€299) / Professional (€599) / Enterprise (€1199)
+- Starter tier: inventory, invoicing, reports, file-import — max 5 user
+- TIER_MODULES, TIER_PRICES, TIER_MAX_USERS, ADDON_MODULES a `tiers.ts`-ben
+- Landing page átdolgozás: 4 csomag kártya, Starter hozzáadva
+
+### Phase 2: Purchasing + POS modulok (Basic tier)
+- **purchasing** — Beszállító CRUD, rendelés, beérkezés → inventory integráció
+- **pos** — POS felület, eladás, fizetési módok, napi zárás, → készletcsökkentés
+
+### Phase 3: CRM + Worksheets (Professional tier)
+- **crm** — Ügyfélkezelés, interakciók, pipeline (Lead→Won/Lost), emlékeztetők
+- **worksheets** — Munkalapok, munkaóra, anyag, aláírás (base64), PDF, → számla generálás
+
+### Phase 4: Szektor Presetek
+- 6 iparági preset: Gyártás, Kiskereskedelem, Szolgáltatás, Vendéglátás/Élelmiszer, Építőipar, Logisztika
+- Automatikus modul-konfiguráció szektor alapján
+
+### Phase 5: Recipes + Appointments + Projects (Add-on modulok)
+- **recipes** — Receptúrák, hozzávalók, gyártás → inventory csökkentés (€29/hó add-on)
+- **appointments** — Időpontfoglalás, naptár nézet, kapacitás kezelés (€29/hó add-on)
+- **projects** — Projekt CRUD, feladatok, Kanban, költségvetés (€49/hó add-on)
+
+### Phase 6: E-commerce + API Gateway
+- **e-commerce** — WooCommerce/Shopify szinkronizáció, rendelés import, készlet push (€49/hó add-on)
+- **api-gateway** — Külső API kulcs kezelés, rate limiting, request napló (€99/hó add-on)
+
+### Phase 7: PWA v3 + Edge Auth + CSP
+- Service Worker v3 OffscreenCanvas (SW cache management)
+- PWA manifest + offline support
+- Edge auth védelem (proxy.ts)
+- CSP headers (Content-Security-Policy)
+- Teljes i18n audit: DashboardPage mind a 14 modulban konvertálva (260+ kulcs)
+
 ## [1.4.0] - 2026-03-14
 
 ### Számlázás modul (invoicing) — Professional tier

@@ -1,7 +1,7 @@
 # Ainova Cloud Intelligence (ACI) — System Overview
 
-> **Prepared for:** Bryan ( Director of International Sales & Branding)
-
+> **Prepared for:** Bryan (Director of International Sales & Branding)
+> **Last updated:** 2026.03.15 — Phase 0-7 complete, 26 modules, 4-tier pricing
 
 ---
 
@@ -19,9 +19,10 @@ It is **not** an ERP system (like SAP or Microsoft Dynamics). It's designed to s
 
 | Company Size | Typical Needs | ACI Package |
 |---|---|---|
-| **Small factory** (5–20 people) | Track who's working, manage tasks, log fleet usage, import Excel data | **Basic** (~€80/month) |
-| **Medium factory** (20–100 people) | + Performance KPIs, weekly capacity planning, delivery tracking, inventory | **Professional** (~€150/month) |
-| **Large factory** (100–500+ people) | + OEE monitoring, shift planning, quality control (8D reports), preventive maintenance, machine connectivity | **Enterprise** (~€300/month) |
+| **Small startup** (1–5 people) | Inventory, invoicing, reports, data import | **Starter** (€99/month) |
+| **Small factory** (5–20 people) | Track who's working, manage tasks, log fleet usage, POS, purchasing | **Basic** (€299/month) |
+| **Medium factory** (20–100 people) | + Performance KPIs, capacity planning, delivery, inventory, CRM, worksheets, invoicing | **Professional** (€599/month) |
+| **Large factory** (100–500+ people) | + OEE monitoring, shift planning, quality control (8D), preventive maintenance, machine connectivity | **Enterprise** (€1199/month) |
 
 **Key difference from competitors:** ACI charges a **flat monthly fee** (not per-user), which makes it dramatically cheaper than SAP, Dynamics, or Odoo at scale.
 
@@ -29,7 +30,16 @@ It is **not** an ERP system (like SAP or Microsoft Dynamics). It's designed to s
 
 ## What Can It Do? (Module by Module)
 
-### Basic Package — 5 Modules
+### Starter Package — 4 Core Modules
+
+| Module | What It Does | Real-World Example |
+|---|---|---|
+| **Inventory** | Stock management with movement logs (in/out/adjustment) | Steel plates: 450 pieces in stock. Minimum threshold: 200. System highlights if it drops below. |
+| **Invoicing** | Hungarian NAV-compatible invoicing. 5 VAT rates, PDF generation. | Create invoice from worksheet or manually. System generates NAV XML. |
+| **Reports** | Custom report builder with charts, saved configurations, Excel/PDF export | Create a chart showing "Weekly output vs. target by production line" and save it for reuse. |
+| **File Import** | Drag-and-drop Excel/CSV import with automatic column mapping | Upload a daily production report from an old system → ACI maps the columns automatically. |
+
+### Basic Package — +5 Modules + 4 Add-ons
 
 | Module | What It Does | Real-World Example |
 |---|---|---|
@@ -38,17 +48,36 @@ It is **not** an ERP system (like SAP or Microsoft Dynamics). It's designed to s
 | **Fleet** | Vehicle registry — trips, fuel logs, status | The factory has 8 forklifts and 3 delivery vans. Each trip and refueling is logged. |
 | **File Import** | Drag-and-drop Excel/CSV import with automatic column mapping | Upload a daily production report from an old system → ACI maps the columns automatically. |
 | **Reports** | Custom report builder with charts, saved configurations, Excel/PDF export | Create a chart showing "Weekly output vs. target by production line" and save it for reuse. |
+| **Purchasing** | Supplier management, purchase orders, goods receipt → inventory | Order 500 steel plates from Supplier A. When goods arrive, stock updates automatically. |
+| **POS** | Point of Sale — sales, payment methods, daily closing | A retail/factory shop sells products. Each transaction is logged. End-of-day cash reconciliation. |
 
-### Professional Package — 4 Additional Modules
+### Basic Add-on Modules (€29–€49/month each)
+
+| Module | What It Does | Real-World Example |
+|---|---|---|
+| **Recipes** | Recipe management with ingredients, production → inventory deduction | "Chocolate cake" recipe uses 2kg flour, 1kg sugar. Producing 100 cakes deducts from stock. |
+| **Appointments** | Appointment booking, calendar view, capacity management | Service company books 30-min client slots. System prevents double-booking. |
+| **Projects** | Project management with tasks, Kanban board, budget tracking | "Factory renovation" project has 12 tasks. Budget: €50,000. Spent so far: €32,000 (64%). |
+| **E-commerce** | WooCommerce/Shopify sync — order import, stock push | Online shop gets 15 orders → imported to ACI → stock levels updated automatically. |
+
+### Professional Package — +5 Modules + 2 Add-ons
 
 | Module | What It Does | Real-World Example |
 |---|---|---|
 | **Performance** | Worker/team efficiency KPIs — standard time vs. actual time | An operator's target is 100 units/hour. They actually produced 87. That's 87% efficiency, which gets tracked and visualized on a KPI dashboard. |
 | **Scheduling** | Weekly capacity planning — resource allocation by machine/line/area | Next week, Production Line A has 80% capacity booked. Line B is only at 40%. The planner can rebalance. |
 | **Delivery** | Shipment tracking by customer, date, and status | 14 shipments went out this week to 8 customers. 2 were late. Summary cards show on-time rate. |
-| **Inventory** | Stock management with movement logs (in/out/adjustment) | Steel plates: 450 pieces in stock. Minimum threshold: 200. System highlights if it drops below. |
+| **CRM** | Customer relationship management — contacts, pipeline (lead→won/lost), interactions, reminders | Track 50 leads. 12 are in negotiation. Pipeline shows €120K potential revenue. |
+| **Worksheets** | Work orders with labor hours, materials, digital signature, PDF, → invoice | Technician fills worksheet: 3h labor + 2 parts used. Customer signs on tablet. Auto-converts to invoice. |
 
-### Enterprise Package — 7 Additional Modules
+### Professional Add-on Modules (€99/month each)
+
+| Module | What It Does | Real-World Example |
+|---|---|---|
+| **SAP Import** | Import data from SAP ERP systems (RFC or OData connection) | The company uses SAP for finance/purchasing. ACI pulls material master data and production orders directly from SAP. *(Requires SAP connectivity license.)* |
+| **API Gateway** | External REST API access with API key management, rate limiting (100 req/min) | A third-party system queries ACI data using an API key. Every request is logged and rate-limited. |
+
+### Enterprise Package — +6 Modules
 
 | Module | What It Does | Real-World Example |
 |---|---|---|
@@ -58,7 +87,6 @@ It is **not** an ERP system (like SAP or Microsoft Dynamics). It's designed to s
 | **Maintenance** | Preventive maintenance scheduling with due-date calculation and completion logging | CNC machine needs oil change every 500 hours. It's at 485 hours. System highlights it as "due soon" in orange. Overdue items turn red. |
 | **PLC Connector** | Connect directly to factory machines (Siemens S7, Modbus, MQTT, OPC-UA) | A PLC sends real-time temperature, speed, and cycle count data directly into ACI — no manual entry needed. *(Hardware integration requires on-site setup.)* |
 | **Digital Twin** | 2D visual map of the production floor with interactive machine icons | A bird's-eye view SVG of the factory floor. Click a machine → see its status, last maintenance, current OEE. 7 demo machines are pre-loaded. |
-| **SAP Import** | Import data from SAP ERP systems (RFC or OData connection) | The company uses SAP for finance/purchasing. ACI pulls material master data and production orders directly from SAP. *(Requires SAP connectivity license.)* |
 
 ### Special / Internal
 
@@ -149,9 +177,10 @@ You don't need to know this, but if anyone asks:
 | Feature | ACI | Katana | SAP Business One | Odoo |
 |---|---|---|---|---|
 | **Pricing model** | Flat monthly | Per plan | Per user/month | Per user/month |
-| **Starting price** | ~€80/month | $99/month | ~€100/user/month | ~€20/user/month |
-| **10-user cost** | ~€80/month | $99/month | ~€1,000/month | ~€200/month |
-| **50-user cost** | ~€150/month | $799/month | ~€5,000/month | ~€1,000/month |
+| **Starting price** | €99/month | $99/month | ~€100/user/month | ~€20/user/month |
+| **10-user cost** | €299/month | $99/month | ~€1,000/month | ~€200/month |
+| **50-user cost** | €599/month | $799/month | ~€5,000/month | ~€1,000/month |
+| **100+ user cost** | €1199/month | Custom | ~€10,000/month | ~€2,000/month |
 | **OEE tracking** | Yes (built-in) | Limited | Add-on | Add-on |
 | **Machine connectivity** | Yes (PLC/MQTT) | No | Add-on | No |
 | **Digital Twin** | Yes | No | No | No |

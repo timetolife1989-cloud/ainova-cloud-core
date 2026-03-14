@@ -98,10 +98,12 @@ npx tsx scripts/generate-license.ts \
 
 **Output:** Licenc kulcs (XXXX-XXXX-XXXX-XXXX) + SQL INSERT + Base64 kód
 
-**Tier-ek:**
-- `basic` — 5 modul, max 10 user
-- `professional` — 9 modul, max 50 user
-- `enterprise` — 13+ modul, max 999 user
+**Tier-ek (2026.03.15 — 4-tier modell):**
+- `starter` — 4 modul (inventory, invoicing, reports, file-import), max 5 user — €99/hó
+- `basic` — + 5 modul (workforce, tracking, fleet, purchasing, pos) + 4 add-on, max 15 user — €299/hó
+- `professional` — + 7 modul (performance, scheduling, delivery, crm, worksheets, api-gateway, sap-import), max 50 user — €599/hó
+- `enterprise` — + 6 modul (oee, plc-connector, shift-management, quality, maintenance, digital-twin), korlátlan user — €1199/hó
+- `dev` — Minden modul, fejlesztői mód
 
 **Ellenőrzés:** Minden modul betöltésnél a `isModuleAllowed()` funkció ellenőrzi, hogy a modul tier-je megegyezik-e a licenc tier-jével.
 

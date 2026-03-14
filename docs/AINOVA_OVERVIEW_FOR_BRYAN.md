@@ -1,7 +1,7 @@
 # Ainova Cloud Core — Complete Product Overview
 
 **Prepared for:** Bryan (Branding & Marketing)  
-**Date:** March 14, 2026  
+**Date:** March 15, 2026  
 **Purpose:** Full understanding of what Ainova is, what it does, and how it works
 
 ---
@@ -56,7 +56,7 @@ Instead of using spreadsheets, paper forms, or multiple disconnected systems, Ai
 ### Technology Stack:
 - **Frontend:** Next.js 16 + React 19 (modern web framework)
 - **Backend:** Node.js with TypeScript (type-safe JavaScript)
-- **Database:** Multi-database support (MSSQL, SQLite, PostgreSQL planned)
+- **Database:** PostgreSQL (Supabase Cloud, PgBouncer connection pooling)
 - **Styling:** Tailwind CSS 4 (modern, responsive design)
 - **Deployment:** Web-based (cloud or on-premise server)
 - **Access:** Any modern web browser (Chrome, Edge, Firefox, Safari)
@@ -78,32 +78,55 @@ Ainova is built like LEGO blocks. Each **module** is a separate feature area tha
 - Easy scaling as companies grow
 - Clean separation of different business functions
 
-### Current Modules (17 total):
+### Current Modules (26 registered, 4 tiers + add-ons):
 
-#### **BASIC Tier** (Entry-level package)
-1. **Workforce** — Employee attendance, shift tracking, headcount management
-2. **Tracking** — Task and job tracking, work order management
-3. **Fleet** — Vehicle management, mileage tracking, maintenance schedules
+#### **STARTER Tier** (€99/month, up to 5 users)
+1. **Inventory** — Stock management, material tracking, warehouse operations
+2. **Invoicing** — Invoice generation, NAV-compatible billing
+3. **Reports** — Standard reporting and data export
 4. **File Import** — Bulk data import from Excel/CSV files
-5. **Reports** — Standard reporting and data export
 
-#### **PROFESSIONAL Tier** (Mid-market)
-6. **Inventory** — Stock management, material tracking, warehouse operations
-7. **Quality** — Quality control, defect logging, inspection records
-8. **Delivery** — Shipping, receiving, logistics tracking
+#### **BASIC Tier** (€299/month, up to 15 users)
+All Starter modules plus:
+5. **Workforce** — Employee attendance, shift tracking, headcount management
+6. **Tracking** — Task and job tracking, work order management
+7. **Fleet** — Vehicle management, mileage tracking, maintenance schedules
+8. **Purchasing** — Purchase orders, supplier management, approvals
+9. **POS** — Point-of-sale, cash register, receipt printing
+
+*Basic Add-on modules (individually priced):*
+- **Recipes** — Bill of materials, recipe management (€29/month)
+- **Appointments** — Booking, scheduling, calendar (€29/month)
+- **Projects** — Project planning, milestones, Gantt (€49/month)
+- **E-commerce** — Online store, product catalog (€49/month)
+
+#### **PROFESSIONAL Tier** (€599/month, up to 50 users)
+All Basic modules plus:
+8. **Performance** — KPI dashboards, performance analytics
 9. **Scheduling** — Production scheduling, resource planning
+10. **Delivery** — Shipping, receiving, logistics tracking
+11. **CRM** — Customer relationship management, pipeline
+12. **Worksheets** — Digital work instructions, checklists
 
-#### **ENTERPRISE Tier** (Advanced features)
-10. **OEE (Overall Equipment Effectiveness)** — Machine performance metrics
-11. **Performance** — KPI dashboards, performance analytics
-12. **Maintenance** — Preventive maintenance, equipment service tracking
-13. **Shift Management** — Complex shift patterns, rotation planning
-14. **PLC Connector** — Direct connection to factory machines (Siemens, Allen-Bradley, etc.)
-15. **Digital Twin** — 2D/3D visualization of factory layout and processes
+*Professional Add-on modules:*
+- **SAP Import** — Direct integration with SAP ERP system (€99/month)
+- **API Gateway** — External API access, rate limiting, key management (€99/month)
 
-#### **CUSTOM Tier** (Client-specific)
-16. **LAC Napi Perces** — Custom module for LAC company (your original client)
-17. **AI Assistant** — ChatGPT-powered helper for data queries and insights
+#### **ENTERPRISE Tier** (€1199/month, unlimited users)
+All Professional modules plus:
+13. **OEE** — Overall Equipment Effectiveness (manufacturing gold standard)
+14. **PLC Connector** — Direct machine data (Siemens S7, Modbus, OPC UA)
+15. **Shift Management** — Complex shift patterns, rotation planning
+16. **Quality** — Quality control, inspections, defect tracking, 8D workflow
+17. **Maintenance** — Preventive & corrective maintenance, work orders
+18. **Digital Twin** — 2D/3D visualization of factory layout and processes
+
+*Enterprise Add-on module:*
+- **Multi-site** — Multi-location management (€199/month)
+
+#### **Additional**
+- **AI Assistant** — ChatGPT-powered helper for data queries and insights (all tiers)
+- **LAC Napi Perces** — Custom module for LAC company (disabled by default)
 
 ---
 
@@ -287,12 +310,15 @@ First-time installation walks through:
 
 ### Current:
 - **REST API** — JSON endpoints for external systems
+- **API Gateway** — External API key management, rate limiting, usage tracking
 - **CSV/Excel import** — Batch data from ERP, HR systems
-- **Email notifications** — Alerts via SMTP
-
-### Planned/In Development:
+- **SAP Import** — Direct integration with SAP ERP
 - **PLC Connector** — Direct machine data (Siemens S7, Modbus, OPC UA)
-- **SAP integration** — Sync with SAP ERP
+- **Email notifications** — Alerts via SMTP
+- **Server-Sent Events (SSE)** — Real-time push updates to connected clients
+- **PWA** — Progressive Web App with offline capability
+
+### Planned:
 - **Webhook support** — Push notifications to other systems
 - **Mobile app** — Native iOS/Android (future roadmap)
 
@@ -322,10 +348,11 @@ First-time installation walks through:
 ## Licensing Model
 
 ### Tiers:
-1. **BASIC** — €49/month — 5 modules, up to 50 users
-2. **PROFESSIONAL** — €149/month — 9 modules, up to 200 users
-3. **ENTERPRISE** — €499/month — All modules, unlimited users, priority support
-4. **CUSTOM** — Quote-based — Tailored features, dedicated instance
+1. **STARTER** — €99/month — 4 core modules (inventory, invoicing, reports, import), up to 5 users
+2. **BASIC** — €299/month — +5 modules (workforce, tracking, fleet, purchasing, pos) + 4 optional add-ons, up to 15 users
+3. **PROFESSIONAL** — €599/month — +5 modules + 2 optional add-ons, up to 50 users
+4. **ENTERPRISE** — €1199/month — +6 modules + 1 optional add-on, unlimited users, priority support
+5. **CUSTOM** — Quote-based — Tailored features, dedicated instance
 
 ### License Validation:
 - License key stored in database
@@ -372,29 +399,27 @@ First-time installation walks through:
 
 ## Roadmap & Future Features
 
-### Phase 1 (Complete):
-- Core modules (Workforce, Tracking, Fleet)
-- Admin panel
-- Multi-language support
-- Import/Export
-- RBAC
+### Phase 0–1 (Complete — March 2026):
+- Core stabilization, bug fixes, Starter tier, Landing page
+- Admin panel, multi-language (HU/EN/DE), RBAC, Import/Export
 
-### Phase 2 (In Progress):
-- Advanced analytics
-- Mobile-responsive design
-- Workflow automation
-- Email notifications
+### Phase 2–3 (Complete — March 2026):
+- Purchasing, POS, CRM, Worksheets modules
+- Sector presets (6 industries)
 
-### Phase 3 (Planned):
-- PLC integration
-- Digital Twin visualization
-- AI assistant
-- Mobile app
+### Phase 4–5 (Complete — March 2026):
+- Recipes, Appointments, Projects add-on modules
+- Industry sector presets (Food, Automotive, Pharma, etc.)
 
-### Phase 4 (Future):
+### Phase 6–7 (Complete — March 2026):
+- E-commerce module, API Gateway
+- PWA v3 with OffscreenCanvas, edge auth, CSP headers
+
+### Future:
+- Dashboard Builder (drag & drop widgets)
+- Multi-site management
 - Marketplace for third-party modules
-- Multi-tenant SaaS platform
-- Embedded BI (Business Intelligence)
+- Mobile app (native iOS/Android)
 - IoT sensor integration
 
 ---
@@ -408,9 +433,8 @@ First-time installation walks through:
 - ✅ Hydration mismatch warnings (client/server sync)
 
 ### Current Limitations:
-- Some UI text still hardcoded (login, setup wizard)
 - Limited test coverage (unit tests in progress)
-- No mobile app yet (web-responsive only)
+- No mobile app yet (web-responsive only, PWA available)
 - Single database per instance (no sharding)
 
 ---
@@ -475,11 +499,11 @@ ainova-cloud-core/
 ## Competitive Positioning
 
 ### vs. SAP MES:
-- **Ainova:** €49-499/month, setup in 1 day, simple UI
+- **Ainova:** €99-1199/month, setup in 1 day, simple UI
 - **SAP:** €100K+ license, 6-12 month implementation, complex
 
 ### vs. MRPeasy/Katana:
-- **Ainova:** More customizable, on-premise option, modular pricing
+- **Ainova:** More customizable, on-premise option, modular pricing, 22 modules
 - **Competitors:** Fixed feature sets, cloud-only, per-user pricing
 
 ### vs. Excel Spreadsheets:
@@ -507,14 +531,14 @@ ainova-cloud-core/
 ## Summary for Branding/Marketing
 
 **Elevator Pitch:**
-Ainova Cloud Core is a modern, affordable manufacturing management system that replaces spreadsheets and paper forms with a single, easy-to-use web application. It helps small and medium factories track everything from worker attendance to inventory to machine performance — all in real-time, from any device.
+Ainova Cloud Core is a modern, affordable manufacturing & business management system that replaces spreadsheets and paper forms with a single, easy-to-use web application. With 22 modules covering everything from attendance to inventory to CRM to e-commerce, it helps small and medium businesses operate smarter — all in real-time, from any device.
 
 **Key Differentiators:**
-1. **Modular** — Pay only for what you need, add features as you grow
-2. **Affordable** — 10x cheaper than enterprise MES systems
+1. **Modular** — 22 modules across 4 tiers, pay only for what you need
+2. **Affordable** — From €99/month, 10x cheaper than enterprise MES
 3. **Fast** — Set up in hours, not months
-4. **Flexible** — Cloud or on-premise, multi-language, customizable
-5. **Modern** — Built with latest web tech, mobile-friendly, beautiful UI
+4. **Flexible** — Cloud or on-premise, multi-language (HU/EN/DE), customizable
+5. **Modern** — Next.js 16, PWA, real-time updates, beautiful UI
 
 **Target Message:**
 "Stop managing your factory with spreadsheets. Get real-time visibility, reduce errors, and make better decisions — without breaking the bank."
@@ -528,4 +552,4 @@ Ainova Cloud Core is a modern, affordable manufacturing management system that r
 
 ---
 
-*This document is a living resource. Last updated: March 14, 2026*
+*This document is a living resource. Last updated: March 15, 2026*

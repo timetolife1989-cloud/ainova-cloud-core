@@ -10,12 +10,15 @@
 - [x] Frontend: KPI dashboard + rögzítő form
 - [x] DB: performance_entries + performance_targets táblák
 - [x] Seeder: 30 napos demo adat 20+ dolgozóval
+- [x] Backend: Target vs. tényleges comparison endpoint
+- [x] Frontend: Célérték beállító modal UI
+- [x] Logic: Norma idő konfigurálhatóság
 
 ## Még hátralévő feladatok
 
 ### P1 — i18n & Lokalizáció
-- [ ] Frontend: Dashboard label-ek lokalizálása
-- [ ] Frontend: Hibaüzenetek i18n kulcsokra cserélése
+- [x] Frontend: DashboardPage i18n konvertálva (hu/en/de)
+- [ ] Frontend: Hibaüzenetek i18n kulcsokra cserélése (részleges)
 
 ### P2 — Funkció bővítés
 - [ ] Backend: Csapat összesítő endpoint (csapat szintű avg hatékonyság)
@@ -26,7 +29,6 @@
 - [ ] Frontend: Target vs. tényleges bar chart
 - [ ] Frontend: Top/Bottom dolgozó rangsor
 - [x] Logic: Norma idő konfigurálhatóság (admin settings integráció)
-
 ### P3 — Tesztek
 - [ ] Backend: Unit teszt — hatékonyság számítás (norm_time / actual_time × 100)
 - [ ] Backend: Unit teszt — célérték validáció

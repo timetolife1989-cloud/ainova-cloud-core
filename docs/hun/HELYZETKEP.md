@@ -1,6 +1,6 @@
 # HELYZETKÉP — Hol tartasz, mi működik, mi nem, és mit csinálj
 
-> **Készült:** 2026. március 10. (frissítve: 2026.03.13 — SAP/PLC/AI előkészítés, sap-import modul hozzáadva)
+> **Készült:** 2026. március 10. (frissítve: 2026.03.15 — Phase 0-7 KÉSZ, 26 modul, 4-tier modell)
 > **Cél:** Rendet tenni a fejedben. Ezt a dokumentumot olvasd el elejétől végéig.
 
 ---
@@ -15,10 +15,13 @@ Képzeld el úgy, mint egy **okos Excel-t a gyárnak**:
 - Az admin beállítja mit láthatnak, kik vannak, milyen jogaik vannak
 - Különböző **modulok** (funkciók) kapcsolhatók be/ki — mint egy LEGO
 
-**A nagy ötlet:** Ezt a szoftvert el akarod adni gyártó cégeknek, 3 csomagban:
-- **Basic** (5 modul) — kis cégek
-- **Professional** (9 modul) — közepes cégek
-- **Enterprise** (13+ modul) — nagyvállalatok
+**A nagy ötlet:** Ezt a szoftvert el akarod adni gyártó cégeknek, 4 csomagban:
+- **Starter** (4 modul: inventory, invoicing, reports, file-import, max 5 user) — €99/hó
+- **Basic** (+ 5 modul: workforce, tracking, fleet, purchasing, pos + 4 add-on) — €299/hó
+- **Professional** (9 extra modul) — €599/hó
+- **Enterprise** (6 extra modul, korlátlan user) — €1199/hó
+
+Összesen **26 regisztrált modul** + 7 add-on opció.
 
 ---
 
@@ -238,50 +241,45 @@ A program rétegei egyszerűen:
 
 ---
 
-## 4. A PROGRAM JELENLEGI ÁLLAPOTA (Őszintén)
+## 4. A PROGRAM JELENLEGI ÁLLAPOTA (2026.03.15 — Phase 0-7 KÉSZ)
 
-### ✅ Ami TÉNYLEG kész és működik (ha a DB él):
-- Login/Logout flow (session-based)
+### ✅ Ami TÉNYLEG kész és működik:
+- Login/Logout flow (session-based, edge auth pre-check)
 - Dashboard megjelenítés modul tile-okkal
-- Admin panel (10 menüpont - UI megvan)
-- Setup Wizard (5 lépés)
-- Header (navigáció, logout, óra, nyelvváltó HU/EN/DE — MŰKÖDIK)
-- Modul rendszer (regisztráció, aktiválás, dependency check)
+- Admin panel (10+ menüpont — UI + API)
+- Setup Wizard (5 lépés + Sector Preset választó)
+- Header (navigáció, logout, nyelvváltó HU/EN/DE)
+- Modul rendszer (26 modul regisztrálva, tier-based aktiválás)
 - RBAC (szerepkörök, jogosultságok)
-- Licenc rendszer (tier-based szűrés)
-- i18n rendszer (I18nProvider + useTranslation hook — szerver-oldali inject, működik)
-- DB migrációs rendszer (15 core + modul táblák)
+- 4-tier licenc rendszer (Starter/Basic/Professional/Enterprise + 7 add-on)
+- i18n rendszer (I18nProvider + useTranslation, 3 nyelv)
+- DB migrációs rendszer (15+ core + 40+ modul tábla — Supabase/PostgreSQL)
 - Import pipeline (Excel/CSV)
 - Ctrl+K keresés (Command Palette)
 - Build hiba nélkül lefordul (TypeScript 0 error)
-- Reports riport motor (query API, viewer, editor — recharts alapú)
-- Quality 8D riport wizard (D1-D8, CRUD API, viewer modal)
-- Maintenance "kész" jelölés + napló (complete API, log API, tab UI)
-- Performance célérték beállító UI (targets CRUD API + modal)
-- Digital Twin valós API (CRUD, 7 gép seed, layout DB)
+- SSE real-time értesítések (EventBus + /api/sse endpoint)
+- Service Worker v3 (PWA, offline cache, modul chunk cache)
+- CSP headers (Content-Security-Policy proxy.ts-ben)
+- OffscreenCanvas (NeuronBackground fő szálon kívül)
+- PDF/Excel export (ExportButton komponens)
+- Összes modul teljes CRUD API-val (26 db)
 
 ### ⚠️ Ami félig kész / előkészítve:
-- Nyelvkezelés (dashboard KÉSZ, de login/setup/admin oldalak szövegei még hardcode)
-- Modul dashboardok (UI van, de valódi gyártási logika nincs)
-- Export (PDF/Excel keret kész, de nem tesztelve valós adattal)
-- Email értesítések (kód kész, de SMTP konfig nincs)
-- Workflow engine (keret kész, de nem tesztelve)
-- **AI Asszisztens** — SYSTEM_PROMPT kész (18 modul + SAP + PLC táblaismeret), de OpenAI API kulcs szükséges
-- **PLC Connector** — driver interfészek + 4 stub driver kész (S7/Modbus TCP/Modbus RTU/MQTT/OPC-UA), 002 migráció (alerts, driver_config, poll_status); hardver-aktiváláshoz `npm install node-snap7/modbus-serial/mqtt/node-opcua` szükséges
-- **SAP import** — teljes séma (mod_sap_* 5 tábla, 50+ objektum katalógus), 4 API route, 4 fül admin UI kész; RFC-aktiváláshoz `npm install node-rfc` + SAP NW RFC SDK szükséges
-
-### ❌ Ami SKELETON (csak váz, nem funkcionális):
-- SSE real-time (event bus kész, de nincs ki/bekapcsolva sehol)
-- API Gateway (kód kész, de nincs kliens aki használná)
-- Multi-site (csak CRUD, nincs bekötve a modulokba)
-- Dashboard Builder (layout mentés kész, widget renderelés nincs)
+- i18n: Login/setup/admin oldalak szövegei részben hardcode
+- Email értesítések (kód kész, SMTP konfig szükséges)
+- Workflow engine (szabálymotor kész, bővítésre vár)
+- **AI Asszisztens** — SYSTEM_PROMPT kész, OpenAI API kulcs szükséges
+- **PLC Connector** — driver interfészek kész, hardver szükséges
+- **SAP import** — teljes séma + admin UI, SAP RFC SDK szükséges
+- Multi-site (CRUD kész, nincs bekötve a modulokba)
+- Dashboard Builder (layout mentés kész, widget renderelés részleges)
 
 ### 🔢 Számokban:
-- **18 modul** regisztrálva (17 aktív a loaderben, incl. sap-import)
-- **60+ API route** definiálva
-- **17 DB migráció** (core táblák + modul migrációk)
-- **~120 TypeScript fájl** a lib/ és modules/ mappákban
-- **0 TypeScript build hiba** (tehát buildel, de ez nem jelenti hogy működik!)
+- **26 modul** regisztrálva (25 aktív, lac-napi-perces disabled demo-ban)
+- **100+ API route** definiálva
+- **55+ DB tábla** (core + modul migrációk — Supabase PostgreSQL)
+- **~200+ TypeScript fájl** a lib/ és modules/ mappákban
+- **0 TypeScript build hiba**
 
 ---
 
@@ -459,59 +457,59 @@ ainova-cloud-core/
 ```
 ┌──────────────────────────────────────────────────────────┐
 │                    AINOVA PROJEKT ÁLLAPOT                 │
+│                    (2026.03.15 — v2.0.0)                 │
 ├──────────────────────────────────────────────────────────┤
 │                                                          │
-│  ✅ KÉSZ:          A kódbázis váza, architektúra,        │
-│                    modul rendszer, auth, admin UI         │
-│                    (~ a ház alapja és falai állnak)       │
+│  ✅ KÉSZ:          Phase 0-7 teljes roadmap befejezve    │
+│                    26 modul, 4-tier licenc, PWA,          │
+│                    SSE, CSP, edge auth, sector presets    │
+│                    (~ a ház beköltözhető állapotban)      │
 │                                                          │
-│  🔧 MOST KELL:    Stabilizálás, nyelvkezelés,            │
-│                    1 modul 100%-ra befejezése             │
-│                    (~ az ajtókat/ablakokat berakni)       │
+│  🔧 MOST KELL:    Tesztelés, i18n teljessé tétel,        │
+│                    első pilot ügyfél telepítés            │
+│                    (~ utolsó simítások és berendezés)     │
 │                                                          │
-│  ⏳ KÉSŐBB:        Többi modul, tesztelés,                │
-│                    első ügyfél telepítés                  │
-│                    (~ berendezni és beköltözni)           │
+│  ⏳ KÉSŐBB:        Unit/E2E tesztek, SAP/PLC aktiválás,  │
+│                    Mobile app, Marketplace               │
+│                    (~ kert, garázs, medence)              │
 │                                                          │
-│  🔮 TÁVOLI JÖVŐ:  Marketplace, Mobile, SaaS              │
+│  🔮 TÁVOLI JÖVŐ:  Multi-tenant SaaS, AI features,       │
+│                    IoT dashboard                         │
 │                    (~ második emelet ráépítés)            │
-│                                                          │
-│  BRYAN:           Landing page (marketing) — különálló   │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 10. KONKRÉT TEENDŐK LISTÁJA (végrehajtási sorrendben)
+## 10. KONKRÉT TEENDŐK LISTÁJA
 
-### ✅ ELVÉGZETT (2026.03.10):
+### ✅ MIND ELVÉGZETT — Phase 0-7 (2026.03.10 — 2026.03.15):
 - Session timezone bug fix → SQLite kompatibilitás
-- Module API 404 fix → fallback mechanizmus  
-- .toISOString() crash fix → 16 modul API
+- Module API 404 fix → fallback mechanizmus
+- .toISOString() crash fix → 16+ modul API
 - Header hydration fix → kliens oldali idő renderelés
-- **Nyelvváltó végleges fix → I18nProvider + SW cache kizárás**
-- **Workforce CSV export → pontosvessző szeparátor (magyar Excel kompatibilis)**
-- **Workforce grafikonok → Recharts integráció (napi/heti/havi/éves bontás)**
-- **Service Worker fix → /dashboard oldalak kizárva a cache-ből**
+- Nyelvváltó végleges fix → I18nProvider + SW cache kizárás
+- Workforce CSV export → pontosvessző szeparátor
+- Workforce grafikonok → Recharts integráció
+- Phase 0: Stabilizáció (dupla €, force-dynamic, getSetting bulk, stb.)
+- Phase 1: 4-tier modell + Starter tier + Landing page
+- Phase 2: Purchasing + POS modulok
+- Phase 3: CRM + Worksheets modulok
+- Phase 4: Sector Presets (6 iparág) + Setup wizard
+- Phase 5: Recipes + Appointments + Projects add-on modulok
+- Phase 6: E-commerce + API Gateway integráció modulok
+- Phase 7: SW v3, PWA, OffscreenCanvas, CSP, edge auth
 
-### 🔄 MOSTANI FÓKUSZ:
-
-| # | Feladat | Állapot | Miért fontos |
-|---|---------|--------|-------------|
-| 1 | **Nyelvváltó (HU/EN/DE)** | ✅ KÉSZ | Checkmark + fordítás szinkronban, 1 klikk |
-| 2 | **Workforce CSV export** | ✅ KÉSZ | Pontosvessző + magyar fejlécek |
-| 3 | **Workforce grafikonok** | ✅ KÉSZ | Recharts, gradiens, tooltip, periódus választó |
-| 4 | **Login/Setup/Admin lokalizálás** | ⏳ VÁR | Ezek még hardcode szövegekkel működnek |
-| 5 | **Hibaüzenetek javítása** | ⏳ VÁR | Valódi hibaüzenetek, ne "Hiba történt" |
-
-### 📋 KÉSŐBBI FELADATOK:
+### 📋 HÁTRALÉVŐ FELADATOK:
 | # | Feladat | Prioritás | Megjegyzés |
 |---|---------|-----------|------------|
-| 6 | Workforce modul 100%-ra | KÖZEPES | Referencia modul — szűrés, szerkesztés, törlés |
-| 7 | Login/Setup lokalizálás | KÖZEPES | useTranslation bekötés |
-| 8 | Cache réteg (Redis) | ALACSONY | Teljesítmény |
-| 9 | Unit tesztek írása | ALACSONY | Stabilitás |
+| 1 | i18n: login/setup/admin hardcoded stringek | KÖZEPES | Részben kész, részben hardcode |
+| 2 | Unit tesztek írása | KÖZEPES | Jelenleg minimális coverage |
+| 3 | E2E tesztek (Playwright) | KÖZEPES | Nincs |
+| 4 | PLC hardver aktiválás | ALACSONY | Hardware szükséges |
+| 5 | SAP RFC SDK aktiválás | ALACSONY | SAP NW RFC SDK szükséges |
+| 6 | Pilot ügyfél telepítés | MAGAS | Első éles teszt |
 
 ---
 

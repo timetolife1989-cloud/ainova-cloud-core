@@ -15,8 +15,8 @@
 ## Még hátralévő feladatok
 
 ### P1 — i18n & Lokalizáció
-- [ ] Frontend: Jármű típus nevek lokalizálása (`van`, `truck`, `car`, `forklift`)
-- [ ] Frontend: Form label-ek i18n kulcsokra cserélése
+- [x] Frontend: DashboardPage i18n konvertálva (hu/en/de)
+- [ ] Frontend: Jármű típus nevek lokalizálása (részleges)
 
 ### P2 — Funkció bővítés
 - [ ] Backend: Trip (út) CRUD API endpoint (`/api/modules/fleet/trips`)

@@ -1,8 +1,9 @@
 # TASKS_FOR_AI.md — Workforce modul
 
 > **Modul:** workforce
-> **Állapot:** ✅ Működik (PG bugok javítva 2026.03.12)
+> **Állapot:** ✅ Production Ready
 > **Csomag:** Basic
+> **Utolsó frissítés:** 2026.03.15
 
 ## Befejezett funkciók
 - [x] Backend: CRUD API (`/api/modules/workforce/data`)
@@ -22,9 +23,9 @@
 ## Még hátralévő feladatok
 
 ### P1 — i18n & Lokalizáció
-- [ ] Frontend: Hardcoded magyar stringek kicserélése `t()` hívásokra a `DashboardPage.tsx`-ben
-- [ ] Frontend: Form label-ek lokalizálása (pl. "Műszak", "Terület", "Tervezett létszám")
-- [ ] Frontend: Hibaüzenetek lokalizálása
+- [x] Frontend: DashboardPage i18n konvertálva (260+ kulcs hu/en/de)
+- [x] Frontend: Form label-ek lokalizálva
+- [ ] Frontend: Hibaüzenetek lokalizálása (részleges)
 
 ### P2 — Funkció bővítés
 - [ ] Backend: Excel export endpoint (`/api/modules/workforce/export`)

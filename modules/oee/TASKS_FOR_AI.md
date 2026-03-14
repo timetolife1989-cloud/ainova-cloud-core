@@ -17,8 +17,8 @@
 ## Még hátralévő feladatok
 
 ### P1 — i18n & Lokalizáció
-- [ ] Frontend: Dashboard label-ek lokalizálása (Availability, Performance, Quality)
-- [ ] Frontend: Form label-ek i18n kulcsokra cserélése
+- [x] Frontend: DashboardPage i18n konvertálva (hu/en/de)
+- [ ] Frontend: Dashboard label-ek további lokalizálása (részleges)
 
 ### P2 — Funkció bővítés
 - [ ] Backend: Gép összesítő endpoint (gépenként átlag OEE trend)

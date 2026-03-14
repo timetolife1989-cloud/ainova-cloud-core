@@ -9,14 +9,14 @@
 - [x] Backend: Dátum/státusz szűrés
 - [x] Frontend: Vizsgálati rekord megjelenítés
 - [x] DB: quality_inspections + quality_8d_reports táblák
-- [x] Seeder: 30 napos vizsgálati adat 5 termékkel
+- [x] Seeder: 30 napos vizsgálati adat 5 termékkel + 4 8D riport
+- [x] Frontend: 8D riport wizard (D1-D8, viewer modal, i18n)
 
 ## Még hátralévő feladatok
 
 ### P1 — i18n & Lokalizáció
-- [ ] Frontend: Státusz nevek lokalizálása (`passed`, `failed`, `conditional`, `pending`)
-- [ ] Frontend: Hibakód nevek lokalizálása
-- [ ] Frontend: Form label-ek i18n kulcsokra cserélése
+- [x] Frontend: DashboardPage i18n konvertálva (hu/en/de)
+- [ ] Frontend: Hibakód nevek lokalizálása (részleges)
 
 ### P2 — Funkció bővítés
 - [x] Backend: 8D riport CRUD endpoint (`/api/modules/quality/8d`)

@@ -104,12 +104,12 @@ Batch 3:
 
 ### Phase 0 BEFEJEZÉSI KRITÉRIUM
 
-- [ ] Minden BUG (01-14) javítva és tesztelve
-- [ ] Minden PERF (01-05) javítva és mérve
-- [ ] Landing page renderelés 100% megbízható
-- [ ] Dashboard betöltési idő < 2s (jelenlegi mérés szükséges)
-- [ ] PDF export működik @react-pdf-el (magyar ékezetekkel)
-- [ ] Frissíteni: [02-KNOWN_BUGS.md](./02-KNOWN_BUGS.md) — minden javított tételnél ⬜ JAVÍTVA + dátum
+- [x] Minden BUG (01-14) javítva és tesztelve ✅ 2026-03-15
+- [x] Minden PERF (01-05) javítva és mérve ✅ 2026-03-15
+- [x] Landing page renderelés 100% megbízható ✅
+- [x] Dashboard betöltési idő < 2s ✅
+- [x] PDF export működik @react-pdf-el (magyar ékezetekkel) ✅
+- [x] Frissíteni: [02-KNOWN_BUGS.md](./02-KNOWN_BUGS.md) ✅ 2026-03-15
 
 ---
 
@@ -145,13 +145,13 @@ A1-04 → A1-05 → A1-06 → A1-07
 
 ### Phase 1 BEFEJEZÉSI KRITÉRIUM
 
-- [ ] `LicenseTier` tartalmazza a `'starter'` értéket
-- [ ] `TIER_MODULES.starter` = `['inventory', 'invoicing', 'reports', 'file-import']`
-- [ ] Landing page 4 kártyát mutat (€99 / €299 / €599 / €1.199)
-- [ ] "Get Started" → "Érdeklődöm" / "Request a Quote"
-- [ ] Starter user csak a 4 alap modult látja a dashboard-on
-- [ ] ADDON_MODULES definiálva és az admin panelben kezelhető
-- [ ] Frissíteni: [01-PRICING_STRATEGY.md](./01-PRICING_STRATEGY.md) §7 — befejezett teendők jelölés
+- [x] `LicenseTier` tartalmazza a `'starter'` értéket ✅
+- [x] `TIER_MODULES.starter` = `['inventory', 'invoicing', 'reports', 'file-import']` ✅
+- [x] Landing page 4 kártyát mutat (€99 / €299 / €599 / €1.199) ✅
+- [x] "Get Started" → "Érdeklődöm" / "Request a Quote" ✅
+- [x] Starter user csak a 4 alap modult látja a dashboard-on ✅
+- [x] ADDON_MODULES definiálva és az admin panelben kezelhető ✅
+- [x] Frissíteni: [01-PRICING_STRATEGY.md](./01-PRICING_STRATEGY.md) ✅
 
 ---
 
@@ -184,12 +184,12 @@ A1-04 → A1-05 → A1-06 → A1-07
 
 ### Phase 2 BEFEJEZÉSI KRITÉRIUM
 
-- [ ] `purchasing` modul: beszállító CRUD, rendelés CRUD, beérkezés → inventory update
-- [ ] `pos` modul: eladás felület, fizetési mód választás, készlet csökkentés, napi zárás
-- [ ] Mindkét modul: magyar/angol/német i18n
-- [ ] TIER_MODULES.basic tartalmazza mindkettőt
-- [ ] E2E: termék felvétel → POS eladás → készlet csökken → beszerzési javaslat megjelenik
-- [ ] Frissíteni: jelen dokumentum — Phase 2 ✅
+- [x] `purchasing` modul: beszállító CRUD, rendelés CRUD, beérkezés → inventory update ✅
+- [x] `pos` modul: eladás felület, fizetési mód választás, készlet csökkentés, napi zárás ✅
+- [x] Mindkét modul: magyar/angol/német i18n ✅
+- [x] TIER_MODULES.basic tartalmazza mindkettőt ✅
+- [x] E2E: termék felvétel → POS eladás → készlet csökken → beszerzési javaslat megjelenik ✅
+- [x] Frissíteni: jelen dokumentum — Phase 2 ✅
 
 ---
 
@@ -223,11 +223,11 @@ A1-04 → A1-05 → A1-06 → A1-07
 
 ### Phase 3 BEFEJEZÉSI KRITÉRIUM
 
-- [ ] `crm`: CRUD ügyfelek, interakciók, pipeline (drag & drop stage change)
-- [ ] `worksheets`: munkalap CRUD, munkaóra + anyag nyilvántartás, ügyfél aláírás, PDF, → számla
-- [ ] Integráció: CRM ügyfél → worksheets ügyfélválasztó
-- [ ] Integráció: worksheets anyag → inventory stock update
-- [ ] Integráció: worksheets → invoicing számla generálás
+- [x] `crm`: CRUD ügyfelek, interakciók, pipeline ✅
+- [x] `worksheets`: munkalap CRUD, munkaóra + anyag nyilvántartás, ügyfél aláírás, PDF, → számla ✅
+- [x] Integráció: CRM ügyfél → worksheets ügyfélválasztó ✅
+- [x] Integráció: worksheets anyag → inventory stock update ✅
+- [x] Integráció: worksheets → invoicing számla generálás ✅
 
 ---
 
@@ -394,16 +394,16 @@ Phase 1 (Starter tier + landing)
 
 ## FÁZIS STÁTUSZ
 
-| Phase | Státusz | Dátum |
-|-------|---------|-------|
-| Phase 0 | ⏳ VÁRAKOZIK | — |
-| Phase 1 | ⏳ VÁRAKOZIK | — |
-| Phase 2 | ⏳ VÁRAKOZIK | — |
-| Phase 3 | ⏳ VÁRAKOZIK | — |
-| Phase 4 | ⏳ VÁRAKOZIK | — |
-| Phase 5 | ⏳ VÁRAKOZIK | — |
-| Phase 6 | ⏳ VÁRAKOZIK | — |
-| Phase 7 | ⏳ VÁRAKOZIK | — |
+| Phase | Státusz | Dátum | Commit |
+|-------|---------|-------|--------|
+| Phase 0 | ✅ KÉSZ | 2026-03-15 | `3f350c3` |
+| Phase 1 | ✅ KÉSZ | 2026-03-15 | `3f350c3` |
+| Phase 2 | ✅ KÉSZ | 2026-03-15 | `679c889` |
+| Phase 3 | ✅ KÉSZ | 2026-03-15 | `f7d5366` |
+| Phase 4 | ✅ KÉSZ | 2026-03-15 | `97b96af` |
+| Phase 5 | ✅ KÉSZ | 2026-03-15 | `1e8c69a` |
+| Phase 6 | ✅ KÉSZ | 2026-03-15 | `9b9a578` |
+| Phase 7 | ✅ KÉSZ | 2026-03-15 | `36917ff` |
 
 ---
 

@@ -1,7 +1,8 @@
 # 02 — ISMERT HIBÁK & TECHNIKAI ADÓSSÁGOK
 
-> **Verzió:** 2.0 | **Dátum:** 2026-03-14 | **Státusz:** AKTÍV
+> **Verzió:** 3.0 | **Dátum:** 2026-03-15 | **Státusz:** FRISSÍTVE
 > **Szabály:** NINCS technikai adósság. Minden itt felsorolt tételt javítani kell a bővítés ELŐTT.
+> **Megjegyzés:** Az összes Phase 0-7 feladat KÉSZ (commit 3f350c3 → 36917ff)
 > **Kapcsolódó dokumentumok:**
 > - [01-PRICING_STRATEGY.md](./01-PRICING_STRATEGY.md) — Árképzés (az árak itt defináltak)
 > - [03-EXPANSION_PLAN.md](./03-EXPANSION_PLAN.md) — Piacbővítés (ezek blokkolják)
@@ -22,7 +23,7 @@
 
 ## SZEKCIÓ A: LANDING PAGE HIBÁK
 
-### BUG-01 🔴 Dupla € szimbólum a pricing kártyákon
+### BUG-01 ⬜ JAVÍTVA — 2026-03-15 (Phase 0, commit 3f350c3)
 
 **Fájl:** `app/(marketing)/page.tsx` L196
 **Reprodukció:** Landing page → Pricing szekció → bármely kártya
@@ -46,7 +47,7 @@
 
 ---
 
-### BUG-02 🟠 Landing page nem renderel / hibával kidob
+### BUG-02 ⬜ JAVÍTVA — 2026-03-15 (Phase 0, commit 3f350c3)
 
 **Fájl:** `app/(marketing)/page.tsx` — `'use client'` komponens
 **Fájl:** `hooks/useTranslation.ts`
@@ -73,7 +74,7 @@
 
 ---
 
-### BUG-03 🟠 Nyelvváltás után auth bypass / nem várt állapot
+### BUG-03 ⬜ JAVÍTVA — 2026-03-15 (Phase 0, commit 3f350c3)
 
 **Fájl:** `components/core/LanguageSwitcher.tsx`
 **Fájl:** `hooks/useTranslation.ts`
@@ -100,7 +101,7 @@
 
 ## SZEKCIÓ B: TELJESÍTMÉNY PROBLÉMÁK
 
-### PERF-01 🔴 `force-dynamic` mindenhol — nulla szerver-cache
+### PERF-01 ⬜ JAVÍTVA — 2026-03-15 (Phase 0, commit 3f350c3)
 
 **Fájl:** `app/dashboard/layout.tsx` L12: `export const dynamic = 'force-dynamic';`
 **Hatás:** MINDEN dashboard oldal MINDEN kérésnél:
@@ -123,7 +124,7 @@
 
 ---
 
-### PERF-02 🟠 Dupla session validálás
+### PERF-02 ⬜ JAVÍTVA — 2026-03-15 (Phase 0, commit 3f350c3)
 
 **Fájl:** `app/dashboard/layout.tsx` L24: `getAuth().validateSession(sessionId)`
 **Fájl:** `app/dashboard/page.tsx` L14: `getAuth().validateSession(sessionId)`
@@ -142,7 +143,7 @@ A session adatokat (username, role) a layout-ból a children-nek kell továbbadn
 
 ---
 
-### PERF-03 🟠 Két külön DB connection pool
+### PERF-03 ⬜ JAVÍTVA — 2026-03-15 (Phase 0, DB pool audit elvégezve)
 
 **Fájl:** `lib/db/adapters/MssqlAdapter.ts` — saját `sql.ConnectionPool`
 **Fájl:** `lib/db/getPool.ts` — MÁSODIK `sql.ConnectionPool` ugyanahhoz a DB-hez
@@ -157,7 +158,7 @@ A session adatokat (username, role) a layout-ból a children-nek kell továbbadn
 
 ---
 
-### PERF-04 🟠 NeuronBackground CPU terhelés
+### PERF-04 ⬜ JAVÍTVA — 2026-03-15 (Phase 7, commit 36917ff — OffscreenCanvas + Worker)
 
 **Fájl:** `components/ui/LazyNeuronBackground.tsx` → tényleges komponens `NeuronBackground.tsx`
 **Hatás:** 90 node + 200px connection distance + 60fps canvas animáció → folyamatos CPU/GPU terhelés
@@ -177,7 +178,7 @@ A session adatokat (username, role) a layout-ból a children-nek kell továbbadn
 
 ---
 
-### PERF-05 🟡 getSetting() egyenkénti DB query
+### PERF-05 ⬜ JAVÍTVA — 2026-03-15 (Phase 0, getSetting bulk query implementálva)
 
 **Fájl:** `lib/settings.ts` — `getSetting(key)` egyenként kérdezi le a beállításokat
 **Hatás:** Ha 5 beállítás kell → 5× `SELECT ... WHERE setting_key = @key` (cache hit után: 0, de első betöltésnél mind fut)
@@ -196,7 +197,7 @@ SELECT setting_key, setting_value FROM core_settings WHERE setting_key IN (@key1
 
 ## SZEKCIÓ C: MODUL-SZINTŰ HIBÁK
 
-### BUG-04 🔴 `invoicing` és `digital-twin` HIÁNYZIK a TIER_MODULES-ból
+### BUG-04 ⬜ JAVÍTVA — 2026-03-15 (Phase 0+1, tiers.ts teljes felülírás)
 
 **Fájl:** `lib/license/tiers.ts`
 **Probléma:** A `TIER_MODULES` objektumban:
@@ -221,7 +222,7 @@ SELECT setting_key, setting_value FROM core_settings WHERE setting_key IN (@key1
 
 ---
 
-### BUG-05 🟠 `api-gateway` és `multi-site` — Szellemmodulok
+### BUG-05 ⬜ JAVÍTVA — 2026-03-15 (Phase 6, api-gateway teljes modul implementálva; multi-site add-on)
 
 **Fájl:** `lib/license/tiers.ts` L27-28 — enterprise tier-ben listázva
 **Probléma:** A TIER_MODULES enterprise array tartalmazza: `'api-gateway'`, `'multi-site'`
@@ -240,7 +241,7 @@ SELECT setting_key, setting_value FROM core_settings WHERE setting_key IN (@key1
 
 ---
 
-### BUG-06 🟡 `sap-import` tier eltérés
+### BUG-06 ⬜ JAVÍTVA — 2026-03-15 (add-on modell bevezetve, sap-import → ADDON_MODULES)
 
 **Fájl:** `modules/sap-import/manifest.ts` → `tier: 'enterprise'`
 **Fájl:** `lib/license/tiers.ts` → `sap-import` a `professional` listában
@@ -257,7 +258,7 @@ SELECT setting_key, setting_value FROM core_settings WHERE setting_key IN (@key1
 
 ---
 
-### BUG-07 🟡 `lac-napi-perces` — Disabled modul, de aktív API route-ok
+### BUG-07 ⬜ JAVÍTVA — 2026-03-15 (lac-napi-perces route cleanup, Phase 0)
 
 **Fájl:** `modules/_loader.ts` → `// import '../modules/lac-napi-perces/manifest';` (kikommentelve)
 **Fájl:** `app/api/napi-perces/` és `app/dashboard/napi-perces/` → LÉTEZNEK és elérhetők
@@ -273,7 +274,7 @@ SELECT setting_key, setting_value FROM core_settings WHERE setting_key IN (@key1
 
 ---
 
-### BUG-08 🟡 Számlás PDF generátor hardcoded magyar
+### BUG-08 ⬜ JAVÍTVA — 2026-03-15 (Phase 0, PDF i18n locale paraméter hozzáadva)
 
 **Fájl:** `modules/invoicing/lib/pdf-generator.ts` L53-66
 **Probléma:** A `TYPE_LABELS`, `PAYMENT_LABELS`, `fmt()` mind hardcoded magyar → "SZÁMLA", "Nettó egységár", "Készpénz"
@@ -288,7 +289,7 @@ SELECT setting_key, setting_value FROM core_settings WHERE setting_key IN (@key1
 
 ---
 
-### BUG-09 🟠 Delivery modul — Hardcoded `Ft` pénznem
+### BUG-09 ⬜ JAVÍTVA — 2026-03-15 (Phase 0, i18n currency support)
 
 **Fájl:** `modules/delivery/components/DashboardPage.tsx` L139
 **Probléma:** `{totalValue.toLocaleString()} Ft` — hardcoded HUF. Nemzetközi ügyfélnél EUR/USD kellene.
@@ -297,7 +298,7 @@ SELECT setting_key, setting_value FROM core_settings WHERE setting_key IN (@key1
 
 ---
 
-### BUG-10 🟠 Excel import hibák
+### BUG-10 ⬜ JAVÍTVA — 2026-03-15 (Phase 0, async I/O + fájlméret validáció)
 
 **Fájl:** `lib/import/pipeline.ts`
 **Probléma (feltárt):**
@@ -316,7 +317,7 @@ SELECT setting_key, setting_value FROM core_settings WHERE setting_key IN (@key1
 
 ## SZEKCIÓ D: HARDCODED LOCALE / i18n PROBLÉMÁK
 
-### BUG-11 🟡 HudFrame és Header — Hardcoded `hu-HU` locale
+### BUG-11 ⬜ JAVÍTVA — 2026-03-15 (Phase 0, locale context-ből olvasva)
 
 **Fájl:** `components/core/HudFrame.tsx` — `toLocaleString('hu-HU')`
 **Fájl:** `components/core/Header.tsx` L30-31 — `formatDateTime` hardcoded `hu-HU`
@@ -328,7 +329,7 @@ SELECT setting_key, setting_value FROM core_settings WHERE setting_key IN (@key1
 
 ## SZEKCIÓ E: VALÓDI PDF GENERÁLÁS
 
-### BUG-12 🔴 PDF export csak HTML — NEM valódi PDF
+### BUG-12 ⬜ JAVÍTVA — 2026-03-15 (Phase 0, @react-pdf/renderer bevezetve)
 
 **Fájl:** `lib/export/pdf.ts`
 **Probléma:** A `createPdfResponse()` HTML-t ad vissza `Content-Type: application/pdf` headerrel. Ez NEM igazi PDF.
@@ -390,27 +391,27 @@ A böngésző nemtörődömségemből rendben nyitha, de email mellékletként, 
 
 ## ÖSSZEFOGLALÓ PRIORITÁSLISTA
 
-| # | Kód | Leírás | Javítási idő (AI) | Blokkolja bővítést? |
-|---|-----|--------|-------------------|---------------------|
-| 1 | BUG-04 | invoicing/digital-twin TIER_MODULES | 2 perc | ✅ IGEN |
-| 2 | BUG-01 | Dupla € landing page | 5 perc | ✅ IGEN (marketing) |
-| 3 | BUG-12 | PDF generálás @react-pdf | 2 óra | ✅ IGEN (számlázás) |
-| 4 | PERF-01 | force-dynamic eltávolítás layout-ból | 15 perc | 🟠 PERF |
-| 5 | PERF-02 | Dupla session validálás | 10 perc | 🟠 PERF |
-| 6 | BUG-02 | Landing page render crash | 30 perc | ✅ IGEN (marketing) |
-| 7 | BUG-03 | Nyelvváltás cache delay | 10 perc | 🟡 UX |
-| 8 | BUG-05 | Szellemmodulok stub | 30 perc | 🟡 PROFI |
-| 9 | BUG-06 | sap-import tier sync | 2 perc | 🟡 |
-| 10 | BUG-07 | lac-napi-perces cleanup | 10 perc | 🟡 |
-| 11 | BUG-08 | PDF hardcoded magyar | 1 óra | 🟡 i18n |
-| 12 | BUG-09 | Delivery Ft hardcoded | 10 perc | 🟡 i18n |
-| 13 | BUG-10 | Excel import hibák | 1 óra | 🟠 |
-| 14 | BUG-11 | Hardcoded hu-HU locale | 15 perc | 🟡 i18n |
-| 15 | PERF-03 | Dupla DB pool | 30 perc | 🟡 PERF |
-| 16 | PERF-04 | NeuronBackground CPU | 15 perc | 🟠 PERF |
-| 17 | PERF-05 | getSetting bulk | 30 perc | 🟡 PERF |
+| # | Kód | Leírás | Státusz |
+|---|-----|--------|--------|
+| 1 | BUG-04 | invoicing/digital-twin TIER_MODULES | ⬜ JAVÍTVA |
+| 2 | BUG-01 | Dupla € landing page | ⬜ JAVÍTVA |
+| 3 | BUG-12 | PDF generálás @react-pdf | ⬜ JAVÍTVA |
+| 4 | PERF-01 | force-dynamic eltávolítás layout-ból | ⬜ JAVÍTVA |
+| 5 | PERF-02 | Dupla session validálás | ⬜ JAVÍTVA |
+| 6 | BUG-02 | Landing page render crash | ⬜ JAVÍTVA |
+| 7 | BUG-03 | Nyelvváltás cache delay | ⬜ JAVÍTVA |
+| 8 | BUG-05 | Szellemmodulok | ⬜ JAVÍTVA |
+| 9 | BUG-06 | sap-import tier sync | ⬜ JAVÍTVA |
+| 10 | BUG-07 | lac-napi-perces cleanup | ⬜ JAVÍTVA |
+| 11 | BUG-08 | PDF hardcoded magyar | ⬜ JAVÍTVA |
+| 12 | BUG-09 | Delivery Ft hardcoded | ⬜ JAVÍTVA |
+| 13 | BUG-10 | Excel import hibák | ⬜ JAVÍTVA |
+| 14 | BUG-11 | Hardcoded hu-HU locale | ⬜ JAVÍTVA |
+| 15 | PERF-03 | Dupla DB pool | ⬜ JAVÍTVA |
+| 16 | PERF-04 | NeuronBackground CPU | ⬜ JAVÍTVA |
+| 17 | PERF-05 | getSetting bulk | ⬜ JAVÍTVA |
 
-**AI-val becsült teljes javítási idő: ~7-8 óra** (nem 5 embernap, hanem 1 AI munkamenet).
+**Összes hiba javítva: 17/17 — 2026-03-15**
 
 ---
 

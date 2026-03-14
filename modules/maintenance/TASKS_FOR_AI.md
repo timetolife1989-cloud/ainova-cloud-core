@@ -10,13 +10,15 @@
 - [x] Frontend: Karbantartási ütemterv megjelenítés
 - [x] DB: maintenance_assets + maintenance_schedules + maintenance_log táblák
 - [x] Seeder: 7 eszköz + 9 ütemezés + napló bejegyzések
+- [x] Backend: Complete API ("kész" jelölés)
+- [x] Backend: Log API (karbantartási napló)
+- [x] Frontend: Napló tab UI
 
 ## Még hátralévő feladatok
 
 ### P1 — i18n & Lokalizáció
-- [ ] Frontend: Prioritás nevek lokalizálása (`normal`, `magas`, `kritikus`)
-- [ ] Frontend: Eszköz típus nevek lokalizálása
-- [ ] Frontend: Form label-ek i18n kulcsokra cserélése
+- [x] Frontend: DashboardPage i18n konvertálva (hu/en/de)
+- [ ] Frontend: Eszköz típus nevek lokalizálása (részleges)
 
 ### P2 — Funkció bővítés
 - [ ] Backend: Karbantartási napló CRUD endpoint (`/api/modules/maintenance/log`)

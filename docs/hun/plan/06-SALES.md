@@ -1,9 +1,11 @@
 # ÉRTÉKESÍTÉS-ELŐKÉSZÍTÉS
 
+> Utolsó frissítés: 2026.03.15
+
 ## Demo környezet
 - ✅ `demo.ainovacloud.com` él (Vercel)
 - ✅ Demo adatok seedel-ve (200 fős gyár, 30 nap adat)
-- ⬜ Auto-reset (24 óránként seed újra futtatás → Vercel Cron Job)
+- ✅ Auto-reset (24 óránként — Vercel Cron Job 03:00 UTC, CRON_SECRET)
 - ⬜ Read-only mód opció (demo user ne törölhessen adatot)
 
 ## Demo fiókok
@@ -18,15 +20,17 @@
 | `operator3` | `Operator2025!` | operator |
 
 ## Landing page
-- ⬜ Marketing szöveg véglegesítés (3 csomag: Basic / Professional / Enterprise)
-- ⬜ Árazás megjelenítés
-- ⬜ CTA gombok (demo kérés, árajánlat)
+- ✅ Marketing szöveg kész (4 csomag: Starter / Basic / Professional / Enterprise)
+- ✅ Árazás megjelenítés (€99/€299/€599/€1199 + add-on árak)
+- ✅ CTA gombok (demo kérés, bejelentkezés)
+- ✅ Többnyelvű (HU / EN / DE — I18nProvider + 50+ kulcs)
+- ✅ Sector presets szekció (6 iparág)
 - ⬜ Screenshotok / videó a modulokról
-- ⬜ Többnyelvű (HU / EN / DE)
+- ⬜ Testimonials / referenciák
 
 ## Dokumentáció vevőknek
 - ⬜ Felhasználói kézikönyv (PDF)
-- ⬜ Admin útmutató
+- ⬜ Admin útmutató (OWNER_GUIDE.md részleges)
 - ⬜ API dokumentáció (OpenAPI/Swagger)
 - ⬜ Modul katalógus (feature lista csomagonként)
 

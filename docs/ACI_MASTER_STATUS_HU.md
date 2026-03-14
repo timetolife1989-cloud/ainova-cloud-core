@@ -1,7 +1,7 @@
 # ACI MASTER STATUS — Az Igazság Egyetlen Forrása
 
-> **Generálva:** 2026-03-14
-> **Verzió:** v1.4.0 (Számlázás modul + teljes NAV-kompatibilis invoicing)
+> **Generálva:** 2026-03-15
+> **Verzió:** v2.0.0 (Teljes Roadmap Phase 0-7 KÉSZ — 26 modul + szektor preset rendszer)
 > **Cél:** Production-Ready deployment Supabase + Vercel stacken
 
 ---
@@ -16,7 +16,7 @@
 | **DB** | PostgreSQL (Supabase Cloud) — elsődleges adapter |
 | **Auth** | Session-based (bcryptjs, 12 rounds) |
 | **Deploy** | Vercel (frontend) + Supabase (DB) |
-| **Licenc model** | 3 csomag: Basic / Professional / Enterprise |
+| **Licenc model** | 4 csomag: Starter / Basic / Professional / Enterprise + Add-on modulok |
 
 ---
 
@@ -28,27 +28,52 @@
 - 🔴 **Tervezett** — Csak manifest/skeleton létezik, nincs érdemi logika
 - 🚫 **Nem implementált** — A modul funkció leírása létezik, de kód nincs
 
-### BASIC Csomag
+### STARTER Csomag (€99/hó, max 5 user)
+
+| Modul | Állapot | API | UI | DB | Megjegyzés |
+|-------|---------|-----|----|----|-----------|
+| **inventory** | ✅ Production Ready | ✅ CRUD + kategória/alacsony készlet szűrés | ✅ Készletszint kijelzés | ✅ inventory_items + inventory_movements | Készlet kezelés mozgás naplóval. |
+| **invoicing** | ✅ Production Ready | ✅ CRUD + ÁFA + sorszám + akciók (issue/paid/storno) + PDF | ✅ Számla lista + szerkesztő + vevőkezelő | ✅ invoicing_customers + invoicing_invoices + invoicing_line_items + invoicing_vat_summary + invoicing_number_sequence | Magyar szabvány számlázás. 5 ÁFA kulcs, atomi sorszám, készlet integráció, NAV stub. |
+| **reports** | ✅ Production Ready | ✅ CRUD + JSON config | ✅ Dinamikus chart renderelés | ✅ reports_saved | Riport generátor mentett konfigokkal. |
+| **file-import** | ⚠️ Részleges (UI only) | ❌ Saját API nincs — közös admin API-t használ | ✅ Drag-n-drop + auto-mapping | ⚠️ Közös core_import_configs | Tervezetten megosztott modul. Nincs saját migráció. |
+
+### BASIC Csomag (€299/hó, max 15 user)
 
 | Modul | Állapot | API | UI | DB | Megjegyzés |
 |-------|---------|-----|----|----|-----------|
 | **workforce** | ✅ Production Ready | ✅ CRUD + szűrés + lapozás | ✅ Form + táblázat + chart | ✅ workforce_daily | Teljes műszaki létszám kezelés. 30 napos demo adat. |
 | **tracking** | ✅ Production Ready | ✅ CRUD + státusz szűrés + rendezés | ✅ Modal + szűrőpanel + badge-ek | ✅ tracking_items + tracking_history | Feladatkövetés státusz timeline-nal. |
 | **fleet** | ✅ Production Ready | ✅ CRUD + aktív szűrés | ✅ Dashboard + form | ✅ fleet_vehicles + fleet_trips + fleet_refuels | Járműpark nyilvántartás. |
-| **file-import** | ⚠️ Részleges (UI only) | ❌ Saját API nincs — közös admin API-t használ | ✅ Drag-n-drop + auto-mapping | ⚠️ Közös core_import_configs | Tervezetten megosztott modul. Nincs saját migráció. |
-| **reports** | ✅ Production Ready | ✅ CRUD + JSON config | ✅ Dinamikus chart renderelés | ✅ reports_saved | Riport generátor mentett konfigokkal. |
+| **purchasing** | ✅ Production Ready | ✅ CRUD + beszállítók + rendelések + beérkezés | ✅ 3 tab DashboardPage | ✅ purchasing_suppliers + purchasing_orders + purchasing_order_items | Beszerzés: rendelés → beérkezés → inventory update. |
+| **pos** | ✅ Production Ready | ✅ sell + refund + close-day + product-search | ✅ POS felület touchscreen-re | ✅ pos_transactions + pos_transaction_items + pos_daily_closings | Pénztár: eladás → készletcsökkentés → számla. |
 
-### PROFESSIONAL Csomag
+### BASIC Add-on Modulok
+
+| Modul | Állapot | API | UI | DB | Megjegyzés |
+|-------|---------|-----|----|----|-----------|
+| **recipes** | ✅ Production Ready | ✅ CRUD + gyártás flow | ✅ Receptúra szerkesztő + gyártás | ✅ mod_recipes + mod_recipe_ingredients + mod_recipe_productions | Receptúrák + BOM + gyártás → inventory csökkentés. |
+| **appointments** | ✅ Production Ready | ✅ CRUD + naptár + kapacitás | ✅ Heti/napi nézet naptár | ✅ mod_appointments + mod_appointment_slots | Időpontfoglalás + emlékeztetők. |
+| **projects** | ✅ Production Ready | ✅ CRUD + feladatok + költségvetés | ✅ Kanban nézet + költségvetés riport | ✅ mod_projects + mod_project_tasks + mod_project_costs | Projektkezelés + Kanban + budget. |
+| **e-commerce** | ✅ Production Ready | ✅ CRUD + WooCommerce/Shopify adapter | ✅ Kapcsolatok + szinkron log | ✅ mod_ecom_connections + mod_ecom_product_mappings + mod_ecom_sync_log | Webshop szinkronizáció. |
+
+### PROFESSIONAL Csomag (€599/hó, max 50 user)
 
 | Modul | Állapot | API | UI | DB | Megjegyzés |
 |-------|---------|-----|----|----|-----------|
 | **performance** | ✅ Production Ready | ✅ CRUD + hatékonyság számítás | ✅ KPI dashboard + form | ✅ performance_entries + performance_targets | Norma idő vs. tényleges idő alapú hatékonyság. |
 | **scheduling** | ✅ Production Ready | ✅ CRUD + heti tervezés | ✅ Kapacitás vizualizáció | ✅ scheduling_capacity + scheduling_allocations | Heti kapacitás tervezés erőforrás allokációval. |
 | **delivery** | ✅ Production Ready | ✅ CRUD + dátum/vevő szűrés | ✅ Szállítmány táblázat | ✅ delivery_shipments | Kiszállítás nyilvántartás vevő-bontással. |
-| **inventory** | ✅ Production Ready | ✅ CRUD + kategória/alacsony készlet szűrés | ✅ Készletszint kijelzés | ✅ inventory_items + inventory_movements | Készlet kezelés mozgás naplóval. |
-| **invoicing** | ✅ Production Ready | ✅ CRUD + ÁFA + sorszám + akciók (issue/paid/storno) + PDF | ✅ Számla lista + szerkesztő + vevőkezelő | ✅ invoicing_customers + invoicing_invoices + invoicing_line_items + invoicing_vat_summary + invoicing_number_sequence | Magyar szabvány számlázás. 5 ÁFA kulcs, atomi sorszám, készlet integráció, NAV stub. |
+| **crm** | ✅ Production Ready | ✅ CRUD + ügyfelek + interakciók + pipeline + emlékeztetők | ✅ Ügyfél lista + detail + pipeline nézet | ✅ crm_customers + crm_interactions + crm_opportunities + crm_reminders | Ügyfélkezelés: pipeline, interakció történet, emlékeztetők. |
+| **worksheets** | ✅ Production Ready | ✅ CRUD + munkaóra + anyag + aláírás + PDF + számla | ✅ Munkalap lista + form + detail | ✅ worksheets_orders + worksheets_labor + worksheets_materials | Munkalapok: anyagfelhasználás → inventory, ügyfél aláírás, PDF, → számla. |
 
-### ENTERPRISE Csomag
+### PROFESSIONAL Add-on Modulok
+
+| Modul | Állapot | Ár/hó | API | UI | DB | Megjegyzés |
+|-------|---------|-------|-----|----|----|-----------|
+| **api-gateway** | ✅ Production Ready | €99 | ✅ API key management + rate limiting + endpoint proxy | ✅ Admin panel: API kulcsok + log | ✅ core_api_keys + core_api_request_log | Külső API integráció: kulcs kezelés, rate limit, request napló. |
+| **sap-import** | ⚠️ Előkészítve | €99 | ✅ CRUD + test action + katalógus keresés + sync trigger (4 route) | ✅ 4 fül DashboardPage | ✅ mod_sap_connections + mod_sap_objects + mod_sap_field_mappings + mod_sap_sync_log + mod_sap_data_cache | Teljes séma + API + admin UI kész. RFC-aktiváláshoz `npm install node-rfc` + SAP NW RFC SDK szükséges. |
+
+### ENTERPRISE Csomag (€1199/hó, korlátlan user)
 
 | Modul | Állapot | API | UI | DB | Megjegyzés |
 |-------|---------|-----|----|----|-----------|
@@ -56,9 +81,14 @@
 | **shift-management** | ✅ Production Ready | ✅ CRUD + ütközés detektálás (409) | ✅ Beosztás form | ✅ shift_definitions + shift_assignments | Műszak tervezés ütközés felismeréssel. |
 | **quality** | ✅ Production Ready | ✅ CRUD + selejt kód katalógus | ✅ Vizsgálati rekord kijelzés | ✅ quality_inspections + quality_8d_reports | Minőség-ellenőrzés 8D riport támogatással. |
 | **maintenance** | ✅ Production Ready | ✅ CRUD + esedékesség számítás | ✅ Kiemelés túlhaladjáknál | ✅ maintenance_assets + maintenance_schedules + maintenance_log | Megelőző karbantartás ütemezés. |
-| **plc-connector** | ⚠️ Előkészítve (Driver stubs kész) | ✅ Eszköz nyilvántartás (S7/Modbus TCP/RTU/MQTT/OPC-UA) | ✅ Eszköz kártya grid + állapot | ✅ mod_plc_devices + mod_plc_registers + mod_plc_data + mod_plc_alerts + mod_plc_driver_config + mod_plc_poll_status | Driver interfészek + 4 stub driver kész. 002 migráció: alerts, driver_config, poll_status, alert_events. Hardver-aktiváláshoz `npm install node-snap7/modbus-serial/mqtt/node-opcua` szükséges. |
+| **plc-connector** | ⚠️ Előkészítve (Driver stubs kész) | ✅ Eszköz nyilvántartás (S7/Modbus TCP/RTU/MQTT/OPC-UA) | ✅ Eszköz kártya grid + állapot | ✅ mod_plc_devices + mod_plc_registers + mod_plc_data + mod_plc_alerts + mod_plc_driver_config + mod_plc_poll_status | Driver interfészek + 4 stub driver kész. Hardver-aktiváláshoz `npm install node-snap7/modbus-serial/mqtt/node-opcua` szükséges. |
 | **digital-twin** | ✅ Production Ready | ✅ CRUD + layout kezelés (7 gép seed) | ✅ 2D SVG gyártósor + interaktív gépek | ✅ mod_dt_layouts + mod_dt_machines (DB-vel) | Valós API endpoint, 7 gép seed adat, DB integráció kész. |
-| **sap-import** | ⚠️ Előkészítve | ✅ CRUD + test action + katalógus keresés + sync trigger (4 route) | ✅ 4 fül DashboardPage (Kapcsolatok, SAP Katalógus, Mező Mappingek, Szinkron Napló) | ✅ mod_sap_connections + mod_sap_objects (50+ objektum seed) + mod_sap_field_mappings + mod_sap_sync_log + mod_sap_data_cache | Teljes séma + API + admin UI kész. RFC-aktiváláshoz `npm install node-rfc` + SAP NW RFC SDK szükséges. OData connector natív fetch-szel használható. |
+
+### ENTERPRISE Add-on Modul
+
+| Modul | Állapot | Ár/hó | Megjegyzés |
+|-------|---------|-------|-----------|
+| **multi-site** | 🔴 Tervezett | €199 | Több telephely kezelés. Séma létezik, logika nem. |
 
 ### Speciális Modulok
 
@@ -200,24 +230,24 @@
 5. ~~Seeder futtatása Supabase-en~~
 6. ~~Superadmin credentials env variable-ba kiszervezve (SUPERADMIN_PASSWORD, SUPERADMIN_USERNAME)~~
 
-### P1 — Magas (Production Quality)
-1. Hardcoded stringek kicserélése i18n kulcsokra (change-password, SyncStatus, CommandPalette)
+### P1 — Magas (Production Quality) — ✅ TELJESÍTVE
+1. ~~Hardcoded stringek kicserélése i18n kulcsokra~~ ✅ Phase 0
 2. ~~Digital Twin API implementáció~~ — ✅ KÉSZ (CRUD, seed, DB)
-3. PLC Connector hardver-aktiválás (node-snap7/modbus-serial/mqtt/node-opcua telepítése)
-4. Landing page lokalizáció (HU/EN/DE)
-5. SAP RFC aktiválás (node-rfc + SAP NW RFC SDK licenc)
+3. PLC Connector hardver-aktiválás (node-snap7/modbus-serial/mqtt/node-opcua telepítése) — ⚠️ HARDVER SZÜKSÉGES
+4. ~~Landing page lokalizáció (HU/EN/DE)~~ ✅ Phase 1
+5. SAP RFC aktiválás (node-rfc + SAP NW RFC SDK licenc) — ⚠️ SAP SDK SZÜKSÉGES
 
-### P2 — Közepes (Feature completeness)
-1. Unit tesztek bővítése (jelenleg minimális coverage)
-2. Vercel deploy konfiguráció
-3. E2E tesztek (Playwright)
-4. API dokumentáció (OpenAPI/Swagger)
+### P2 — Közepes (Feature completeness) — ✅ NAGYRÉSZT TELJESÍTVE
+1. Unit tesztek bővítése (jelenleg minimális coverage) — ⏳ FOLYAMATOS
+2. ~~Vercel deploy konfiguráció~~ ✅
+3. E2E tesztek (Playwright) — ⏳ TERVEZETT
+4. API dokumentáció (OpenAPI/Swagger) — ⏳ TERVEZETT
 
 ### P3 — Alacsony (Nice to have)
-1. PWA offline support fejlesztése
-2. WebSocket migráció SSE-ről (ha szükséges)
-3. Multi-tenant support
-4. Fehér-címkézés (white-label) funkció
+1. ~~PWA offline support fejlesztése~~ ✅ Phase 7
+2. WebSocket migráció SSE-ről (ha szükséges) — ⏳ NEM PRIORITÁS
+3. Multi-tenant support — ⏳ TERVEZETT (multi-site add-on előkészítve)
+4. Fehér-címkézés (white-label) funkció — ⏳ TERVEZETT
 
 ---
 

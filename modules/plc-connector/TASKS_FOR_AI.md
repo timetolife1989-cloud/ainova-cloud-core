@@ -1,15 +1,20 @@
 # TASKS_FOR_AI.md — PLC Connector modul
 
 > **Modul:** plc-connector
-> **Állapot:** ⚠️ Részleges (Infrastruktúra kész, driver nincs)
+> **Állapot:** ⚠️ Előkészítve (infra + 4 driver interfész kész, hardver szükséges)
 > **Csomag:** Enterprise
+> **Utolsó frissítés:** 2026.03.15
 
 ## Befejezett funkciók
 - [x] Backend: Eszköz regisztráció API (név, protokoll, IP, port)
+- [x] Backend: 4 driver interfész (S7, Modbus TCP, Modbus RTU, MQTT, OPC-UA stub)
+- [x] Backend: `IPlcDriver` interface + `createPlcDriver` factory
 - [x] Frontend: Eszköz kártya grid + állapot (online/offline)
 - [x] Frontend: Protokoll választó (S7/Modbus/MQTT)
 - [x] Frontend: Eszköz hozzáadó modal
-- [x] DB: mod_plc_devices + mod_plc_registers + mod_plc_data (idősor) táblák
+- [x] Frontend: DashboardPage i18n konvertálva (hu/en/de)
+- [x] DB: mod_plc_devices + mod_plc_registers + mod_plc_data + alerts, driver_config, poll_status táblák
+- [x] Seeder: 4 demo eszköz
 
 ## Még hátralévő feladatok
 

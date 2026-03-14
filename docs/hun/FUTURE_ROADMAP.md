@@ -1,6 +1,8 @@
 # Ainova Cloud Intelligence — Feature Roadmap & Innovációs Terv
 
-> Ez a dokumentum a szoftver jövőbeli fejlesztési irányait, innovációs javaslatait és prioritásait tartalmazza. Minden javaslat a precizitás, gyorsaság, karbantarthatóság, átláthatóság és innováció elvei mentén készült.
+> Ez a dokumentum a szoftver fejlesztési történetét és jövőbeli irányait tartalmazza.
+> **Utolsó frissítés:** 2026.03.15 — Phase 0-7 KÉSZ, Fázis 1-3 feature-ök implementálva.
+> **Aktuális verzió:** v2.0.0 (26 modul, 4-tier licenc)
 
 ---
 
@@ -281,31 +283,43 @@ UI megjelenítés (szöveg + opcionális chart)
 
 ---
 
-## IMPLEMENTÁLÁSI STÁTUSZ
+## IMPLEMENTÁLÁSI STÁTUSZ (2026.03.15)
 
 | # | Feature | Fázis | Státusz |
 |---|---------|-------|---------|
-| 1 | PDF/Excel Export | 1 | ✅ Kész — `lib/export/pdf.ts`, `lib/export/excel.ts`, API endpoint |
-| 2 | Demo környezet | 1 | ✅ Kész — `scripts/seed-demo-data.ts` |
-| 3 | Landing page | 1 | ✅ Kész — `app/(marketing)/page.tsx` |
-| 4 | Email értesítések | 1 | ✅ Kész — `lib/notifications/email.ts` (nodemailer) |
-| 5 | Dashboard Builder | 2 | ✅ Kész — API `app/api/admin/dashboard-layouts/route.ts` |
-| 6 | PWA + offline | 2 | ✅ Kész — `public/manifest.json`, `public/sw.js` |
-| 7 | Globális keresés | 2 | ✅ Kész — `components/core/CommandPalette.tsx`, API |
-| 8 | Real-time SSE | 2 | ✅ Kész — `lib/sse/event-bus.ts`, `app/api/sse/` |
-| 9 | Nyelvváltó (HU/EN/DE) | 2 | ✅ Kész — Header dropdown, azonnali váltás |
+| 1 | PDF/Excel Export | 1 | ✅ Kész — `lib/export/pdf.ts`, `lib/export/excel.ts`, ExportButton 9+ modulba |
+| 2 | Demo környezet | 1 | ✅ Kész — `scripts/seed-demo-data.ts`, auto-reset Vercel Cron |
+| 3 | Landing page | 1 | ✅ Kész — `app/(marketing)/page.tsx`, 4-tier árazás, i18n |
+| 4 | Email értesítések | 1 | ✅ Kész — `lib/notifications/email.ts` (nodemailer, SMTP config szükséges) |
+| 5 | Dashboard Builder | 2 | ⚠️ Részleges — layout mentés kész, widget renderelés folytatásra vár |
+| 6 | PWA + offline | 2 | ✅ Kész — `public/manifest.json`, `public/sw.js` v3, modul chunk cache |
+| 7 | Globális keresés | 2 | ✅ Kész — `components/core/CommandPalette.tsx`, Ctrl+K |
+| 8 | Real-time SSE | 2 | ✅ Kész — `lib/sse/event-bus.ts`, `app/api/sse/`, heartbeat 30s |
+| 9 | Nyelvváltó (HU/EN/DE) | 2 | ✅ Kész — I18nProvider + SW cache fix, 1 klikk váltás |
 | 10 | Fordítás szerkesztő | 2 | ✅ Kész — API `app/api/admin/translations/route.ts` |
-| 11 | AI asszisztens | 3 | ✅ Kész — `lib/ai/assistant.ts`, OpenAI GPT-4o-mini |
-| 12 | PLC connector | 3 | ✅ Kész — Manifest, migration, API, dashboard |
-| 13 | Digital Twin | 3 | ✅ Kész — Manifest, migration, 2D canvas dashboard |
+| 11 | AI asszisztens | 3 | ✅ Előkészítve — `lib/ai/assistant.ts`, OpenAI API kulcs szükséges |
+| 12 | PLC connector | 3 | ⚠️ Előkészítve — 4 driver interfész, hardver szükséges |
+| 13 | Digital Twin | 3 | ✅ Kész — CRUD API, 7 gép seed, 2D SVG layout DB |
 | 14 | Workflow Engine | 3 | ✅ Kész — `lib/workflows/engine.ts`, rule API |
-| 15 | API Gateway | 3 | ✅ Kész — `lib/api-gateway/middleware.ts`, key API |
-| 16 | Multi-site | 3 | ✅ Kész — Migration, API `app/api/admin/sites/` |
-| 17 | Tesztek + CI | T | ✅ Kész — vitest config, unit tesztek, GitHub Actions |
+| 15 | API Gateway | 3 | ✅ Kész — `modules/api-gateway/`, API kulcs kezelés, rate limiting, request napló |
+| 16 | Multi-site | 3 | ⚠️ Részleges — CRUD kész, modulokba nincs bekötve |
+| 17 | Tesztek + CI | T | ⚠️ Részleges — vitest config kész, minimális test coverage |
 | 18 | Marketplace | 4 | ⏳ Tervben |
 | 19 | Mobile App | 4 | ⏳ Tervben |
 | 20 | Multi-tenant SaaS | 4 | ⏳ Tervben |
 | 21 | Embedded BI | 4 | ⏳ Tervben |
+| 22 | Purchasing modul | P2 | ✅ Kész — Phase 2 (commit 679c889) |
+| 23 | POS modul | P2 | ✅ Kész — Phase 2 (commit 679c889) |
+| 24 | CRM modul | P3 | ✅ Kész — Phase 3 (commit f7d5366) |
+| 25 | Worksheets modul | P3 | ✅ Kész — Phase 3 (commit f7d5366) |
+| 26 | Sector Presets | P4 | ✅ Kész — Phase 4 (commit 97b96af) — 6 iparág |
+| 27 | Recipes add-on | P5 | ✅ Kész — Phase 5 (commit 1e8c69a) |
+| 28 | Appointments add-on | P5 | ✅ Kész — Phase 5 (commit 1e8c69a) |
+| 29 | Projects add-on | P5 | ✅ Kész — Phase 5 (commit 1e8c69a) |
+| 30 | E-commerce modul | P6 | ✅ Kész — Phase 6 (commit 9b9a578) |
+| 31 | CSP + Edge auth | P7 | ✅ Kész — Phase 7 (commit 36917ff) |
+| 32 | OffscreenCanvas | P7 | ✅ Kész — Phase 7 (commit 36917ff) |
+| 33 | 4-tier licenc | P1 | ✅ Kész — Phase 1 (commit 3f350c3) — Starter/Basic/Pro/Enterprise |
 
 ---
 

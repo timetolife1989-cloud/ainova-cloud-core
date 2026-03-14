@@ -1,10 +1,10 @@
-# PRIORITÁSOK — 2026.03.13
+# PRIORITÁSOK — 2026.03.15
 
-> ŐSZINTE státusz. Nincs hamis ✅ — csak az van megjelölve ami TÉNYLEG működik a live URL-en.
+> ŐSZINTE státusz — Phase 0-7 roadmap TELJESÍTVE. Alább a kiegészítő feladatok, amik a Phase-ektől függetlenül kerültek felvételre.
 
 ---
 
-## P0 — KRITIKUS (javítva, push-olva)
+## P0 — KRITIKUS (mind javítva ✅)
 
 - ✅ Vercel deployment működik (Supabase Cloud, PgBouncer, SSL)
 - ✅ Login működik (pg modul, boolean konverzió, i18n provider)
@@ -21,7 +21,7 @@
 - ✅ i18n: Admin panel (UserTable, UserForm, UserFilters, AuditLogTable, SyncStatusWidget)
 - ✅ Security headers (CSP, HSTS, Permissions-Policy, SameSite=strict)
 
-## P1 — MOST JAVÍTANDÓ (CEO feedback 2026.03.12)
+## P1 — MOST JAVÍTANDÓ (CEO feedback — mind javítva ✅)
 
 - ✅ Mobile nyelvváltó javítva (Header responsive — logo+avatar+lang+logout mobilon is)
 - ✅ Dátum input mezők: dark theme CSS (color-scheme: dark, webkit-calendar invert)
@@ -32,12 +32,12 @@
 - ✅ Teljesítmény optimalizálás (useMemo 6 modulban, staleTime 5min, refetchOnWindowFocus kikapcsolva, MenuTile CSS-only, CommandPalette lazy load, dead Inter import törölve)
 - ✅ Demo seed bővítés (reports 8 mentett definíció, PLC connector 4 eszköz, quality 8D 4 riport)
 
-## P2 — FONTOS (javítva, push-olva)
+## P2 — FONTOS (mind javítva ✅)
 
 - ✅ Dashboard nyelvváltó (force-dynamic + revalidatePath + router.refresh)
 - ✅ Password change oldal i18n (27 kulcs hu/en/de, layout + I18nProvider)
 
-## P3 — KÖZEPES (javítva, push-olva)
+## P3 — KÖZEPES (mind javítva ✅)
 
 - ✅ Reports modul: riport motor implementálás (query API, viewer, editor, delete — commit 92f6da0)
 - ✅ Maintenance: "kész" jelölés + napló UI (complete API, log API, tab UI — commit 10cfac1)
@@ -45,7 +45,7 @@
 - ✅ Performance: célérték beállító UI (targets CRUD API, tab UI, modal — commit e13b520)
 - ✅ Excel/PDF export javítás minden modulban (SQL injection fix, ExportButton 9 modulba, i18n)
 
-## P4 — NICE TO HAVE (javítva, push-olva)
+## P4 — NICE TO HAVE (mind javítva ✅)
 
 - ✅ Digital Twin: valós API endpoint (CRUD, seed 7 gép, layout DB)
 - ✅ PLC Connector: driver interfészek előkészítve (S7/Modbus TCP/Modbus RTU/MQTT/OPC-UA stub driverek, 002 migráció — alerts, driver_config, poll_status táblák)
@@ -53,3 +53,28 @@
 - ✅ Demo környezet auto-reset (Vercel Cron 03:00 UTC, CRON_SECRET)
 - ✅ Mobile responsive optimalizáció (5 loading grid + audit)
 - ✅ AI Asszisztens SYSTEM_PROMPT teljes újraírás (mind a 18 modul + SAP + PLC táblaismeret, OEE benchmark, minőségi formula, BI fókusz — OpenAI API kulcs szükséges)
+
+## P5 — Phase 0-7 Roadmap (2026.03.15 — mind KÉSZ ✅)
+
+- ✅ Phase 0: Stabilizáció (dupla €, force-dynamic, getSetting bulk, SSE heartbeat, TIER_MODULES)
+- ✅ Phase 1: 4-tier licenc + Starter csomag + Landing page árazás
+- ✅ Phase 2: Purchasing + POS modulok (6 DB tábla, CRUD API, seed)
+- ✅ Phase 3: CRM + Worksheets modulok (5 DB tábla, pipeline, PDF, számla konverzió)
+- ✅ Phase 4: Sector Presets (6 iparági preset, Setup wizard UI, auto-aktiválás)
+- ✅ Phase 5: Recipes + Appointments + Projects add-on modulok (7 DB tábla)
+- ✅ Phase 6: E-commerce + API Gateway integráció (5 DB tábla, rate limiting)
+- ✅ Phase 7: SW v3 + PWA + OffscreenCanvas + CSP + edge auth
+
+---
+
+## HÁTRALÉVŐ TEENDŐK (aktuális)
+
+| # | Feladat | Prioritás | Állapot |
+|---|---------|-----------|---------|
+| 1 | i18n: hardcoded stringek (login, setup, admin részleges) | KÖZEPES | Részben kész |
+| 2 | Unit tesztek (vitest) | KÖZEPES | Minimális coverage |
+| 3 | E2E tesztek (Playwright) | KÖZEPES | Nincs |
+| 4 | SAP RFC SDK aktiválás | ALACSONY | Ext. SDK szükséges |
+| 5 | PLC driver aktiválás (hardware) | ALACSONY | Hardware szükséges |
+| 6 | SMTP email konfiguráció | ALACSONY | Kód kész, konfig hiányzik |
+| 7 | Pilot ügyfél telepítés | MAGAS | Első éles teszt |

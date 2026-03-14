@@ -14,8 +14,8 @@
 ## Még hátralévő feladatok
 
 ### P1 — i18n & Lokalizáció
-- [ ] Frontend: Státusz nevek lokalizálása (`pending`, `shipped`, `delivered`, `returned`)
-- [ ] Frontend: Form label-ek i18n kulcsokra cserélése
+- [x] Frontend: DashboardPage i18n konvertálva (hu/en/de)
+- [ ] Frontend: Státusz nevek lokalizálása (részleges)
 
 ### P2 — Funkció bővítés
 - [ ] Backend: Vevő összesítő endpoint (vevőnkénti darabszám/érték aggregáció)

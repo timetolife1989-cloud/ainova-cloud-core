@@ -14,9 +14,9 @@
 ## Még hátralévő feladatok
 
 ### P1 — i18n & Lokalizáció
-- [ ] Frontend: Műszak nevek lokalizálása (Reggeli, Délutáni, Éjszakai)
-- [ ] Frontend: Státusz nevek lokalizálása (`planned`, `confirmed`, `absent`)
-- [ ] Frontend: Form label-ek és hibaüzenetek i18n kulcsokra cserélése
+- [x] Frontend: DashboardPage i18n konvertálva (hu/en/de)
+- [x] Frontend: Műszak nevek lokalizálva (labelKey pattern)
+- [ ] Frontend: Form hibaüzenetek i18n kulcsokra cserélése
 
 ### P2 — Funkció bővítés
 - [ ] Backend: Heti beosztás másolás endpoint (előző hét klónozása)

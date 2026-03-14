@@ -25,7 +25,7 @@ export const manifest: ModuleDefinition = {
   href: '/dashboard/modules/my-module',
   color: 'bg-blue-600',                     // Tailwind szín
   version: '1.0.0',
-  tier: 'basic' as const,                   // 'basic' | 'professional' | 'enterprise'
+  tier: 'basic' as const,                   // 'starter' | 'basic' | 'professional' | 'enterprise'
   dependsOn: [],                            // Függőségek (más modul ID-k)
   permissions: [
     'my-module.view',
@@ -47,6 +47,7 @@ registerModule(manifest);
 ```
 
 ### Tier értékek
+- `starter` — Starter csomagban elérhető (legalsó szint)
 - `basic` — Basic csomagban elérhető
 - `professional` — Professional csomagtól elérhető
 - `enterprise` — Csak Enterprise csomagban
@@ -63,26 +64,23 @@ registerModule(manifest);
 Hozd létre: `modules/<modul-id>/migrations/001_my_module.sql`
 
 ```sql
--- My Module tábla
+-- My Module tábla (PostgreSQL — Supabase)
 
-IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'my_module_items')
-  CREATE TABLE my_module_items (
-    id              INT IDENTITY(1,1) PRIMARY KEY,
-    name            NVARCHAR(200) NOT NULL,
-    value           DECIMAL(10,2),
-    created_by      NVARCHAR(100),
-    created_at      DATETIME2 DEFAULT SYSDATETIME()
-  );
-GO
+CREATE TABLE IF NOT EXISTS my_module_items (
+  id              SERIAL PRIMARY KEY,
+  name            VARCHAR(200) NOT NULL,
+  value           NUMERIC(10,2),
+  created_by      VARCHAR(100),
+  created_at      TIMESTAMPTZ DEFAULT NOW()
+);
 
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'idx_my_module_name' AND object_id = OBJECT_ID('my_module_items'))
-  CREATE INDEX idx_my_module_name ON my_module_items(name);
-GO
+CREATE INDEX IF NOT EXISTS idx_my_module_name ON my_module_items(name);
 ```
 
 **Fontos szabályok:**
-- Minden migráció **idempotens** (IF NOT EXISTS)
-- Tábla neve: `<modul_id>_<táblanév>` (pl. `my_module_items`)
+- Minden migráció **idempotens** (`CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`)
+- Adatbázis: **PostgreSQL** (Supabase Cloud)
+- Tábla neve: `<modul_id>_<táblanév>` (pl. `my_module_items`) vagy `mod_<modul_id>_<táblanév>`
 - NE használj `core_` prefixet — az a core tábláknak van fenntartva
 
 ## 4. TypeScript típusok

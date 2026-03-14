@@ -17,9 +17,9 @@
 ## Még hátralévő feladatok
 
 ### P1 — i18n & Lokalizáció
-- [ ] Frontend: Hardcoded magyar státusz nevek lokalizálása (`Nyitott`, `Folyamatban`, `Kész`, `Lezárt`)
-- [ ] Frontend: Prioritás nevek lokalizálása (`alacsony`, `normal`, `magas`, `kritikus`)
-- [ ] Frontend: Form label-ek és hibaüzenetek i18n kulcsokra cserélése
+- [x] Frontend: DashboardPage i18n konvertálva (hu/en/de)
+- [ ] Frontend: Státusz nevek lokalizálása (részleges)
+- [ ] Frontend: Form hibaüzenetek i18n kulcsokra cserélése
 
 ### P2 — Funkció bővítés
 - [ ] Backend: Státusz timeline endpoint (tracking_history lekérdezés item_id alapján)

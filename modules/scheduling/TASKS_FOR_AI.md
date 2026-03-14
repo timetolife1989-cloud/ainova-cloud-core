@@ -14,8 +14,8 @@
 ## Még hátralévő feladatok
 
 ### P1 — i18n & Lokalizáció
-- [ ] Frontend: Erőforrás típus nevek lokalizálása (`worker`, `machine`, `area`)
-- [ ] Frontend: Form label-ek i18n kulcsokra cserélése
+- [x] Frontend: DashboardPage i18n konvertálva (hu/en/de)
+- [ ] Frontend: Erőforrás típus nevek lokalizálása (részleges)
 
 ### P2 — Funkció bővítés
 - [ ] Backend: Allokáció CRUD endpoint (`/api/modules/scheduling/allocations`)
