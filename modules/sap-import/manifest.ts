@@ -43,4 +43,5 @@ registerModule({
   ],
   dependsOn: [],
   migrations: ['001_sap_connector.sql'],
+  isAddon: true,
 });

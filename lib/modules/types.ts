@@ -12,6 +12,9 @@ export interface ModuleManifest {
   adminSettings: AdminSettingDef[]; // Admin panel configurable settings
   migrations: string[];             // SQL file names from the module migrations/ folder
   adminOnly?: boolean;
+  sector?: string[];                // Sector IDs where this module is relevant
+  comingSoon?: boolean;             // Module announced but not yet implemented
+  isAddon?: boolean;                // Available as add-on outside tier bundles
 }
 
 export interface AdminSettingDef {

@@ -16,6 +16,7 @@ export const manifest: ModuleDefinition = {
   ],
   adminSettings: [],
   migrations: [],
+  sector: ['retail', 'gastronomy'],
 };
 
 registerModule(manifest);

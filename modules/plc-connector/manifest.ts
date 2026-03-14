@@ -23,4 +23,5 @@ registerModule({
   ],
   dependsOn: [],
   migrations: ['001_plc_connector.sql', '002_plc_enhancements.sql'],
+  sector: ['manufacturing'],
 });

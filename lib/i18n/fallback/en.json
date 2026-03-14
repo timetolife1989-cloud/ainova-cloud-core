@@ -67,6 +67,8 @@
   "admin.audit_log_desc": "Logins, admin actions, event list",
   "admin.license": "License",
   "admin.license_desc": "Package tier, allowed modules, expiration",
+  "admin.sectors": "Sectors",
+  "admin.sectors_desc": "Manage industry preset templates",
   "admin.roles": "Roles & Permissions",
   "admin.roles_desc": "Manage roles, permission matrix",
   "admin.units": "Units",
@@ -878,6 +880,9 @@
   "landing.footer_rights": "All rights reserved.",
   "landing.footer_signin": "Sign In",
   "landing.footer_setup": "Setup",
+  "landing.sector_all": "All Industries",
+  "landing.sector_recommended_hint": "For the {sector} sector, the {tier} package is recommended.",
+  "landing.tier_recommended": "RECOMMENDED",
 
   "auth.error.not_logged_in": "Not logged in",
   "auth.error.session_check_failed": "Session validation failed",

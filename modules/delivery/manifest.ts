@@ -20,6 +20,7 @@ export const manifest: ModuleDefinition = {
     { key: 'delivery_weight_unit', label: 'Weight unit', type: 'unit_select', default: 'kg' },
   ],
   migrations: ['001_delivery.sql'],
+  sector: ['logistics'],
 };
 
 registerModule(manifest);

@@ -21,4 +21,5 @@ registerModule({
     { key: 'crm_pipeline_stages', label: 'Pipeline stages (comma-separated)', type: 'string', default: 'lead,proposal,negotiation,won,lost' },
   ],
   migrations: ['modules/crm/migrations/001_crm.sql'],
+  sector: ['services', 'retail', 'construction', 'logistics'],
 });

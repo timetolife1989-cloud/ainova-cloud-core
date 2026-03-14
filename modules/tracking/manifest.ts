@@ -20,6 +20,7 @@ export const manifest: ModuleDefinition = {
     { key: 'tracking_unit', label: 'Quantity unit', type: 'unit_select', default: 'pieces' },
   ],
   migrations: ['001_tracking.sql'],
+  sector: ['manufacturing', 'services', 'construction', 'logistics'],
 };
 
 registerModule(manifest);

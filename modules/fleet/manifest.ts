@@ -21,6 +21,7 @@ export const manifest: ModuleDefinition = {
     { key: 'fleet_currency', label: 'Currency', type: 'unit_select', default: 'huf' },
   ],
   migrations: ['001_fleet.sql'],
+  sector: ['construction', 'logistics', 'services'],
 };
 
 registerModule(manifest);

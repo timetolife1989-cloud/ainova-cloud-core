@@ -13,4 +13,5 @@ registerModule({
   adminSettings: [],
   dependsOn: [],
   migrations: ['001_digital_twin.sql'],
+  sector: ['manufacturing'],
 });

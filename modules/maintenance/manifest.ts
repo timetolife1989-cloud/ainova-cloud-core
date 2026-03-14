@@ -15,6 +15,7 @@ export const manifest: ModuleDefinition = {
     { key: 'maintenance_alert_days', label: 'Alert days in advance', type: 'number', default: '7' },
   ],
   migrations: ['001_maintenance.sql'],
+  sector: ['manufacturing', 'logistics'],
 };
 
 registerModule(manifest);

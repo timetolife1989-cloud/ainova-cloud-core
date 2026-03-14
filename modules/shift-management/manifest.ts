@@ -15,6 +15,7 @@ export const manifest: ModuleDefinition = {
     { key: 'shift_types', label: 'Shift types (comma-separated)', type: 'string', default: 'Morning,Afternoon,Night' },
   ],
   migrations: ['001_shift_management.sql'],
+  sector: ['manufacturing'],
 };
 
 registerModule(manifest);

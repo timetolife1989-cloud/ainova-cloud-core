@@ -20,6 +20,7 @@ export const manifest: ModuleDefinition = {
     { key: 'inventory_low_stock_alert', label: 'Low stock alert', type: 'boolean', default: 'true' },
   ],
   migrations: ['001_inventory.sql'],
+  sector: ['manufacturing', 'retail', 'gastronomy', 'construction', 'logistics', 'services'],
 };
 
 registerModule(manifest);

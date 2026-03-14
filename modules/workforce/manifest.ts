@@ -21,6 +21,7 @@ export const manifest: ModuleDefinition = {
     { key: 'workforce_track_absences', label: 'Track absences', type: 'boolean', default: 'true' },
   ],
   migrations: ['001_workforce.sql', '002_workforce_overtime.sql'],
+  sector: ['manufacturing', 'retail', 'gastronomy', 'construction', 'logistics'],
 };
 
 registerModule(manifest);

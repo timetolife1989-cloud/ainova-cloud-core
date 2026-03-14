@@ -21,6 +21,7 @@ export const manifest: ModuleDefinition = {
     { key: 'performance_target_percent', label: 'Target performance %', type: 'number', default: '100' },
   ],
   migrations: ['001_performance.sql'],
+  sector: ['manufacturing'],
 };
 
 registerModule(manifest);

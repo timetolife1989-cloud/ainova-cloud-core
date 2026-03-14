@@ -16,6 +16,7 @@ export const manifest: ModuleDefinition = {
     { key: 'oee_shift_hours', label: 'Shift length (hours)', type: 'number', default: '8' },
   ],
   migrations: ['001_oee.sql'],
+  sector: ['manufacturing'],
 };
 
 registerModule(manifest);

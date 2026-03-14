@@ -57,6 +57,15 @@ export interface ModuleDefinition {
 
   /** Migration file names */
   migrations?: string[];
+
+  /** Sector IDs where this module is relevant */
+  sector?: string[];
+
+  /** Module announced but not yet implemented */
+  comingSoon?: boolean;
+
+  /** Available as add-on outside tier bundles */
+  isAddon?: boolean;
 }
 
 /** All registered modules — Phase 2 modules push into this array */

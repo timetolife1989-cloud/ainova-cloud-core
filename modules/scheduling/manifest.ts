@@ -21,6 +21,7 @@ export const manifest: ModuleDefinition = {
     { key: 'scheduling_capacity_unit', label: 'Capacity unit', type: 'unit_select', default: 'hours' },
   ],
   migrations: ['001_scheduling.sql'],
+  sector: ['manufacturing', 'services', 'logistics'],
 };
 
 registerModule(manifest);

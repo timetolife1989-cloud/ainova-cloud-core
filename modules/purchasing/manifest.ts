@@ -22,6 +22,7 @@ export const manifest: ModuleDefinition = {
     { key: 'purchasing_default_vat', label: 'Default VAT rate (%)', type: 'number', default: '27' },
   ],
   migrations: ['001_purchasing.sql'],
+  sector: ['retail', 'gastronomy', 'construction'],
 };
 
 registerModule(manifest);

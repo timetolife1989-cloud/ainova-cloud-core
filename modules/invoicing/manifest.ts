@@ -49,6 +49,7 @@ export const manifest: ModuleDefinition = {
     { key: 'invoicing_nav_exchange_key', label: 'NAV exchange key (XML csere kulcs)', type: 'string', default: '' },
   ],
   migrations: ['001_invoicing.sql'],
+  sector: ['manufacturing', 'retail', 'services', 'gastronomy', 'construction', 'logistics'],
 };
 
 registerModule(manifest);

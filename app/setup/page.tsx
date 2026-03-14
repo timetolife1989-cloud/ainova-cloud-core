@@ -1,11 +1,32 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Settings, Database, UserPlus, Palette, Blocks, Key, CheckCircle, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
+import { Settings, Database, UserPlus, Palette, Blocks, Key, CheckCircle, ArrowRight, ArrowLeft, Loader2, Factory, ShoppingCart, Wrench, ChefHat, HardHat, Truck, Building2 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 
-type Step = 'welcome' | 'admin' | 'branding' | 'modules' | 'license' | 'complete';
-const STEPS: Step[] = ['welcome', 'admin', 'branding', 'modules', 'license', 'complete'];
+type Step = 'welcome' | 'admin' | 'branding' | 'sector' | 'modules' | 'license' | 'complete';
+const STEPS: Step[] = ['welcome', 'admin', 'branding', 'sector', 'modules', 'license', 'complete'];
+
+interface SectorPreset {
+  sectorId: string;
+  nameHu: string;
+  nameEn: string;
+  nameDe: string;
+  icon: string;
+  modules: string[];
+  optionalModules: string[];
+  settings: Record<string, string>;
+  recommendedTier: string;
+}
+
+const SECTOR_ICONS: Record<string, React.ReactNode> = {
+  Factory: <Factory className="w-8 h-8" />,
+  ShoppingCart: <ShoppingCart className="w-8 h-8" />,
+  Wrench: <Wrench className="w-8 h-8" />,
+  ChefHat: <ChefHat className="w-8 h-8" />,
+  HardHat: <HardHat className="w-8 h-8" />,
+  Truck: <Truck className="w-8 h-8" />,
+};
 
 // STEP_INFO will be generated dynamically using translations
 
@@ -40,6 +61,10 @@ export default function SetupPage() {
   // Modules form
   const [selectedModules, setSelectedModules] = useState<string[]>(['workforce', 'tracking', 'fleet', 'file-import', 'reports']);
 
+  // Sector form
+  const [sectors, setSectors] = useState<SectorPreset[]>([]);
+  const [selectedSector, setSelectedSector] = useState<string | null>(null);
+
   // License form
   const [licenseKey, setLicenseKey] = useState('');
 
@@ -51,6 +76,14 @@ export default function SetupPage() {
         if (data.completed) {
           window.location.href = '/login';
         }
+      })
+      .catch(() => {});
+
+    // Load sector presets
+    fetch('/api/admin/sectors?setup=1')
+      .then(r => r.json())
+      .then((data: { sectors: SectorPreset[] }) => {
+        if (data.sectors) setSectors(data.sectors);
       })
       .catch(() => {});
   }, []);
@@ -91,6 +124,17 @@ export default function SetupPage() {
           if (!appName.trim()) { setError(t('setup.company_name') + ' ' + t('common.required')); setLoading(false); return; }
           body = { step: 'branding', appName, locale };
           break;
+        case 'sector': {
+          // Apply sector preset modules if a sector was selected
+          if (selectedSector) {
+            const preset = sectors.find(s => s.sectorId === selectedSector);
+            if (preset) {
+              setSelectedModules(preset.modules);
+            }
+          }
+          body = { step: 'sector', sectorId: selectedSector };
+          break;
+        }
         case 'modules':
           body = { step: 'modules', activeModules: selectedModules };
           break;
@@ -133,6 +177,7 @@ export default function SetupPage() {
       welcome: <Settings className="w-8 h-8" />,
       admin: <UserPlus className="w-8 h-8" />,
       branding: <Palette className="w-8 h-8" />,
+      sector: <Building2 className="w-8 h-8" />,
       modules: <Blocks className="w-8 h-8" />,
       license: <Key className="w-8 h-8" />,
       complete: <CheckCircle className="w-8 h-8" />,
@@ -217,6 +262,35 @@ export default function SetupPage() {
                     <option value="de">Deutsch</option>
                   </select></div>
               </>
+            )}
+
+            {currentStep === 'sector' && (
+              <div className="space-y-3">
+                <p className="text-gray-400 text-sm mb-4">{t('setup.sector_desc')}</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {sectors.map(s => {
+                    const name = locale === 'hu' ? s.nameHu : locale === 'de' ? s.nameDe : s.nameEn;
+                    return (
+                      <button
+                        key={s.sectorId}
+                        onClick={() => setSelectedSector(selectedSector === s.sectorId ? null : s.sectorId)}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border transition-colors ${
+                          selectedSector === s.sectorId
+                            ? 'bg-blue-900/30 border-blue-500 text-blue-300'
+                            : 'bg-gray-950 border-gray-800 text-gray-400 hover:border-gray-600'
+                        }`}
+                      >
+                        <div className="text-2xl">
+                          {SECTOR_ICONS[s.icon] ?? <Building2 className="w-8 h-8" />}
+                        </div>
+                        <span className="text-sm font-medium text-white">{name}</span>
+                        <span className="text-xs opacity-60">{s.recommendedTier}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">{t('setup.sector_skip_hint')}</p>
+              </div>
             )}
 
             {currentStep === 'modules' && (

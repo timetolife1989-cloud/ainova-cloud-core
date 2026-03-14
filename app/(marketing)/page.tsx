@@ -1,15 +1,20 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { LazyNeuronBackground } from '@/components/ui/LazyNeuronBackground';
 import { LanguageSwitcher } from '@/components/core/LanguageSwitcher';
 
 export default function LandingPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [activeSector, setActiveSector] = useState<string | null>(null);
+  const [sectorPresets, setSectorPresets] = useState<Array<{
+    sectorId: string; nameHu: string; nameEn: string; nameDe: string;
+    icon: string; modules: string[]; recommendedTier: string;
+  }>>([]);
 
   const FEATURES = [
     { icon: '👥', titleKey: 'landing.feat_workforce', descKey: 'landing.feat_workforce_desc' },
@@ -21,6 +26,33 @@ export default function LandingPage() {
     { icon: '🔧', titleKey: 'landing.feat_maintenance', descKey: 'landing.feat_maintenance_desc' },
     { icon: '✅', titleKey: 'landing.feat_quality', descKey: 'landing.feat_quality_desc' },
   ];
+
+  useEffect(() => {
+    fetch('/api/admin/sectors?setup=1')
+      .then(r => r.json())
+      .then((data: { sectors: typeof sectorPresets }) => {
+        if (data.sectors) setSectorPresets(data.sectors);
+      })
+      .catch(() => {});
+  }, []);
+
+  const activeSectorPreset = sectorPresets.find(s => s.sectorId === activeSector);
+
+  // Map module IDs to i18n keys for display
+  const MODULE_LABEL_MAP: Record<string, string> = {
+    inventory: 'inventory.title', invoicing: 'invoicing.title', reports: 'reports.title',
+    'file-import': 'import.title', workforce: 'landing.feat_workforce', tracking: 'landing.feat_tracking',
+    fleet: 'landing.feat_fleet', purchasing: 'purchasing.title', pos: 'pos.title',
+    performance: 'landing.feat_performance', scheduling: 'landing.feat_scheduling',
+    delivery: 'delivery.title', crm: 'crm.title', worksheets: 'worksheets.title',
+    oee: 'landing.feat_oee', 'shift-management': 'shift.title', quality: 'landing.feat_quality',
+    maintenance: 'landing.feat_maintenance', 'digital-twin': 'digital_twin.title',
+    'plc-connector': 'landing.feat_oee',
+  };
+
+  const SECTOR_EMOJI: Record<string, string> = {
+    Factory: '🏭', ShoppingCart: '🛒', Wrench: '🔧', ChefHat: '👨‍🍳', HardHat: '🏗️', Truck: '🚛',
+  };
 
   const TIERS = [
     {
@@ -184,20 +216,74 @@ export default function LandingPage() {
           <p className="text-gray-400 text-lg">{t('landing.pricing_subtitle')}</p>
         </div>
 
+        {/* Sector tab bar */}
+        {sectorPresets.length > 0 && (
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
+            <button
+              onClick={() => setActiveSector(null)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                !activeSector ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+              }`}
+            >
+              {t('landing.sector_all')}
+            </button>
+            {sectorPresets.map(s => {
+              const name = locale === 'hu' ? s.nameHu : locale === 'de' ? s.nameDe : s.nameEn;
+              return (
+                <button
+                  key={s.sectorId}
+                  onClick={() => setActiveSector(activeSector === s.sectorId ? null : s.sectorId)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeSector === s.sectorId ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <span>{SECTOR_EMOJI[s.icon] ?? '🏢'}</span>
+                  {name}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Sector recommendation banner */}
+        {activeSectorPreset && (
+          <div className="mb-8 p-4 bg-blue-900/20 border border-blue-800/50 rounded-xl text-center">
+            <p className="text-blue-300 text-sm">
+              {t('landing.sector_recommended_hint', {
+                sector: locale === 'hu' ? activeSectorPreset.nameHu : locale === 'de' ? activeSectorPreset.nameDe : activeSectorPreset.nameEn,
+                tier: activeSectorPreset.recommendedTier,
+              })}
+            </p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {TIERS.map((tier) => (
+          {TIERS.map((tier) => {
+            const tierKey = tier.nameKey.replace('landing.tier_', '');
+            const isRecommended = activeSectorPreset?.recommendedTier === tierKey;
+            const isPopular = activeSector ? isRecommended : tier.popular;
+
+            // When a sector is active, show that sector's relevant modules for this tier
+            const displayFeatures = activeSectorPreset
+              ? activeSectorPreset.modules
+                  .filter(m => MODULE_LABEL_MAP[m])
+                  .slice(0, 5)
+                  .map(m => MODULE_LABEL_MAP[m]!)
+              : tier.features;
+
+            return (
             <motion.div
               key={tier.nameKey}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className={`relative rounded-2xl p-6 border ${
-                tier.popular ? 'border-blue-500 shadow-xl shadow-blue-600/20 lg:scale-105' : 'border-gray-800'
+                isPopular ? 'border-blue-500 shadow-xl shadow-blue-600/20 lg:scale-105' : 'border-gray-800'
               } bg-gradient-to-b ${tier.color}`}
             >
-              {tier.popular && (
+              {isPopular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
-                  {t('landing.tier_popular')}
+                  {isRecommended ? t('landing.tier_recommended') : t('landing.tier_popular')}
                 </div>
               )}
               <h3 className="text-xl font-bold mb-2">{t(tier.nameKey)}</h3>
@@ -206,7 +292,7 @@ export default function LandingPage() {
                 <span className="text-gray-400 text-sm"> /{t('landing.tier_per_month')}</span>
               </div>
               <ul className="space-y-2 mb-6">
-                {tier.features.map((f) => (
+                {displayFeatures.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-sm text-gray-300">
                     <span className="text-green-400">✓</span> {t(f)}
                   </li>
@@ -218,7 +304,7 @@ export default function LandingPage() {
               <a
                 href="/setup"
                 className={`block w-full text-center py-3 rounded-xl font-semibold transition-colors ${
-                  tier.popular
+                  isPopular
                     ? 'bg-blue-500 hover:bg-blue-400 text-white'
                     : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
                 }`}
@@ -226,7 +312,8 @@ export default function LandingPage() {
                 {t(tier.ctaKey)}
               </a>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Pricing disclaimer */}

@@ -117,6 +117,14 @@ export async function POST(request: NextRequest) {
         return Response.json({ ok: true, nextStep: 'modules' });
       }
       
+      case 'sector': {
+        const sectorId = (body as { sectorId?: string | null }).sectorId;
+        if (sectorId) {
+          await setSetting('selected_sector', sectorId, 'setup-wizard');
+        }
+        return Response.json({ ok: true, nextStep: 'modules' });
+      }
+
       case 'modules': {
         const parsed = StepSchemas.modules.safeParse(body);
         if (!parsed.success) return Response.json({ error: parsed.error.issues[0]?.message }, { status: 400 });

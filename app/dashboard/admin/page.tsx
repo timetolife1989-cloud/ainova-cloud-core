@@ -24,6 +24,7 @@ async function getAdminMenuItems(): Promise<AdminMenuItem[]> {
     { title: await t('admin.diagnostics'),          description: await t('admin.diagnostics_desc'),      icon: 'Activity',       href: '/dashboard/admin/diagnostics',    order: 80 },
     { title: await t('admin.audit_log'),            description: await t('admin.audit_log_desc'),       icon: 'FileText',       href: '/dashboard/admin/audit-log',      order: 90 },
     { title: await t('admin.license'),              description: await t('admin.license_desc'),         icon: 'Key',            href: '/dashboard/admin/license',        order: 100 },
+    { title: await t('admin.sectors'),              description: await t('admin.sectors_desc'),         icon: 'Building2',      href: '/dashboard/admin/sectors',        order: 110 },
   ];
 }
 

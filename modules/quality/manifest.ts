@@ -15,6 +15,7 @@ export const manifest: ModuleDefinition = {
     { key: 'quality_reject_codes', label: 'Reject codes (comma-separated)', type: 'string', default: 'DIM,VIS,FUN,MAT,OTH' },
   ],
   migrations: ['001_quality.sql'],
+  sector: ['manufacturing', 'gastronomy'],
 };
 
 registerModule(manifest);

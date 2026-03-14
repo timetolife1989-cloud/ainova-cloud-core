@@ -38,4 +38,5 @@ registerModule({
     },
   ],
   migrations: ['modules/pos/migrations/001_pos.sql'],
+  sector: ['retail', 'gastronomy'],
 });

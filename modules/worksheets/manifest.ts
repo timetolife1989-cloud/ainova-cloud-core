@@ -21,4 +21,5 @@ registerModule({
     { key: 'worksheets_auto_deduct_inventory', label: 'Auto deduct inventory', type: 'boolean', default: 'true' },
   ],
   migrations: ['modules/worksheets/migrations/001_worksheets.sql'],
+  sector: ['services'],
 });

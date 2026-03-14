@@ -29,6 +29,7 @@ export const manifest: ModuleDefinition = {
     },
   ],
   migrations: ['001_reports.sql'],
+  sector: ['manufacturing', 'retail', 'services', 'gastronomy', 'construction', 'logistics'],
 };
 
 registerModule(manifest);
