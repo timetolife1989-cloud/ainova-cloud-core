@@ -20,6 +20,8 @@ import '@/modules/purchasing/manifest';
 import '@/modules/pos/manifest';
 
 // === PROFESSIONAL csomag ===
+import '@/modules/crm/manifest';
+import '@/modules/worksheets/manifest';
 import '@/modules/performance/manifest';
 import '@/modules/scheduling/manifest';
 import '@/modules/delivery/manifest';
