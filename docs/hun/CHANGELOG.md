@@ -2,6 +2,27 @@
 
 Minden jelentős változás dokumentálva van ebben a fájlban.
 
+## [1.4.0] - 2026-03-14
+
+### Számlázás modul (invoicing) — Professional tier
+- **manifest.ts** — 5 jogosultság, 12 admin beállítás (cégadatok, NAV, számlázási alapértékek)
+- **001_invoicing.sql** — 5 MSSQL tábla (customers, number_sequence, invoices, line_items, vat_summary)
+- **vat-calculator.ts** — ÁFA motor: 27%, 18%, 5%, TAM, AAM; HUF egész forintra kerekítés
+- **invoice-number.ts** — Atomi sorszámgenerátor (UPDLOCK/HOLDLOCK), minta: ACI-2026-00001
+- **API route-ok** — Számlalista (szűrőkkel), piszkozat létrehozás, számla akciók (issue/paid/storno), vevő CRUD
+- **pdf-generator.ts** — A4 nyomtatható HTML számla (eladó/vevő, tételek, ÁFA összesítő, aláírás mezők)
+- **nav-adapter.ts** — NAV Online Számla 3.0 stub (hitelesítő adatok, nav_status kezelés)
+- **DashboardPage.tsx** — Számla lista nézet: összesítő kártyák, szűrők, akció gombok, PDF gomb
+- **InvoiceEditor.tsx** — Számla szerkesztő: vevő typeahead, tétel sorok, ÁFA bontás, készlet integráció
+- **CustomerManager.tsx** — Vevőkezelő: lista, keresés, új vevő modal (adószám: 8-1-2 validáció)
+- **i18n** — hu/en/de fordítások (70+ kulcs)
+- **_loader.ts** — Modul regisztrálva a Professional csomagban
+- **Dokumentáció** — docs/hun/INVOICING_MODULE.md (teljes API, séma, használati leírás)
+
+### Készlet integráció
+- Kiállításkor (issue) → automatikus `out` mozgás az inventory_movements táblába
+- Sztornókor (storno) → automatikus `in` mozgás, készlet visszatöltés
+
 ## [1.3.0] - 2026-03-13
 
 ### SAP Integráció előkészítés

@@ -1,14 +1,32 @@
 import { getDb } from '@/lib/db';
 
+// ── Settings cache (30s TTL) ──
+const _settingsCache = new Map<string, { value: string | null; at: number }>();
+const SETTINGS_CACHE_TTL = 30_000;
+
 export async function getSetting(key: string): Promise<string | null> {
+  const now = Date.now();
+  const cached = _settingsCache.get(key);
+  if (cached && (now - cached.at) < SETTINGS_CACHE_TTL) {
+    return cached.value;
+  }
+
   const rows = await getDb().query<{ setting_value: string | null }>(
     'SELECT setting_value FROM core_settings WHERE setting_key = @key',
     [{ name: 'key', type: 'nvarchar', value: key, maxLength: 100 }]
   );
-  return rows[0]?.setting_value ?? null;
+  const value = rows[0]?.setting_value ?? null;
+  _settingsCache.set(key, { value, at: now });
+  return value;
+}
+
+export function clearSettingsCache(): void {
+  _settingsCache.clear();
 }
 
 export async function setSetting(key: string, value: string, updatedBy?: string): Promise<void> {
+  // Invalidate cache for this key
+  _settingsCache.delete(key);
   const db = getDb();
   const params = [
     { name: 'key',       type: 'nvarchar' as const, value: key,               maxLength: 100 },

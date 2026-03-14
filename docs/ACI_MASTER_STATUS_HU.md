@@ -1,7 +1,7 @@
 # ACI MASTER STATUS — Az Igazság Egyetlen Forrása
 
-> **Generálva:** 2026-03-13
-> **Verzió:** v1.3.0 (SAP/PLC/AI előkészítés + P0–P4 teljesítés)
+> **Generálva:** 2026-03-14
+> **Verzió:** v1.4.0 (Számlázás modul + teljes NAV-kompatibilis invoicing)
 > **Cél:** Production-Ready deployment Supabase + Vercel stacken
 
 ---
@@ -46,6 +46,7 @@
 | **scheduling** | ✅ Production Ready | ✅ CRUD + heti tervezés | ✅ Kapacitás vizualizáció | ✅ scheduling_capacity + scheduling_allocations | Heti kapacitás tervezés erőforrás allokációval. |
 | **delivery** | ✅ Production Ready | ✅ CRUD + dátum/vevő szűrés | ✅ Szállítmány táblázat | ✅ delivery_shipments | Kiszállítás nyilvántartás vevő-bontással. |
 | **inventory** | ✅ Production Ready | ✅ CRUD + kategória/alacsony készlet szűrés | ✅ Készletszint kijelzés | ✅ inventory_items + inventory_movements | Készlet kezelés mozgás naplóval. |
+| **invoicing** | ✅ Production Ready | ✅ CRUD + ÁFA + sorszám + akciók (issue/paid/storno) + PDF | ✅ Számla lista + szerkesztő + vevőkezelő | ✅ invoicing_customers + invoicing_invoices + invoicing_line_items + invoicing_vat_summary + invoicing_number_sequence | Magyar szabvány számlázás. 5 ÁFA kulcs, atomi sorszám, készlet integráció, NAV stub. |
 
 ### ENTERPRISE Csomag
 

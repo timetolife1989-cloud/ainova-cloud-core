@@ -22,3 +22,99 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
   filter: invert(1);
 }
+
+/* ═══════════════════════════════════════════
+   HUD — Clean header + Glass content panel
+   ═══════════════════════════════════════════ */
+
+.hud-frame {
+  --hud-accent: 140 180 255;
+}
+
+/* ── Header bar: solid dark ── */
+.hud-header {
+  background: #050a14;
+  isolation: isolate;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 1px 8px rgba(0, 0, 0, 0.7),
+    0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Glass content panel ── */
+.glass-panel {
+  background: rgba(8, 14, 28, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Glass specular highlight */
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    transparent 40%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* ── Separator ── */
+.hud-separator {
+  width: 1px;
+  height: 24px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.12), transparent);
+}
+
+/* ── Logout button ── */
+.hud-btn-danger {
+  position: relative;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  color: #f87171;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.hud-btn-danger:hover {
+  background: rgba(220, 38, 38, 0.18);
+  border-color: rgba(220, 38, 38, 0.4);
+  color: #fca5a5;
+}
+
+/* ── Content scrollbar ── */
+.hud-content::-webkit-scrollbar {
+  width: 4px;
+}
+.hud-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.hud-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+.hud-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ── LED strip animations (pure CSS, no JS) ── */
+@keyframes led-pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.55; }
+}
+@keyframes led-flash {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.95; }
+}
+.hud-led-pulse {
+  animation: led-pulse 3s ease-in-out infinite;
+}
+.hud-led-flash {
+  animation: led-flash 0.8s ease-in-out infinite;
+}

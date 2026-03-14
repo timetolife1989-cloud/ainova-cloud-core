@@ -69,10 +69,7 @@ export function registerModule(mod: ModuleDefinition): void {
     ALL_MODULES.push(mod);
   }
 
-  // Auto-register module permissions (best-effort, non-blocking)
-  if (mod.permissions && mod.permissions.length > 0) {
-    ensurePermissionsExist(mod.id, mod.permissions).catch(() => {});
-  }
+  // Permissions are ensured via migration scripts, not on every import
 }
 
 /**

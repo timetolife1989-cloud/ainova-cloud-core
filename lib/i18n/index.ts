@@ -26,19 +26,30 @@ const _cache = new Map<string, TranslationMap>();
 let _cacheAt = 0;
 const CACHE_TTL = 10 * 60 * 1000; // 10 min
 
+// Locale cache (30s TTL — matches settings cache)
+let _localeCache: { value: SupportedLocale; at: number } | null = null;
+const LOCALE_CACHE_TTL = 30_000;
+
 /**
- * Get the current locale from settings.
+ * Get the current locale from settings (cached).
  */
 export async function getLocale(): Promise<SupportedLocale> {
+  const now = Date.now();
+  if (_localeCache && (now - _localeCache.at) < LOCALE_CACHE_TTL) {
+    return _localeCache.value;
+  }
   try {
     const locale = await getSetting('app_locale');
     if (locale && SUPPORTED_LOCALES.includes(locale as SupportedLocale)) {
+      _localeCache = { value: locale as SupportedLocale, at: now };
       return locale as SupportedLocale;
     }
   } catch {
     // fallback
   }
-  return (process.env.DEFAULT_LOCALE as SupportedLocale) ?? 'en';
+  const fallback = (process.env.DEFAULT_LOCALE as SupportedLocale) ?? 'en';
+  _localeCache = { value: fallback, at: now };
+  return fallback;
 }
 
 /**
@@ -113,6 +124,7 @@ export async function t(key: string, params?: Record<string, string | number>): 
 export function clearTranslationCache(): void {
   _cache.clear();
   _cacheAt = 0;
+  _localeCache = null;
 }
 
 /**

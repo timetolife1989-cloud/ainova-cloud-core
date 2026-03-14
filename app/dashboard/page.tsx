@@ -16,38 +16,54 @@ export default async function DashboardPage() {
 
   const modules = await getActiveModules(session.role);
 
-  // Pre-resolve module titles/subtitles
+  // Pre-resolve module titles/subtitles in parallel
   const moduleTitles: Record<string, string> = {};
   const moduleSubtitles: Record<string, string> = {};
-  for (const mod of modules) {
-    moduleTitles[mod.id] = await t(mod.id + '.title');
-    moduleSubtitles[mod.id] = await t(mod.id + '.subtitle');
-  }
+  await Promise.all(
+    modules.map(async (mod) => {
+      const [title, subtitle] = await Promise.all([
+        t(mod.id + '.title'),
+        t(mod.id + '.subtitle'),
+      ]);
+      moduleTitles[mod.id] = title;
+      moduleSubtitles[mod.id] = subtitle;
+    })
+  );
+
+  // Pre-resolve all translations in parallel
+  const [dashboardTitle, dashboardWelcome, noModulesUser, noModules, noModulesAdmin, adminTitle] = await Promise.all([
+    t('dashboard.title'),
+    t('dashboard.welcome', { name: session.fullName || session.username }),
+    t('dashboard.no_modules_user'),
+    t('dashboard.no_modules'),
+    t('dashboard.no_modules_admin'),
+    t('admin.title'),
+  ]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <DashboardSectionHeader
-        title={await t('dashboard.title')}
-        subtitle={await t('dashboard.welcome', { name: session.fullName || session.username })}
+        title={dashboardTitle}
+        subtitle={dashboardWelcome}
       />
 
       {modules.length === 0 && session.role !== 'admin' ? (
         <div className="rounded-xl border border-gray-800 bg-gray-900 p-8 text-center">
           <p className="text-gray-400">
-            {await t('dashboard.no_modules_user')}
+            {noModulesUser}
           </p>
         </div>
       ) : modules.length === 0 ? (
         <div className="rounded-xl border border-yellow-800 bg-yellow-950/20 p-8 text-center">
-          <p className="text-yellow-400 font-medium mb-2">{await t('dashboard.no_modules')}</p>
+          <p className="text-yellow-400 font-medium mb-2">{noModules}</p>
           <p className="text-gray-400 text-sm">
-            {await t('dashboard.no_modules_admin')}
+            {noModulesAdmin}
           </p>
           <a
             href="/dashboard/admin"
             className="inline-block mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700"
           >
-            {await t('admin.title')}
+            {adminTitle}
           </a>
         </div>
       ) : (
