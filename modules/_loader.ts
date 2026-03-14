@@ -19,6 +19,11 @@ import '@/modules/reports/manifest';
 import '@/modules/purchasing/manifest';
 import '@/modules/pos/manifest';
 
+// === BASIC add-on modulok ===
+import '@/modules/recipes/manifest';
+import '@/modules/appointments/manifest';
+import '@/modules/projects/manifest';
+
 // === PROFESSIONAL csomag ===
 import '@/modules/crm/manifest';
 import '@/modules/worksheets/manifest';

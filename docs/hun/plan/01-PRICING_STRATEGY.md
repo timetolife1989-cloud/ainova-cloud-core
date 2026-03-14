@@ -212,16 +212,16 @@ Tab-ok, amelyekre kattintva a pricing kártyákon a modullisták a szektornak me
 
 ## 5. VERSENYPOZÍCIÓ AZ ÚJ ÁRAZÁSSAL
 
-| Szoftver | Típus | Havi ár | Raktár | Számla | POS | NAV | Magyar | Flat fee |
-|----------|-------|---------|--------|--------|-----|-----|--------|----------|
-| **ACI Starter** | SaaS | **€99** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Billingo (Premium) | SaaS | ~€12 | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ |
-| Számlázz.hu | SaaS | ~€8 | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ |
-| MiniCRM (Starter) | SaaS | ~€55 | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ (per user) |
-| Odoo Community | Open-source | €0 | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
-| Odoo Enterprise | SaaS | €24/user | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ (per user) |
-| Katana MRP | SaaS | €99+ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ (per user) |
-| SAP Business One | License | €100+/user | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ (per user) |
+| Szoftver           | Típus    | Havi ár | Raktár | Számla | POS | NAV | Magyar | Flat fee |
+|----------|---------|----------|---------|--------|--------|-----|----------|----------|
+| **ACI Starter**    | SaaS     | **€99** | ✅     | ✅    | ✅ | ✅ | ✅ | ✅ |
+| Billingo (Premium) | SaaS     | ~€12    | ❌     | ✅    | ❌ | ✅ | ✅ | ✅ |
+| Számlázz.hu | SaaS | ~€8      | ❌      | ✅     | ❌    | ✅ | ✅ | ✅ |
+| MiniCRM (Starter)  | SaaS     | ~€55    | ❌     | ❌    | ❌ | ❌ | ✅ | ❌ (per user) |
+| Odoo Community     | Op.sour. | €0      | ✅     | ✅     | ✅ | ❌| ❌ | ✅ |
+| Odoo Enterprise    | SaaS     | €24/user | ✅    | ✅    | ✅ | ❌ | ❌ | ❌ (per user) |
+| Katana MRP | SaaS  | saas     |  99+      /  ✅  | ✅    | ❌ | ❌ | ❌ | ❌ (per user) |
+| SAP Business One   | License  | €100+/user | ✅  | ✅    | ❌ | ✅ | ✅ | ❌ (per user) |
 
 **ACI versenyelőny:**
 1. **Fix havi díj** — nem per-user, 5-15 user ugyanannyiért
@@ -241,12 +241,12 @@ Tab-ok, amelyekre kattintva a pricing kártyákon a modullisták a szektornak me
 
 ### Első éves becslés (12 hónap, egyedül dolgozva)
 
-| Hónap | Új ügyfél | Összesen | Havi recurring | Havi impl. díj | Össz. bevétel (havi) |
-|-------|----------|---------|----------------|-----------------|---------------------|
-| 1 | 1 Starter | 1 | €99 | €299 | €398 |
-| 3 | 2 (1 Basic) | 4 | €596 | €599 | €1.195 |
-| 6 | 2 | 9 | €1.593 | €599 | €2.192 |
-| 12 | 2 | 20 | €3.980 | €299 | €4.279 |
+| Hónap | Új ügyfél   | Összesen   | Havi recurring | Havi impl. díj  | Össz. bevétel (havi) |
+|-------|-------------|------------|----------------|-----------------|---------------------|
+| 1     | 1 Starter   | 1          | €99            | €299            | €398   |
+| 3     | 2 (1 Basic) | 4          | €596           | €599            | €1.195 |
+| 6     | 2           | 9          | €1.593         | €599            | €2.192 |
+| 12    | 2           | 20         | €3.980         | €299            | €4.279 |
 
 **Éves összesítő (reális, pesszimista):**
 - Recurring: **~€28.000** (~11M Ft)
