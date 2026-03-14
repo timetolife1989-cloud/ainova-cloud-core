@@ -17,13 +17,20 @@ export function useTranslation() {
   useEffect(() => {
     if (hasProvider) return;
     fetch(`/api/i18n?_t=${Date.now()}`, { cache: 'no-store' })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`i18n fetch failed: ${res.status}`);
+        return res.json();
+      })
       .then((data: { translations: Translations; locale: string }) => {
         setFetchedTranslations(data.translations);
         setFetchedLocale(data.locale);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error('[useTranslation] Failed to load translations:', err);
+        setFetchedTranslations({});
+        setLoading(false);
+      });
   }, [hasProvider]);
 
   const locale = hasProvider ? _i18nLocale : fetchedLocale;

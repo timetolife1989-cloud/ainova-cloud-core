@@ -25,8 +25,8 @@ function getInitials(name: string): string {
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 }
 
-function formatDateTime(date: Date): string {
-  return date.toLocaleString('hu-HU', {
+function formatDateTime(date: Date, locale: string): string {
+  return date.toLocaleString(locale, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -172,7 +172,7 @@ export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) 
             {currentTime ? (
               <>
                 <span className="text-white font-mono font-semibold text-xs">
-                  {formatDateTime(currentTime)}
+                  {formatDateTime(currentTime, locale)}
                 </span>
                 <span className="text-gray-400 text-[10px]">
                   {getDayName(currentTime, locale)} &bull; {getWeekNumber(currentTime)}. {t('common.week_short')}
@@ -287,7 +287,7 @@ export function Header({ appName, username, role, locale = 'hu' }: HeaderProps) 
             {/* Date/time */}
             {currentTime && (
               <div className="px-4 py-3 border-t border-gray-800">
-                <p className="text-xs text-gray-400">{formatDateTime(currentTime)}</p>
+                <p className="text-xs text-gray-400">{formatDateTime(currentTime, locale)}</p>
                 <p className="text-[10px] text-gray-500">{getDayName(currentTime, locale)} &bull; {getWeekNumber(currentTime)}. {t('common.week_short')}</p>
               </div>
             )}

@@ -24,35 +24,47 @@ export default function LandingPage() {
 
   const TIERS = [
     {
+      nameKey: 'landing.tier_starter',
+      price: '99',
+      features: ['inventory.title', 'invoicing.title', 'reports.title', 'import.title'],
+      userLimit: t('landing.tier_up_to_users', { count: 5 }),
+      color: 'from-emerald-700 to-emerald-800',
+      popular: false,
+      ctaKey: 'landing.tier_cta_inquiry',
+    },
+    {
       nameKey: 'landing.tier_basic',
-      price: '€299',
-      features: ['landing.feat_workforce', 'landing.feat_tracking', 'landing.feat_fleet', 'reports.title', 'import.title'],
-      userLimit: t('landing.tier_up_to_users', { count: 10 }),
+      price: '299',
+      features: ['landing.feat_workforce', 'landing.feat_tracking', 'landing.feat_fleet', 'purchasing.title', 'pos.title'],
+      userLimit: t('landing.tier_up_to_users', { count: 15 }),
       color: 'from-gray-700 to-gray-800',
       popular: false,
+      ctaKey: 'landing.tier_cta_inquiry',
     },
     {
       nameKey: 'landing.tier_professional',
-      price: '€599',
-      features: ['landing.feat_performance', 'landing.feat_scheduling', 'delivery.title', 'inventory.title'],
+      price: '599',
+      features: ['landing.feat_performance', 'landing.feat_scheduling', 'delivery.title', 'crm.title', 'worksheets.title'],
       userLimit: t('landing.tier_up_to_users', { count: 50 }),
       color: 'from-blue-700 to-blue-800',
       popular: true,
+      ctaKey: 'landing.tier_cta_inquiry',
     },
     {
       nameKey: 'landing.tier_enterprise',
-      price: '€1,199',
-      features: ['landing.feat_oee', 'shift.title', 'landing.feat_quality', 'landing.feat_maintenance'],
+      price: '1,199',
+      features: ['landing.feat_oee', 'shift.title', 'landing.feat_quality', 'landing.feat_maintenance', 'digital_twin.title'],
       userLimit: t('landing.tier_unlimited_users'),
       color: 'from-purple-700 to-purple-800',
       popular: false,
+      ctaKey: 'landing.tier_cta_quote',
     },
   ];
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Neuron animated background */}
-      <LazyNeuronBackground nodeCount={80} connectionDistance={200} overlayOpacity={0.92} />
+      <LazyNeuronBackground nodeCount={40} connectionDistance={200} overlayOpacity={0.92} />
 
       {/* Top nav bar */}
       <nav className="fixed top-0 w-full z-50 bg-gray-950/60 backdrop-blur-xl border-b border-white/5">
@@ -166,21 +178,21 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="max-w-6xl mx-auto px-6 py-20">
+      <section id="pricing" className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('landing.pricing_title')}</h2>
           <p className="text-gray-400 text-lg">{t('landing.pricing_subtitle')}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {TIERS.map((tier) => (
             <motion.div
               key={tier.nameKey}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className={`relative rounded-2xl p-8 border ${
-                tier.popular ? 'border-blue-500 shadow-xl shadow-blue-600/20 scale-105' : 'border-gray-800'
+              className={`relative rounded-2xl p-6 border ${
+                tier.popular ? 'border-blue-500 shadow-xl shadow-blue-600/20 lg:scale-105' : 'border-gray-800'
               } bg-gradient-to-b ${tier.color}`}
             >
               {tier.popular && (
@@ -188,12 +200,12 @@ export default function LandingPage() {
                   {t('landing.tier_popular')}
                 </div>
               )}
-              <h3 className="text-2xl font-bold mb-2">{t(tier.nameKey)}</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-extrabold">{tier.price}</span>
-                <span className="text-gray-400 text-sm"> €{t('landing.tier_per_month')}</span>
+              <h3 className="text-xl font-bold mb-2">{t(tier.nameKey)}</h3>
+              <div className="mb-5">
+                <span className="text-3xl font-extrabold">€{tier.price}</span>
+                <span className="text-gray-400 text-sm"> /{t('landing.tier_per_month')}</span>
               </div>
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-2 mb-6">
                 {tier.features.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-sm text-gray-300">
                     <span className="text-green-400">✓</span> {t(f)}
@@ -211,10 +223,38 @@ export default function LandingPage() {
                     : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
                 }`}
               >
-                {t('landing.tier_cta')}
+                {t(tier.ctaKey)}
               </a>
             </motion.div>
           ))}
+        </div>
+
+        {/* Pricing disclaimer */}
+        <p className="text-center text-gray-500 text-sm mt-8">
+          {t('landing.pricing_disclaimer')}
+        </p>
+      </section>
+
+      {/* Implementation fees */}
+      <section className="bg-gradient-to-b from-gray-950 to-gray-900 py-16">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h3 className="text-2xl font-bold mb-4">{t('landing.impl_title')}</h3>
+          <p className="text-gray-400 mb-8">{t('landing.impl_subtitle')}</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { nameKey: 'landing.tier_starter', fee: '299' },
+              { nameKey: 'landing.tier_basic', fee: '599' },
+              { nameKey: 'landing.tier_professional', fee: '1,499' },
+              { nameKey: 'landing.tier_enterprise', fee: '2,999+' },
+            ].map((item) => (
+              <div key={item.nameKey} className="bg-gray-800/50 border border-gray-700 rounded-xl p-4">
+                <p className="text-sm text-gray-400 mb-1">{t(item.nameKey)}</p>
+                <p className="text-xl font-bold text-white">€{item.fee}</p>
+                <p className="text-xs text-gray-500 mt-1">{t('landing.impl_one_time')}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-gray-500 text-sm mt-6">{t('landing.impl_includes')}</p>
         </div>
       </section>
 

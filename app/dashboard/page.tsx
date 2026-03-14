@@ -6,6 +6,8 @@ import { MenuTile } from '@/components/core/MenuTile';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { t } from '@/lib/i18n';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get('sessionId')?.value;

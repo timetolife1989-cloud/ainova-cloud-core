@@ -1,5 +1,8 @@
 // =====================================================
-// PROXY: Backward compatibility
+// Module disabled — lac-napi-perces is not active
 // =====================================================
+import { redirect } from 'next/navigation';
 
-export { default } from '@/modules/lac-napi-perces/components/DashboardPage';
+export default function NapiPercesPage() {
+  redirect('/dashboard');
+}

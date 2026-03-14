@@ -1,6 +1,7 @@
 import { getDb } from '@/lib/db';
+import { ADDON_MODULES } from '@/lib/license/tiers';
 
-export type LicenseTier = 'basic' | 'professional' | 'enterprise' | 'dev';
+export type LicenseTier = 'starter' | 'basic' | 'professional' | 'enterprise' | 'dev';
 
 export interface LicenseInfo {
   tier: LicenseTier;
@@ -76,12 +77,17 @@ export async function getLicense(): Promise<LicenseInfo> {
   }
 }
 
-/** Checks if a specific module is allowed by the license. */
+/** Checks if a specific module is allowed by the license (tier modules + add-ons). */
 export async function isModuleAllowed(moduleId: string): Promise<boolean> {
   const license = await getLicense();
   if (!license.isActive) return false;
   if (license.modulesAllowed.includes('*')) return true;
-  return license.modulesAllowed.includes(moduleId);
+  // Check if module is in the tier's base modules
+  if (license.modulesAllowed.includes(moduleId)) return true;
+  // Check if module is an active add-on for this license
+  const addon = ADDON_MODULES.find(a => a.id === moduleId);
+  if (addon && license.modulesAllowed.includes(`addon:${moduleId}`)) return true;
+  return false;
 }
 
 /** Checks if a specific feature is allowed. */

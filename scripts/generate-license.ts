@@ -7,21 +7,16 @@
  */
 
 import { createHash, randomBytes } from 'crypto';
+import { TIER_MODULES } from '../lib/license/tiers';
 
 interface LicenseOptions {
-  tier: 'basic' | 'professional' | 'enterprise';
+  tier: 'starter' | 'basic' | 'professional' | 'enterprise';
   customer: string;
   email?: string;
   maxUsers?: number;
   expires?: string;
   modules?: string[];
 }
-
-const TIER_MODULES: Record<string, string[]> = {
-  basic: ['workforce', 'tracking', 'fleet', 'file-import', 'reports'],
-  professional: ['workforce', 'tracking', 'fleet', 'file-import', 'reports', 'performance', 'scheduling', 'delivery', 'inventory'],
-  enterprise: ['workforce', 'tracking', 'fleet', 'file-import', 'reports', 'performance', 'scheduling', 'delivery', 'inventory', 'oee', 'plc-connector', 'shift-management', 'quality', 'maintenance', 'api-gateway', 'multi-site'],
-};
 
 function parseArgs(): LicenseOptions {
   const args = process.argv.slice(2);
@@ -33,7 +28,7 @@ function parseArgs(): LicenseOptions {
 
     switch (key) {
       case 'tier':
-        if (value === 'basic' || value === 'professional' || value === 'enterprise') {
+        if (value === 'starter' || value === 'basic' || value === 'professional' || value === 'enterprise') {
           options.tier = value;
         }
         break;
@@ -56,7 +51,7 @@ function parseArgs(): LicenseOptions {
   }
 
   if (!options.tier) {
-    console.error('Error: --tier is required (basic | professional | enterprise)');
+    console.error('Error: --tier is required (starter | basic | professional | enterprise)');
     process.exit(1);
   }
   if (!options.customer) {

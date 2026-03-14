@@ -28,7 +28,7 @@ const CACHE_TTL = 10 * 60 * 1000; // 10 min
 
 // Locale cache (30s TTL — matches settings cache)
 let _localeCache: { value: SupportedLocale; at: number } | null = null;
-const LOCALE_CACHE_TTL = 30_000;
+const LOCALE_CACHE_TTL = 5_000;
 
 /**
  * Get the current locale from settings (cached).

@@ -38,12 +38,12 @@ function getInitials(name: string): string {
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 }
 
-function formatTime(date: Date): string {
-  return date.toLocaleString('hu-HU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+function formatTime(date: Date, locale: string): string {
+  return date.toLocaleString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
-function formatDate(date: Date): string {
-  return date.toLocaleString('hu-HU', { year: 'numeric', month: '2-digit', day: '2-digit' });
+function formatDate(date: Date, locale: string): string {
+  return date.toLocaleString(locale, { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
 function getWeekNumber(date: Date): number {
@@ -182,10 +182,10 @@ export function HudFrame({ appName, username, role, locale = 'hu', children }: H
           {currentTime && (
             <div className="hidden md:flex flex-col items-end mr-4 flex-shrink-0">
               <span className="text-sm font-mono text-gray-300 tabular-nums">
-                {formatTime(currentTime)}
+                {formatTime(currentTime, locale)}
               </span>
               <span className="text-[10px] text-gray-500 font-mono">
-                {formatDate(currentTime)} &bull; {getDayName(currentTime, locale)} &bull; W{getWeekNumber(currentTime)}
+                {formatDate(currentTime, locale)} &bull; {getDayName(currentTime, locale)} &bull; W{getWeekNumber(currentTime)}
               </span>
             </div>
           )}
@@ -259,7 +259,7 @@ export function HudFrame({ appName, username, role, locale = 'hu', children }: H
             </nav>
             {currentTime && (
               <div className="px-4 py-3 border-t border-white/5">
-                <p className="text-xs text-gray-500 font-mono">{formatDate(currentTime)} {formatTime(currentTime)}</p>
+                <p className="text-xs text-gray-500 font-mono">{formatDate(currentTime, locale)} {formatTime(currentTime, locale)}</p>
               </div>
             )}
             <div className="p-3 border-t border-white/5">

@@ -7,7 +7,7 @@ registerModule({
   version: '1.0.0',
   icon: '🔗',
   color: 'blue',
-  tier: 'enterprise',
+  tier: 'professional',
   href: '/dashboard/modules/sap-import',
   permissions: ['sap-import.view', 'sap-import.edit', 'sap-import.sync'],
   adminSettings: [

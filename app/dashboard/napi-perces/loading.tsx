@@ -1,5 +1,7 @@
 // =====================================================
-// PROXY: Backward compatibility
+// Module disabled — lac-napi-perces is not active
 // =====================================================
 
-export { default } from '@/modules/lac-napi-perces/components/DashboardLoading';
+export default function NapiPercesLoading() {
+  return null;
+}

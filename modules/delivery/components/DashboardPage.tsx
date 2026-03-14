@@ -136,7 +136,7 @@ export default function DeliveryDashboardPage() {
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-900/30 rounded-lg"><DollarSign className="w-5 h-5 text-blue-400" /></div>
-            <div><p className="text-xs text-gray-500">{t('delivery.total_value')}</p><p className="text-2xl font-bold text-white">{totalValue.toLocaleString()} Ft</p></div>
+            <div><p className="text-xs text-gray-500">{t('delivery.total_value')}</p><p className="text-2xl font-bold text-white">{totalValue.toLocaleString()} {t('common.currency')}</p></div>
           </div>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">

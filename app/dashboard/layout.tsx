@@ -8,7 +8,7 @@ import { I18nProvider } from '@/components/core/I18nProvider';
 import { LazyInactivityGuard } from '@/components/core/LazyInactivityGuard';
 import { LazyNeuronBackground } from '@/components/ui/LazyNeuronBackground';
 
-export const dynamic = 'force-dynamic';
+
 
 export default async function DashboardLayout({
   children,
@@ -34,7 +34,7 @@ export default async function DashboardLayout({
   return (
     <I18nProvider locale={locale} translations={translations}>
       <div className="min-h-screen relative">
-        <LazyNeuronBackground nodeCount={90} connectionDistance={200} overlayOpacity={0.6} />
+        <LazyNeuronBackground nodeCount={60} connectionDistance={200} overlayOpacity={0.6} />
         <HudFrame
           appName={process.env.NEXT_PUBLIC_APP_NAME ?? 'Ainova Cloud Intelligence'}
           username={session.fullName || session.username}

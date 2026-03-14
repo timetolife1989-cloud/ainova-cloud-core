@@ -102,7 +102,7 @@ if (typeof globalThis !== 'undefined') {
   }
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const ip = getClientIp(request);
   const userAgent = request.headers.get('user-agent');
