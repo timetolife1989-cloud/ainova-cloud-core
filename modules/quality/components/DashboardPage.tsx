@@ -166,7 +166,7 @@ export default function QualityDashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('quality.title')} subtitle={t('quality.subtitle')} />
         <div className="flex items-center gap-2">
-          <ExportButton moduleId="quality" table="mod_quality_inspections" />
+          <ExportButton moduleId="quality" table="quality_inspections" />
           {tab === 'inspections' && (
             <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium"><Plus className="w-4 h-4" /> {t('quality.new_inspection')}</button>
           )}

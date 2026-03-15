@@ -1,8 +1,9 @@
 # 02 — ISMERT HIBÁK & TECHNIKAI ADÓSSÁGOK
 
-> **Verzió:** 3.0 | **Dátum:** 2026-03-15 | **Státusz:** FRISSÍTVE
+> **Verzió:** 4.0 | **Dátum:** 2026-03-16 | **Státusz:** FRISSÍTVE
 > **Szabály:** NINCS technikai adósság. Minden itt felsorolt tételt javítani kell a bővítés ELŐTT.
 > **Megjegyzés:** Az összes Phase 0-7 feladat KÉSZ (commit 3f350c3 → 36917ff)
+> **Demo teszt audit:** 2026-03-16 — demo.ainovacloud.com élő tesztelés → 7 új hiba azonosítva és javítva
 > **Kapcsolódó dokumentumok:**
 > - [01-PRICING_STRATEGY.md](./01-PRICING_STRATEGY.md) — Árképzés (az árak itt defináltak)
 > - [03-EXPANSION_PLAN.md](./03-EXPANSION_PLAN.md) — Piacbővítés (ezek blokkolják)
@@ -389,6 +390,77 @@ A böngésző nemtörődömségemből rendben nyitha, de email mellékletként, 
 
 ---
 
+## SZEKCIÓ G: DEMO TESZT AUDIT — 2026-03-16
+
+> **Forrás:** demo.ainovacloud.com élő tesztelés (CEO screenshotok alapján)
+> **Összes hiba:** 7 azonosítva → 7 javítva
+
+### BUG-18 ⬜ JAVÍTVA — 2026-03-16
+
+**Fájl:** `app/(marketing)/page.tsx`
+**Reprodukció:** Landing page → Pricing kártyák animálódnak, majd villognak
+**Probléma:** A `motion.div` `whileInView` animáció `IntersectionObserver`-rel figyeli az elemet. Scroll közben az observer ismételten tüzel (visible → hidden → visible), ami a kártyák villogását okozza.
+**Javítás:** `whileInView` → `animate` (egyszer fut le, nem ismétlődik).
+
+### BUG-19 ⬜ JAVÍTVA — 2026-03-16
+
+**Fájl:** `app/(marketing)/page.tsx` (minden CTA gomb)
+**Reprodukció:** Landing page → "Próbáld ki ingyen" / "Demó kérés" gomb → navigál `/setup`-ra → redirect `/login`-ra
+**Probléma:** A CTA gombok `href="/setup"` linket használnak, de a demo site-on a `/setup` oldal nem elérhető (redirect `/login`-ra). Értelmetlen kerülőút.
+**Javítás:** Minden CTA `href` átírva `/setup` → `/login` (hero, tier CTA-k, footer CTA).
+
+### BUG-20 ⬜ JAVÍTVA — 2026-03-16
+
+**Fájl:** `lib/i18n/index.ts` L6: `LOCALE_CACHE_TTL`
+**Fájl:** `components/core/LanguageSwitcher.tsx`
+**Reprodukció:** Dashboard → nyelvváltó → klikk "English" → oldal újratöltődik → MARAD magyar → második klikk → AKKOR vált angolra
+**Probléma gyökere:** A `LanguageSwitcher` PUT-tal frissíti a `core_settings.app_locale`-t, majd `router.refresh()` + `setTimeout(() => window.location.reload(), 600)`. DE a `getLocale()` függvény **5 másodperces cache**-t használ (`LOCALE_CACHE_TTL = 5_000`). Az oldal 600ms alatt újratöltődik, de a cache még a RÉGI locale-t adja vissza.
+**Javítás:** `LOCALE_CACHE_TTL` = 0 (mindig friss DB lekérdezés). A locale cache értelmetlen mert ritkán változik, és a DB query minimális költségű.
+
+### BUG-21 ⬜ JAVÍTVA — 2026-03-16
+
+**Fájl:** `app/error.tsx`
+**Reprodukció:** Bármely oldal hibája → "An error occurred" angol szöveg jelenik meg
+**Probléma:** A globális error boundary angol nyelvű volt ("An error occurred" / "Refresh"). Ez inkonzisztens a magyar felülettel.
+**Javítás:** Magyar szöveg ("Hiba történt" / "Újrapróbálás" / "Vissza a főoldalra") + jobb UX: `reset()` gomb + "vissza a dashboard"-ra navigáció.
+
+### BUG-22 ⬜ JAVÍTVA — 2026-03-16
+
+**Fájl:** 10 modul `DashboardPage.tsx` — `ExportButton` `table` prop
+**Reprodukció:** Bármely modul → Excel/PDF export → "Export failed" hibaüzenet
+**Probléma gyökere:** Az `ExportButton` komponens `table` prop-ja `mod_*` prefix-es nevet adott meg (pl. `mod_invoicing`, `mod_inventory`), DE az adatbázis táblák MÁSTÓL vannak elnevezve (pl. `invoicing_invoices`, `inventory_items`). Az export route `SELECT * FROM ${table}` lekérdezést futtat → nem létező tábla → hiba.
+
+**Javított tábla nevek:**
+
+| Modul | Rossz (volt) | Helyes (javított) |
+|-------|-------------|-------------------|
+| invoicing | `mod_invoicing` | `invoicing_invoices` |
+| inventory | `mod_inventory` | `inventory_items` |
+| tracking | `mod_tracking` | `tracking_items` |
+| oee | `mod_oee_records` | `oee_records` |
+| delivery | `mod_deliveries` | `delivery_shipments` |
+| performance | `mod_performance_entries` | `performance_entries` |
+| quality | `mod_quality_inspections` | `quality_inspections` |
+| fleet | `mod_fleet_trips` | `fleet_trips` |
+| maintenance | `mod_maintenance_schedules` | `maintenance_schedules` |
+| scheduling | `mod_capacity_entries` | `scheduling_capacity` |
+
+### BUG-23 ⬜ JAVÍTVA — 2026-03-16
+
+**Fájl:** `modules/inventory/components/DashboardPage.tsx` L48
+**Fájl:** `modules/scheduling/components/DashboardPage.tsx` L53
+**Reprodukció:** Inventory / Scheduling modul megnyitása ha az API üres választ ad → "Cannot read properties of undefined (reading 'map')"
+**Probléma:** `json.items.map(...)` — ha a fetch hiba vagy az items mező undefined (hálózati hiba, auth hiba, üres válász), a `.map()` hívás crash-el.
+**Javítás:** `(json.items ?? []).map(...)` — null coalescing, üres tömbből nem crash-el.
+
+### BUG-24 🟡 NEM KÓD HIBA — Dokumentálva
+
+**Probléma:** "A modulokban nem lehet adatokat felvinni" (workforce, stb.)
+**Elemzés:** Ez NEM kód hiba. Az RBAC rendszer explicit jogosultság-kiosztást igényel. Az admin felhasználó (superadmin) minden jogosultsággal rendelkezik automatikusan. Más felhasználók számára az Admin Panel → Felhasználók → Jogosultságok menüben kell kiosztani a `modul.create`, `modul.edit` jogosultságokat.
+**Teendő:** RBAC beállítási útmutatót készíteni a dokumentációba.
+
+---
+
 ## ÖSSZEFOGLALÓ PRIORITÁSLISTA
 
 | # | Kód | Leírás | Státusz |
@@ -410,8 +482,15 @@ A böngésző nemtörődömségemből rendben nyitha, de email mellékletként, 
 | 15 | PERF-03 | Dupla DB pool | ⬜ JAVÍTVA |
 | 16 | PERF-04 | NeuronBackground CPU | ⬜ JAVÍTVA |
 | 17 | PERF-05 | getSetting bulk | ⬜ JAVÍTVA |
+| 18 | BUG-18 | Pricing card villogás (whileInView) | ⬜ JAVÍTVA |
+| 19 | BUG-19 | Landing CTA /setup → /login | ⬜ JAVÍTVA |
+| 20 | BUG-20 | Nyelvváltás dupla klikk (5s cache) | ⬜ JAVÍTVA |
+| 21 | BUG-21 | Error page angol → magyar | ⬜ JAVÍTVA |
+| 22 | BUG-22 | Export táblanév eltérések (10 modul) | ⬜ JAVÍTVA |
+| 23 | BUG-23 | Unsafe .map() crash (inventory/scheduling) | ⬜ JAVÍTVA |
+| 24 | BUG-24 | RBAC jogosultság tájékoztató (NEM kód hiba) | 🟡 DOKUMENTÁLVA |
 
-**Összes hiba javítva: 17/17 — 2026-03-15**
+**Összes hiba javítva: 23/23 + 1 dokumentálva — 2026-03-16**
 
 ---
 

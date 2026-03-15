@@ -1,7 +1,7 @@
 # ACI MASTER STATUS — Az Igazság Egyetlen Forrása
 
-> **Generálva:** 2026-03-15
-> **Verzió:** v2.0.0 (Teljes Roadmap Phase 0-7 KÉSZ — 26 modul + szektor preset rendszer)
+> **Generálva:** 2026-03-16
+> **Verzió:** v2.1.0 (Phase 0-7 KÉSZ + Demo Teszt Audit 2026-03-16 — 7 hiba javítva)
 > **Cél:** Production-Ready deployment Supabase + Vercel stacken
 
 ---
@@ -111,11 +111,11 @@
 | **Auth (JWT)** | ✅ Kész | HMAC-SHA256, 15 perces access token, refresh token. |
 | **CSRF védelem** | ✅ Kész | Double-submit cookie, constant-time comparison, 24h TTL. |
 | **RBAC** | ✅ Kész | Jogosultság mátrix, 5-perces cache, beépített role-ok. |
-| **i18n** | ⚠️ Részleges | Rendszer létezik (HU/EN/DE), de sok komponens NEM használja (hardcoded stringek). |
+| **i18n** | ✅ Kész | Rendszer létezik (HU/EN/DE). Locale cache TTL=0 (dupla klikk bug javítva). Error page magyarra fordítva. |
+| **Export** | ✅ Kész | PDF/Excel export (ExcelJS). Táblanév-eltérések 10 modulban javítva (2026-03-16). |
 | **Licenc rendszer** | ✅ Kész | Csomag szintű modul/funkció engedélyezés. |
 | **Modul rendszer** | ✅ Kész | Dinamikus betöltés, dependency check, admin settings. |
 | **Import Pipeline** | ✅ Kész | Generikus CSV/Excel import oszlop mapping-gel. |
-| **Export** | ✅ Kész | PDF/Excel export (ExcelJS). |
 | **SSE** | ✅ Kész | Valós idejű értesítések Server-Sent Events-szel. |
 | **API Gateway** | ✅ Kész | Külső API kulcs kezelés, rate limiting. |
 | **Workflow Engine** | ✅ Kész | Trigger→Feltétel→Akció szabálymotor. |
@@ -248,6 +248,30 @@
 2. WebSocket migráció SSE-ről (ha szükséges) — ⏳ NEM PRIORITÁS
 3. Multi-tenant support — ⏳ TERVEZETT (multi-site add-on előkészítve)
 4. Fehér-címkézés (white-label) funkció — ⏳ TERVEZETT
+
+---
+
+---
+
+## 9. DEMO TESZT AUDIT — 2026-03-16
+
+> **Forrás:** demo.ainovacloud.com élő tesztelés, CEO screenshotok
+
+### Azonosított és javított hibák
+
+| # | Hiba | Fájl(ok) | Javítás |
+|---|------|----------|---------|
+| BUG-18 | Pricing kártyák villognak (whileInView) | `app/(marketing)/page.tsx` | `whileInView` → `animate` |
+| BUG-19 | CTA gombok `/setup`-ra mutatnak (demo-n felesleges) | `app/(marketing)/page.tsx` | `/setup` → `/login` |
+| BUG-20 | Nyelvváltás dupla klikk (5s cache) | `lib/i18n/index.ts` | `LOCALE_CACHE_TTL` 5000 → 0 |
+| BUG-21 | Error page angol nyelvű | `app/error.tsx` | Magyar szöveg + reset + back to dashboard |
+| BUG-22 | Export "Export failed" (10 modul) | 10× `DashboardPage.tsx` | Táblanevek javítva (mod_* → valós) |
+| BUG-23 | .map() crash üres API válasznál | inventory + scheduling `DashboardPage.tsx` | `(json.items ?? []).map(...)` |
+| BUG-24 | Modulokban nem lehet adatot felvinni | — | NEM kód hiba: RBAC jogosultság szükséges |
+
+### Nem kód hibák (RBAC / konfiguráció szükséges)
+
+- **Adatfelvitel:** A modulokhoz való hozzáférés RBAC jogosultság-kiosztástól függ. Admin Panel → Felhasználók → Jogosultságok menüben kell kiosztani a `modul.create`, `modul.edit` jogosultságokat. A superadmin automatikusan minden jogosultsággal rendelkezik.
 
 ---
 

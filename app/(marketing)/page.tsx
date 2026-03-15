@@ -140,7 +140,7 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
-                href="/setup"
+                href="/login"
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold text-lg rounded-xl shadow-lg shadow-blue-600/30 transition-all"
               >
                 {t('landing.cta_trial')}
@@ -275,8 +275,8 @@ export default function LandingPage() {
             <motion.div
               key={tier.nameKey}
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: TIERS.indexOf(tier) * 0.1 }}
               className={`relative rounded-2xl p-6 border ${
                 isPopular ? 'border-blue-500 shadow-xl shadow-blue-600/20 lg:scale-105' : 'border-gray-800'
               } bg-gradient-to-b ${tier.color}`}
@@ -302,7 +302,7 @@ export default function LandingPage() {
                 </li>
               </ul>
               <a
-                href="/setup"
+                href="/login"
                 className={`block w-full text-center py-3 rounded-xl font-semibold transition-colors ${
                   isPopular
                     ? 'bg-blue-500 hover:bg-blue-400 text-white'
@@ -384,7 +384,7 @@ export default function LandingPage() {
           </div>
           <div className="flex items-center gap-6 text-sm text-gray-500">
             <a href="/login" className="hover:text-gray-300 transition-colors">{t('landing.footer_signin')}</a>
-            <a href="/setup" className="hover:text-gray-300 transition-colors">{t('landing.footer_setup')}</a>
+            <a href="/login" className="hover:text-gray-300 transition-colors">{t('landing.footer_signin')}</a>
           </div>
         </div>
       </footer>

@@ -50,7 +50,7 @@ export default function SchedulingDashboardPage() {
       const res = await fetch(`/api/modules/scheduling/data?weekStart=${selectedWeek}`);
       if (res.ok) {
         const json = await res.json() as { items: CapacityEntry[] };
-        setEntries(json.items.map(e => ({
+        setEntries((json.items ?? []).map(e => ({
           ...e,
           utilizationPercent: e.plannedHours > 0 ? Math.round((e.allocatedHours / e.plannedHours) * 100) : 0,
         })));
@@ -138,7 +138,7 @@ export default function SchedulingDashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('scheduling.title')} subtitle={t('scheduling.subtitle')} />
         <div className="flex items-center gap-3">
-          <ExportButton moduleId="scheduling" table="mod_capacity_entries" />
+          <ExportButton moduleId="scheduling" table="scheduling_capacity" />
           <input
             type="date"
             value={selectedWeek}

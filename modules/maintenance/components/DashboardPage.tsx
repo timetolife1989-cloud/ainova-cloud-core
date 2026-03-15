@@ -114,7 +114,7 @@ export default function MaintenanceDashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('maintenance.title')} subtitle={t('maintenance.subtitle')} />
         <div className="flex items-center gap-2">
-          <ExportButton moduleId="maintenance" table="mod_maintenance_schedules" />
+          <ExportButton moduleId="maintenance" table="maintenance_schedules" />
           <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-stone-600 hover:bg-stone-700 text-white rounded-lg text-sm font-medium"><Plus className="w-4 h-4" /> {t('maintenance.new_schedule')}</button>
         </div>
       </div>

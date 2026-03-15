@@ -82,7 +82,7 @@ export default function OeeDashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('oee.title')} subtitle={t('oee.subtitle')} />
         <div className="flex items-center gap-2">
-          <ExportButton moduleId="oee" table="mod_oee_records" />
+          <ExportButton moduleId="oee" table="oee_records" />
           <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium"><Plus className="w-4 h-4" /> {t('oee.new_measurement')}</button>
         </div>
       </div>

@@ -26,9 +26,9 @@ const _cache = new Map<string, TranslationMap>();
 let _cacheAt = 0;
 const CACHE_TTL = 10 * 60 * 1000; // 10 min
 
-// Locale cache (30s TTL — matches settings cache)
+// Locale cache (invalidated on setting change)
 let _localeCache: { value: SupportedLocale; at: number } | null = null;
-const LOCALE_CACHE_TTL = 5_000;
+const LOCALE_CACHE_TTL = 0;
 
 /**
  * Get the current locale from settings (cached).

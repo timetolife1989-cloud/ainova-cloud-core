@@ -112,7 +112,7 @@ export default function DeliveryDashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('delivery.title')} subtitle={t('delivery.subtitle')} />
         <div className="flex items-center gap-2">
-          <ExportButton moduleId="delivery" table="mod_deliveries" />
+          <ExportButton moduleId="delivery" table="delivery_shipments" />
           <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium">
             <Plus className="w-4 h-4" /> {t('delivery.new_shipment')}
           </button>

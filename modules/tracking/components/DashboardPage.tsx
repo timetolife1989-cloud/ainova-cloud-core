@@ -173,7 +173,7 @@ export default function TrackingDashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
         <div className="flex items-center gap-2">
-          <ExportButton moduleId="tracking" table="mod_tracking" />
+          <ExportButton moduleId="tracking" table="tracking_items" />
           <button
             onClick={() => setModalOpen(true)}
             className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium"

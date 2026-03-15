@@ -185,7 +185,7 @@ export default function FleetDashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('fleet.title')} subtitle={t('fleet.subtitle')} />
         <div className="flex items-center gap-2">
-          <ExportButton moduleId="fleet" table="mod_fleet_trips" />
+          <ExportButton moduleId="fleet" table="fleet_trips" />
           <button
             onClick={() => setModalOpen('vehicle')}
             className="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium"

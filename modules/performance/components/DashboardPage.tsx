@@ -219,7 +219,7 @@ export default function PerformanceDashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('performance.title')} subtitle={t('performance.subtitle')} />
         <div className="flex items-center gap-2">
-          <ExportButton moduleId="performance" table="mod_performance_entries" />
+          <ExportButton moduleId="performance" table="performance_entries" />
           {tab === 'entries' && (
             <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-sm font-medium">
               <Plus className="w-4 h-4" /> {t('performance.new_entry')}

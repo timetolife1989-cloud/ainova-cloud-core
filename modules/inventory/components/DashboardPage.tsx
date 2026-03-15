@@ -45,7 +45,7 @@ export default function InventoryDashboardPage() {
       const res = await fetch('/api/modules/inventory/data');
       if (res.ok) {
         const json = await res.json() as { items: InventoryItem[] };
-        setItems(json.items.map(i => ({ ...i, isLowStock: i.currentQty <= i.minQty })));
+        setItems((json.items ?? []).map(i => ({ ...i, isLowStock: i.currentQty <= i.minQty })));
       }
     } catch {
       setItems([]);
@@ -123,7 +123,7 @@ export default function InventoryDashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('inventory.title')} subtitle={t('inventory.subtitle')} />
         <div className="flex items-center gap-2">
-          <ExportButton moduleId="inventory" table="mod_inventory" />
+          <ExportButton moduleId="inventory" table="inventory_items" />
           <button onClick={() => { setError(null); setModalOpen('item'); }} className="flex items-center gap-2 px-4 py-2 bg-lime-600 hover:bg-lime-700 text-white rounded-lg text-sm font-medium">
             <Plus className="w-4 h-4" /> {t('inventory.new_product')}
           </button>

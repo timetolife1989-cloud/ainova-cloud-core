@@ -162,7 +162,7 @@ export default function InvoicingDashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <DashboardSectionHeader title={t('invoicing.title')} subtitle={t('invoicing.subtitle')} />
         <div className="flex items-center gap-2">
-          <ExportButton moduleId="invoicing" table="mod_invoicing" />
+          <ExportButton moduleId="invoicing" table="invoicing_invoices" />
           <button onClick={() => setViewMode('customers')} className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium">
             <Users className="w-4 h-4" /> {t('invoicing.customers')}
           </button>
