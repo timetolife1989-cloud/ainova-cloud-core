@@ -48,7 +48,7 @@ const CreateConfigSchema = z.object({
   configName: z.string().min(1).max(200),
   targetTable: z.string().min(1).max(100),
   fileType: z.enum(['csv', 'xlsx', 'json']).optional(),
-  columnMapping: z.record(z.string()).optional(),
+  columnMapping: z.record(z.string(), z.string()).optional(),
 });
 
 const UpdateConfigSchema = CreateConfigSchema.partial().extend({
