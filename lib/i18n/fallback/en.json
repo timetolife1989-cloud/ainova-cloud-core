@@ -981,6 +981,16 @@
   "error.file_parse": "Error parsing file",
   "error.file_not_on_server": "File not on server — please try again",
   "error.network_check_server": "Network error — check the server",
+  "error.demo_restricted": "This feature is not available in demo mode. Purchase the full version!",
+  "error.demo_export_blocked": "Export is not available in demo mode. Full version includes unlimited export.",
+
+  "demo.banner_text": "This is a demo environment — explore ACI capabilities! Some features are restricted.",
+  "demo.request_offer": "Request offer →",
+  "demo.export_blocked_title": "Export in full version",
+  "demo.export_blocked_desc": "Export (Excel, PDF) is not available in demo mode. Full version includes unlimited export, printing, and API access.",
+  "demo.feature_full_version": "This feature is available in the full version",
+  "demo.try_features": "Try all features freely — you can add data, edit records, and use the dashboard fully.",
+  "demo.upgrade_cta": "Interested in the full version?",
 
   "admin.users.title": "Users",
   "admin.users.subtitle": "Manage accounts, roles, password reset",

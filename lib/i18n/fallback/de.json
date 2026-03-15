@@ -985,6 +985,16 @@
   "error.file_parse": "Fehler beim Analysieren der Datei",
   "error.file_not_on_server": "Datei nicht auf dem Server — bitte erneut versuchen",
   "error.network_check_server": "Netzwerkfehler — Server überprüfen",
+  "error.demo_restricted": "Diese Funktion ist im Demo-Modus nicht verfügbar. Erwerben Sie die Vollversion!",
+  "error.demo_export_blocked": "Export ist im Demo-Modus nicht verfügbar. Die Vollversion enthält unbegrenzten Export.",
+
+  "demo.banner_text": "Dies ist eine Demo-Umgebung — entdecken Sie die ACI-Funktionen! Einige Funktionen sind eingeschränkt.",
+  "demo.request_offer": "Angebot anfordern →",
+  "demo.export_blocked_title": "Export in der Vollversion",
+  "demo.export_blocked_desc": "Export (Excel, PDF) ist im Demo-Modus nicht verfügbar. Die Vollversion enthält unbegrenzten Export, Druck und API-Zugang.",
+  "demo.feature_full_version": "Diese Funktion ist in der Vollversion verfügbar",
+  "demo.try_features": "Testen Sie alle Funktionen frei — Sie können Daten erfassen, bearbeiten und das Dashboard vollständig nutzen.",
+  "demo.upgrade_cta": "Interessiert an der Vollversion?",
 
   "admin.users.title": "Benutzer",
   "admin.users.subtitle": "Konten verwalten, Rollen, Passwort zurücksetzen",

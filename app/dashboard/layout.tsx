@@ -7,6 +7,7 @@ import { LazyCommandPalette } from '@/components/core/LazyCommandPalette';
 import { I18nProvider } from '@/components/core/I18nProvider';
 import { LazyInactivityGuard } from '@/components/core/LazyInactivityGuard';
 import { LazyNeuronBackground } from '@/components/ui/LazyNeuronBackground';
+import { DemoBanner } from '@/components/core/DemoBanner';
 
 
 
@@ -34,6 +35,7 @@ export default async function DashboardLayout({
   return (
     <I18nProvider locale={locale} translations={translations}>
       <div className="min-h-screen relative">
+        <DemoBanner />
         <LazyNeuronBackground nodeCount={60} connectionDistance={200} overlayOpacity={0.6} />
         <HudFrame
           appName={process.env.NEXT_PUBLIC_APP_NAME ?? 'Ainova Cloud Intelligence'}

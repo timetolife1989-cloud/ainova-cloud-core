@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { FileText, Plus, X, Check, AlertTriangle, Ban, CreditCard, Search, Users, Printer } from 'lucide-react';
 import InvoiceEditor from './InvoiceEditor';
 import CustomerManager from './CustomerManager';

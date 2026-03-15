@@ -7,6 +7,7 @@ import {
   AlertTriangle, Pencil, Trash2, Download, Filter, Clock,
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { translateApiError, getErrorMessage } from '@/lib/translate-error';
 import WorkforceCharts from './WorkforceCharts';
 
 // ── Shift Configuration ─────────────────────────────────────────────
@@ -224,7 +225,8 @@ export default function WorkforceDashboardPage() {
       addToast('success', editItem ? t('workforce.save_success_edit') : t('workforce.save_success_create'));
       await fetchData();
     } catch (e) {
-      const msg = e instanceof Error ? e.message : t('common.error');
+      const raw = e instanceof Error ? e.message : t('common.error');
+      const msg = translateApiError(raw, t);
       setError(msg);
       addToast('error', msg);
     } finally {
@@ -292,7 +294,7 @@ export default function WorkforceDashboardPage() {
       addToast('success', t('workforce.delete_success'));
       await fetchData();
     } catch (e) {
-      const msg = e instanceof Error ? e.message : t('common.error');
+      const msg = getErrorMessage(e, t);
       setError(msg);
       addToast('error', msg);
     }

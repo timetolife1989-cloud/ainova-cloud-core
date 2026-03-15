@@ -6,7 +6,11 @@
 - ✅ `demo.ainovacloud.com` él (Vercel)
 - ✅ Demo adatok seedel-ve (200 fős gyár, 30 nap adat)
 - ✅ Auto-reset (24 óránként — Vercel Cron Job 03:00 UTC, CRON_SECRET)
-- ⬜ Read-only mód opció (demo user ne törölhessen adatot)
+- ✅ Demo mód implementálva (`DEMO_MODE=true` env var) — lásd [07-DEMO_MODE_STRATEGY.md](./07-DEMO_MODE_STRATEGY.md)
+- ✅ Demo korlátozások: export/nyomtatás/törlés/admin letiltva, marketing üzenetek
+- ✅ DemoBanner a dashboard tetején + ExportButton marketing popup
+- ✅ Érthető magyar hibaüzenetek (API error i18n fordítás kliens oldalon)
+- ⬜ Vercel env vars beállítása: `DEMO_MODE=true`, `NEXT_PUBLIC_DEMO_MODE=true`
 
 ## Demo fiókok
 

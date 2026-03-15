@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { checkAuth } from '@/lib/rbac/middleware';
+import { checkAuth, isDemoMode } from '@/lib/rbac/middleware';
 import { getDb } from '@/lib/db';
 import { createExcelResponse } from '@/lib/export/excel';
 import { createPdfResponse } from '@/lib/export/pdf';
@@ -16,6 +16,15 @@ export async function GET(
   { params }: { params: Promise<{ moduleId: string }> }
 ) {
   const { moduleId } = await params;
+
+  // Demo mode: block all exports with marketing message
+  if (isDemoMode()) {
+    return Response.json(
+      { error: 'error.demo_export_blocked' },
+      { status: 403 }
+    );
+  }
+
   const auth = await checkAuth(request, `${moduleId}.view`);
   if (!auth.valid) return auth.response;
 

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { Car, Plus, X, Check, AlertTriangle, Fuel, Route } from 'lucide-react';
 
 interface FleetVehicle {
@@ -122,7 +123,7 @@ export default function FleetDashboardPage() {
       setFormType('car');
       await fetchVehicles();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error'));
+      setError(getErrorMessage(e, t));
     } finally {
       setSaving(false);
     }
@@ -158,7 +159,7 @@ export default function FleetDashboardPage() {
       setTripPurpose('');
       await fetchTrips(selectedVehicle.id);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error'));
+      setError(getErrorMessage(e, t));
     } finally {
       setSaving(false);
     }

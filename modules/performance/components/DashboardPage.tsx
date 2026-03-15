@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { TrendingUp, Plus, X, Check, AlertTriangle, Users, Clock, Target, Zap, Crosshair, Trash2 } from 'lucide-react';
 
 interface PerformanceEntry {
@@ -128,7 +129,7 @@ export default function PerformanceDashboardPage() {
       resetForm();
       await fetchData();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error'));
+      setError(getErrorMessage(e, t));
     } finally {
       setSaving(false);
     }
@@ -168,7 +169,7 @@ export default function PerformanceDashboardPage() {
       setTargetModalOpen(false);
       setTgtType('global'); setTgtName(''); setTgtValue(0); setTgtUnit(''); setTgtTo('');
       await fetchTargets();
-    } catch (e) { setErrorTarget(e instanceof Error ? e.message : t('common.error')); }
+    } catch (e) { setErrorTarget(getErrorMessage(e, t)); }
     finally { setSavingTarget(false); }
   };
 

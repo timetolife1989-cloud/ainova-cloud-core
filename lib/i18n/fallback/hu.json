@@ -985,6 +985,16 @@
   "error.file_parse": "Hiba a fájl elemzésekor",
   "error.file_not_on_server": "A fájl nincs a szerveren — próbáld újra",
   "error.network_check_server": "Hálózati hiba — ellenőrizd a szervert",
+  "error.demo_restricted": "Ez a funkció a demóban nem elérhető. Vásárolja meg a teljes verziót!",
+  "error.demo_export_blocked": "Exportálás a demóban nem elérhető. A teljes verzióban korlátlanul exportálhat.",
+
+  "demo.banner_text": "Ez egy demó környezet — ismerkedjen az ACI képességeivel! Egyes funkciók korlátozottak.",
+  "demo.request_offer": "Ajánlatkérés →",
+  "demo.export_blocked_title": "Export a teljes verzióban",
+  "demo.export_blocked_desc": "A demóban az exportálás (Excel, PDF) nem elérhető. A teljes verzióban korlátlan export, nyomtatás és API hozzáférés.",
+  "demo.feature_full_version": "Ez a funkció a teljes verzióban érhető el",
+  "demo.try_features": "Próbálja ki a funkciókat szabadon — adatokat rögzíthet, szerkeszthet, és a dashboardot teljes egészében használhatja.",
+  "demo.upgrade_cta": "Érdekli a teljes verzió?",
 
   "admin.users.title": "Felhasználók",
   "admin.users.subtitle": "Fiókok kezelése, szerepkörök, jelszó visszaállítás",

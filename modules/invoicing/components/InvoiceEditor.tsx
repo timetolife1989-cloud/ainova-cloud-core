@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { Plus, X, Check, AlertTriangle, Search, Trash2 } from 'lucide-react';
 import { VAT_RATES, calculateLineItem, calculateInvoiceTotals, type LineItemCalc } from '../lib/vat-calculator';
 
@@ -162,7 +163,7 @@ export default function InvoiceEditor({ onSuccess, onCancel }: InvoiceEditorProp
       if (!res.ok) throw new Error(body.error ?? t('common.error'));
       onSuccess();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error'));
+      setError(getErrorMessage(e, t));
     } finally {
       setSaving(false);
     }

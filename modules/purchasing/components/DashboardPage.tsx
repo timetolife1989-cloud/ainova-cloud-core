@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { ShoppingBag, Plus, X, Check, AlertTriangle, Truck, Package } from 'lucide-react';
 
 // --- Types ---
@@ -126,7 +127,7 @@ export default function PurchasingDashboardPage() {
       setModalOpen(null);
       setFormName(''); setFormContact(''); setFormEmail(''); setFormPhone(''); setFormAddress(''); setFormTaxNumber('');
       await fetchAll();
-    } catch (e) { setError(e instanceof Error ? e.message : t('common.error')); }
+    } catch (e) { setError(getErrorMessage(e, t)); }
     finally { setSaving(false); }
   };
 
@@ -151,7 +152,7 @@ export default function PurchasingDashboardPage() {
       setOrderSupplierId(0); setOrderExpected(''); setOrderNotes('');
       setOrderItems([{ description: '', quantity: 1, unitPrice: 0 }]);
       await fetchAll();
-    } catch (e) { setError(e instanceof Error ? e.message : t('common.error')); }
+    } catch (e) { setError(getErrorMessage(e, t)); }
     finally { setSaving(false); }
   };
 

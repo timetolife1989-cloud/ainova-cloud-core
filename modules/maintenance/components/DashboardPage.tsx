@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { Wrench, Plus, X, Check, AlertTriangle, AlertCircle, Clock, CheckCircle, ClipboardCheck, History } from 'lucide-react';
 
 interface Schedule {
@@ -87,7 +88,7 @@ export default function MaintenanceDashboardPage() {
       if (!res.ok) throw new Error(body.error ?? t('common.error'));
       setCompleteSchedule(null); setCompleteDuration(60); setCompleteCost(0); setCompleteNotes('');
       await fetchData();
-    } catch (e) { setError(e instanceof Error ? e.message : t('common.error')); }
+    } catch (e) { setError(getErrorMessage(e, t)); }
     finally { setCompleting(false); }
   };
 
@@ -103,7 +104,7 @@ export default function MaintenanceDashboardPage() {
       if (!res.ok) throw new Error(body.error ?? t('common.error'));
       setModalOpen(false); setFormTask(''); setFormInterval(30);
       await fetchData();
-    } catch (e) { setError(e instanceof Error ? e.message : t('common.error')); }
+    } catch (e) { setError(getErrorMessage(e, t)); }
     finally { setSaving(false); }
   };
 

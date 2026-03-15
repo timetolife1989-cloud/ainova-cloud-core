@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { ExportButton } from '@/components/core/ExportButton';
 import { Gauge, Plus, X, Check, AlertTriangle } from 'lucide-react';
@@ -64,7 +65,7 @@ export default function OeeDashboardPage() {
       if (!res.ok) throw new Error(body.error ?? t('dt.status.error'));
       setModalOpen(false);
       await fetchData();
-    } catch (e) { setError(e instanceof Error ? e.message : t('dt.status.error')); }
+    } catch (e) { setError(getErrorMessage(e, t)); }
     finally { setSaving(false); }
   };
 
