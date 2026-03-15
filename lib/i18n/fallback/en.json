@@ -489,6 +489,7 @@
   "delivery.value_ft": "Value (Ft)",
   "delivery.status": "Status",
   "delivery.no_shipments": "No shipments",
+  "delivery.customer_analysis": "Customer Analysis",
 
   "inventory.products": "Products",
   "inventory.low_stock": "Low stock",

@@ -493,6 +493,7 @@
   "delivery.value_ft": "Érték (Ft)",
   "delivery.status": "Státusz",
   "delivery.no_shipments": "Nincs szállítmány",
+  "delivery.customer_analysis": "Ügyfél elemzés",
 
   "inventory.products": "Termékek",
   "inventory.low_stock": "Alacsony készlet",

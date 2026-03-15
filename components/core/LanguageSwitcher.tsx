@@ -55,8 +55,7 @@ export function LanguageSwitcher({ locale: localeProp, compact = false, classNam
         throw new Error(`Failed to save locale: ${res.status} ${errorText}`);
       }
 
-      router.refresh();
-      setTimeout(() => window.location.reload(), 600);
+      window.location.reload();
     } catch (err) {
       console.error('[LanguageSwitcher] Locale change failed:', err);
       alert(`${t('common.lang_change_failed')}: ${err instanceof Error ? err.message : ''}`);

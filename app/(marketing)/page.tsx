@@ -292,7 +292,7 @@ export default function LandingPage() {
               <h3 className="text-xl font-bold mb-2">{t(tier.nameKey)}</h3>
               <div className="mb-5">
                 <span className="text-3xl font-extrabold">€{tier.price}</span>
-                <span className="text-gray-400 text-sm"> /{t('landing.tier_per_month')}</span>
+                <span className="text-gray-400 text-sm"> {t('landing.tier_per_month')}</span>
               </div>
               <ul className="space-y-2 mb-6 flex-1">
                 {displayFeatures.map((f) => (

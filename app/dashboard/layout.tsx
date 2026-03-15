@@ -9,8 +9,6 @@ import { LazyInactivityGuard } from '@/components/core/LazyInactivityGuard';
 import { LazyNeuronBackground } from '@/components/ui/LazyNeuronBackground';
 import { DemoBanner } from '@/components/core/DemoBanner';
 
-export const dynamic = 'force-dynamic';
-
 export default async function DashboardLayout({
   children,
 }: {
