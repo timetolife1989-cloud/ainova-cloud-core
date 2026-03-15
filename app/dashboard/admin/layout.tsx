@@ -8,6 +8,11 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Block admin access in demo mode
+  if (process.env.DEMO_MODE === 'true') {
+    redirect('/dashboard');
+  }
+
   const cookieStore = await cookies();
   const sessionId = cookieStore.get('sessionId')?.value;
   if (!sessionId) redirect('/login');

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { CalendarClock, Plus, X, Check, AlertTriangle } from 'lucide-react';
 
@@ -26,10 +27,11 @@ export default function ShiftManagementDashboardPage() {
     try {
       const res = await fetch('/api/modules/shift-management/data');
       if (res.ok) {
-        const json = await res.json() as { shifts: ShiftDef[]; assignments: Assignment[] };
-        setShifts(json.shifts);
-        setAssignments(json.assignments);
-        if (json.shifts[0]) setFormShift(json.shifts[0].id);
+      const json = await res.json() as { shifts?: ShiftDef[]; assignments?: Assignment[] };
+      const shifts = json.shifts ?? [];
+      setShifts(shifts);
+      setAssignments(json.assignments ?? []);
+      if (shifts[0]) setFormShift(shifts[0].id);
       }
     } finally { setLoading(false); }
   }, []);
@@ -49,7 +51,7 @@ export default function ShiftManagementDashboardPage() {
       if (!res.ok) throw new Error(body.error ?? t('dt.status.error'));
       setModalOpen(false); setFormWorker(''); setFormTeam('');
       await fetchData();
-    } catch (e) { setError(e instanceof Error ? e.message : t('dt.status.error')); }
+    } catch (e) { setError(getErrorMessage(e, t)); }
     finally { setSaving(false); }
   };
 

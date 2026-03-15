@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { ExportButton } from '@/components/core/ExportButton';
 import { ShieldCheck, Plus, X, Check, AlertTriangle, CheckCircle, XCircle, FileText, Eye, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -55,8 +56,8 @@ export default function QualityDashboardPage() {
     try {
       const res = await fetch('/api/modules/quality/data');
       if (res.ok) {
-        const json = await res.json() as { inspections: Inspection[] };
-        setInspections(json.inspections);
+      const json = await res.json() as { inspections?: Inspection[] };
+      setInspections(json.inspections ?? []);
       }
     } finally { setLoading(false); }
   }, []);
@@ -66,8 +67,8 @@ export default function QualityDashboardPage() {
     try {
       const res = await fetch('/api/modules/quality/8d');
       if (res.ok) {
-        const json = await res.json() as { reports: Report8D[] };
-        setReports8d(json.reports);
+      const json = await res.json() as { reports?: Report8D[] };
+      setReports8d(json.reports ?? []);
       }
     } finally { setLoading8d(false); }
   }, []);
@@ -87,7 +88,7 @@ export default function QualityDashboardPage() {
       if (!res.ok) throw new Error(body.error ?? t('dt.status.error'));
       setModalOpen(false); setFormProduct(''); setFormBatch(''); setFormTotal(0); setFormPassed(0); setFormRejectCode('');
       await fetchData();
-    } catch (e) { setError(e instanceof Error ? e.message : t('dt.status.error')); }
+    } catch (e) { setError(getErrorMessage(e, t)); }
     finally { setSaving(false); }
   };
 

@@ -38,8 +38,8 @@ export default function ReportsDashboardPage() {
     try {
       const res = await fetch('/api/modules/reports/data');
       if (res.ok) {
-        const json = await res.json() as { reports: SavedReport[] };
-        setReports(json.reports);
+      const json = await res.json() as { reports?: SavedReport[] };
+      setReports(json.reports ?? []);
       }
     } catch {
       // API might not exist yet

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import * as LucideIcons from 'lucide-react';
 import type { ModuleDefinition } from '@/lib/modules/registry';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 
 interface ModuleToggleCardProps {
   module: ModuleDefinition;
@@ -57,7 +58,7 @@ export function ModuleToggleCard({
     try {
       await onToggle(module.id, !isActive);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error_occurred'));
+      setError(getErrorMessage(e, t));
     } finally {
       setLoading(false);
     }

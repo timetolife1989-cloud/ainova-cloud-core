@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { Truck, Plus, X, Check, AlertTriangle, Package, DollarSign, Scale } from 'lucide-react';
 
 interface DeliveryShipment {
@@ -45,8 +46,8 @@ export default function DeliveryDashboardPage() {
     try {
       const res = await fetch('/api/modules/delivery/data');
       if (res.ok) {
-        const json = await res.json() as { items: DeliveryShipment[] };
-        setShipments(json.items);
+      const json = await res.json() as { items?: DeliveryShipment[] };
+      setShipments(json.items ?? []);
       }
     } catch {
       setShipments([]);
@@ -84,7 +85,7 @@ export default function DeliveryDashboardPage() {
       setFormCustomer(''); setFormOrder(''); setFormQuantity(0); setFormWeight(''); setFormValue('');
       await fetchData();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error'));
+      setError(getErrorMessage(e, t));
     } finally {
       setSaving(false);
     }

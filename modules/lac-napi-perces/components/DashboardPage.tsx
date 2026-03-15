@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import {
   NapiData,
@@ -60,7 +61,7 @@ export default function NapiPercesPage() {
       }
     } catch (err) {
       if (!silent) {
-        setError(err instanceof Error ? err.message : t('napi.unknown_error'));
+        setError(getErrorMessage(err, t));
         setData([]);
       }
     } finally {

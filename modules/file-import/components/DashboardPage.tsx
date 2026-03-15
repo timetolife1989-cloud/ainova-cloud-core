@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { FileUp, Upload, Check, AlertTriangle, FileSpreadsheet, Clock, CheckCircle, XCircle } from 'lucide-react';
 
@@ -55,8 +56,8 @@ export default function FileImportDashboardPage() {
       ]);
 
       if (configsRes.ok) {
-        const json = await configsRes.json() as { configs: ImportConfig[] };
-        setConfigs(json.configs);
+      const json = await configsRes.json() as { configs?: ImportConfig[] };
+      setConfigs(json.configs ?? []);
       }
       // Logs would come from a separate endpoint
       setLogs([]);
@@ -111,7 +112,7 @@ export default function FileImportDashboardPage() {
         setSelectedConfigId(detectJson.configId);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('import.error_occurred'));
+      setError(getErrorMessage(e, t));
     } finally {
       setUploading(false);
     }
@@ -152,7 +153,7 @@ export default function FileImportDashboardPage() {
       setSelectedConfigId(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('import.error_occurred'));
+      setError(getErrorMessage(e, t));
     } finally {
       setProcessing(false);
     }

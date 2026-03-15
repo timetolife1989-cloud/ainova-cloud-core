@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { Package, Plus, X, Check, AlertTriangle, ArrowDown, ArrowUp, AlertCircle } from 'lucide-react';
 
 interface InventoryItem {
@@ -72,7 +73,7 @@ export default function InventoryDashboardPage() {
       setModalOpen(null);
       setFormSku(''); setFormName(''); setFormCategory(''); setFormMinQty(0); setFormLocation('');
       await fetchData();
-    } catch (e) { setError(e instanceof Error ? e.message : t('common.error')); }
+    } catch (e) { setError(getErrorMessage(e, t)); }
     finally { setSaving(false); }
   };
 
@@ -89,7 +90,7 @@ export default function InventoryDashboardPage() {
       if (!res.ok) throw new Error(body.error ?? t('common.error'));
       setModalOpen(null); setSelectedItem(null); setMovQty(0); setMovRef('');
       await fetchData();
-    } catch (e) { setError(e instanceof Error ? e.message : t('common.error')); }
+    } catch (e) { setError(getErrorMessage(e, t)); }
     finally { setSaving(false); }
   };
 

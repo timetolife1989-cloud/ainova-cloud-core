@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { Plus, X, Check, AlertTriangle, Search, Pencil } from 'lucide-react';
 
 interface Customer {
@@ -44,8 +45,8 @@ export default function CustomerManager() {
       if (searchQuery) params.set('search', searchQuery);
       const res = await fetch(`/api/modules/invoicing/data/customers?${params}`);
       if (res.ok) {
-        const json = await res.json() as { customers: Customer[] };
-        setCustomers(json.customers);
+      const json = await res.json() as { customers?: Customer[] };
+      setCustomers(json.customers ?? []);
       }
     } catch {
       setCustomers([]);
@@ -89,7 +90,7 @@ export default function CustomerManager() {
       resetForm();
       await fetchCustomers();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error'));
+      setError(getErrorMessage(e, t));
     } finally {
       setSaving(false);
     }

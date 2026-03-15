@@ -9,6 +9,8 @@ import { FileText, Plus, X, Check, AlertTriangle, Ban, CreditCard, Search, Users
 import InvoiceEditor from './InvoiceEditor';
 import CustomerManager from './CustomerManager';
 
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+
 // ── Types ──
 
 interface Invoice {
@@ -36,17 +38,17 @@ const STATUS_COLORS: Record<string, string> = {
   storno: 'bg-red-900/60 text-red-300',
 };
 
-const TYPE_LABELS: Record<string, string> = {
-  normal: 'Számla',
-  storno: 'Sztornó',
-  advance: 'Előleg',
-  proforma: 'Díjbekérő',
+const TYPE_KEYS: Record<string, string> = {
+  normal: 'invoicing.type_normal',
+  storno: 'invoicing.type_storno',
+  advance: 'invoicing.type_advance',
+  proforma: 'invoicing.type_proforma',
 };
 
-const PAYMENT_LABELS: Record<string, string> = {
-  cash: 'Készpénz',
-  card: 'Bankkártya',
-  transfer: 'Átutalás',
+const PAYMENT_KEYS: Record<string, string> = {
+  cash: 'invoicing.pay_cash',
+  card: 'invoicing.pay_card',
+  transfer: 'invoicing.pay_transfer',
 };
 
 export default function InvoicingDashboardPage() {
@@ -66,8 +68,8 @@ export default function InvoicingDashboardPage() {
       if (searchQuery) params.set('search', searchQuery);
       const res = await fetch(`/api/modules/invoicing/data?${params}`);
       if (res.ok) {
-        const json = await res.json() as { invoices: Invoice[] };
-        setInvoices(json.invoices);
+        const json = await res.json() as { invoices?: Invoice[] };
+        setInvoices(json.invoices ?? []);
       }
     } catch {
       setInvoices([]);
@@ -94,7 +96,7 @@ export default function InvoicingDashboardPage() {
       document.dispatchEvent(new Event('hud-led-success'));
       await fetchInvoices();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error'));
+      setError(getErrorMessage(e, t));
       document.dispatchEvent(new Event('hud-led-error'));
     } finally {
       setActionLoading(null);
@@ -248,7 +250,7 @@ export default function InvoicingDashboardPage() {
               {invoices.map(inv => (
                 <tr key={inv.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
                   <td className="px-4 py-3 font-mono text-gray-200">{inv.invoiceNumber}</td>
-                  <td className="px-4 py-3 text-gray-400">{TYPE_LABELS[inv.invoiceType] ?? inv.invoiceType}</td>
+                  <td className="px-4 py-3 text-gray-400">{t(TYPE_KEYS[inv.invoiceType] ?? '') || inv.invoiceType}</td>
                   <td className="px-4 py-3">
                     <div className="text-gray-200">{inv.customerName}</div>
                     {inv.customerTaxNumber && <div className="text-[11px] text-gray-500 font-mono">{inv.customerTaxNumber}</div>}
@@ -256,7 +258,7 @@ export default function InvoicingDashboardPage() {
                   <td className="px-4 py-3 text-gray-400">{inv.issueDate}</td>
                   <td className="px-4 py-3 text-gray-400">{inv.dueDate}</td>
                   <td className="px-4 py-3 text-right font-mono text-gray-200">{inv.grossTotal.toLocaleString('hu-HU')} Ft</td>
-                  <td className="px-4 py-3 text-gray-400">{PAYMENT_LABELS[inv.paymentMethod] ?? inv.paymentMethod}</td>
+                  <td className="px-4 py-3 text-gray-400">{t(PAYMENT_KEYS[inv.paymentMethod] ?? '') || inv.paymentMethod}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[inv.status] ?? 'bg-gray-700 text-gray-300'}`}>
                       {t(`invoicing.status_${inv.status}`)}
@@ -274,7 +276,7 @@ export default function InvoicingDashboardPage() {
                           <Check className="w-3.5 h-3.5" />
                         </button>
                       )}
-                      {(inv.status === 'issued' || inv.status === 'paid') && (
+                      {(inv.status === 'issued' || inv.status === 'paid') && !isDemo && (
                         <button
                           onClick={() => window.open(`/api/modules/invoicing/data/${inv.id}/pdf`, '_blank')}
                           className="p-1.5 bg-emerald-900/30 hover:bg-emerald-900/50 rounded text-emerald-400"

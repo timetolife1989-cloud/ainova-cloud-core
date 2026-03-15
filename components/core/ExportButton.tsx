@@ -16,27 +16,64 @@ export function ExportButton({ moduleId, table, className }: ExportButtonProps) 
   const [open, setOpen] = useState(false);
   const [showDemoMsg, setShowDemoMsg] = useState(false);
 
-  const doExport = (format: 'xlsx' | 'pdf') => {
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+
+  const doExport = async (format: 'xlsx' | 'pdf') => {
     setOpen(false);
     if (isDemo) {
       setShowDemoMsg(true);
       setTimeout(() => setShowDemoMsg(false), 5000);
       return;
     }
-    const params = new URLSearchParams({ format });
-    if (table) params.set('table', table);
-    window.open(`/api/modules/${moduleId}/export?${params}`, '_blank');
+    setExporting(true);
+    setExportError(null);
+    try {
+      const params = new URLSearchParams({ format });
+      if (table) params.set('table', table);
+      const res = await fetch(`/api/modules/${moduleId}/export?${params}`);
+      if (!res.ok) {
+        const ct = res.headers.get('content-type') ?? '';
+        if (ct.includes('json')) {
+          const json = await res.json() as { error?: string };
+          throw new Error(json.error ?? t('common.error'));
+        }
+        throw new Error(t('common.error'));
+      }
+      const blob = await res.blob();
+      const ext = format === 'xlsx' ? 'xlsx' : 'pdf';
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${moduleId}-export.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setExportError(e instanceof Error ? e.message : t('common.error'));
+      setTimeout(() => setExportError(null), 4000);
+    } finally {
+      setExporting(false);
+    }
   };
 
   return (
     <div className={`relative ${className ?? ''}`}>
       <button
         onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800 text-gray-300 text-sm hover:bg-gray-700 border border-gray-700 transition-colors"
+        disabled={exporting}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800 text-gray-300 text-sm hover:bg-gray-700 border border-gray-700 transition-colors disabled:opacity-50"
       >
-        <span>⬇</span>
+        <span>{exporting ? '⏳' : '⬇'}</span>
         {t('export.title') !== 'export.title' ? t('export.title') : 'Export'}
       </button>
+
+      {exportError && (
+        <div className="absolute right-0 top-full mt-2 z-50 bg-red-900/90 border border-red-700 rounded-lg shadow-xl p-3 min-w-[220px]">
+          <p className="text-xs text-red-200">{exportError}</p>
+        </div>
+      )}
 
       {showDemoMsg && (
         <div className="absolute right-0 top-full mt-2 z-50 bg-gradient-to-r from-indigo-900 to-purple-900 border border-indigo-600 rounded-xl shadow-2xl p-4 min-w-[280px] animate-in fade-in">

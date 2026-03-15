@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import {
   BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
@@ -49,7 +50,7 @@ export function ReportViewer({ reportId, reportName, chartType, onClose }: Repor
       setRows(json.rows);
       setMeta(json.meta);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error');
+      setError(getErrorMessage(e, t));
     } finally {
       setLoading(false);
     }

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { Save, ArrowLeft, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
@@ -98,7 +99,7 @@ export default function ModuleSettingsPage() {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error_occurred'));
+      setError(getErrorMessage(e, t));
     } finally {
       setSaving(false);
     }

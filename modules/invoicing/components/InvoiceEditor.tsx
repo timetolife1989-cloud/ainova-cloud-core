@@ -66,11 +66,11 @@ export default function InvoiceEditor({ onSuccess, onCancel }: InvoiceEditorProp
   useEffect(() => {
     fetch('/api/modules/invoicing/data/customers')
       .then(r => r.json())
-      .then((d: { customers: Customer[] }) => setCustomers(d.customers))
+      .then((d: { customers?: Customer[] }) => setCustomers(d.customers ?? []))
       .catch(() => {});
     fetch('/api/modules/inventory/data')
       .then(r => r.json())
-      .then((d: { items: InventoryItem[] }) => setInventoryItems(d.items))
+      .then((d: { items?: InventoryItem[] }) => setInventoryItems(d.items ?? []))
       .catch(() => {});
   }, []);
 
@@ -184,9 +184,9 @@ export default function InvoiceEditor({ onSuccess, onCancel }: InvoiceEditorProp
         <div>
           <label className="block text-xs font-medium text-gray-400 mb-1">{t('invoicing.payment_method')}</label>
           <select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)} className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100">
-            <option value="cash">Készpénz</option>
-            <option value="card">Bankkártya</option>
-            <option value="transfer">Átutalás</option>
+            <option value="cash">{t('invoicing.pay_cash')}</option>
+            <option value="card">{t('invoicing.pay_card')}</option>
+            <option value="transfer">{t('invoicing.pay_transfer')}</option>
           </select>
         </div>
         <div>
@@ -318,7 +318,7 @@ export default function InvoiceEditor({ onSuccess, onCancel }: InvoiceEditorProp
           </div>
           {totals.vatSummary.map(vs => (
             <div key={vs.vatRateCode} className="flex items-center gap-8 text-sm">
-              <span className="text-gray-400">ÁFA {vs.vatRateCode}:</span>
+              <span className="text-gray-400">{t('invoicing.vat')} {vs.vatRateCode}:</span>
               <span className="font-mono text-gray-300 w-32 text-right">{vs.vatAmount.toLocaleString('hu-HU')} Ft</span>
             </div>
           ))}

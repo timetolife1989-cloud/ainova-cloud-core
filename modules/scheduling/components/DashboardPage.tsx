@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { Calendar, Plus, X, Check, AlertTriangle, Users, Cpu, MapPin } from 'lucide-react';
 
 interface CapacityEntry {
@@ -99,7 +100,7 @@ export default function SchedulingDashboardPage() {
       setFormPlannedHours(40);
       await fetchData();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error'));
+      setError(getErrorMessage(e, t));
     } finally {
       setSaving(false);
     }

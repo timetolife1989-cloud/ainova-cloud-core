@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 import { X, Check, AlertTriangle } from 'lucide-react';
 
 interface ReportEditorProps {
@@ -65,7 +66,7 @@ export function ReportEditor({ onClose, onSaved }: ReportEditorProps) {
       onSaved();
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error');
+      setError(getErrorMessage(e, t));
     } finally {
       setSaving(false);
     }

@@ -5,6 +5,7 @@ import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader
 import { ExportButton } from '@/components/core/ExportButton';
 import { ClipboardCheck, Plus, X, Check, AlertTriangle, Clock, CheckCircle, Circle, AlertCircle } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getErrorMessage } from '@/lib/translate-error';
 
 interface TrackingItem {
   id: number;
@@ -68,8 +69,8 @@ export default function TrackingDashboardPage() {
       if (filterStatus) url += `?status=${encodeURIComponent(filterStatus)}`;
       const res = await fetch(url);
       if (res.ok) {
-        const json = await res.json() as { items: TrackingItem[] };
-        setItems(json.items);
+      const json = await res.json() as { items?: TrackingItem[] };
+      setItems(json.items ?? []);
       }
     } finally {
       setLoading(false);
@@ -117,7 +118,7 @@ export default function TrackingDashboardPage() {
       resetForm();
       await fetchData();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('common.error'));
+      setError(getErrorMessage(e, t));
     } finally {
       setSaving(false);
     }
