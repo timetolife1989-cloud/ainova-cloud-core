@@ -212,7 +212,7 @@ export default function POSDashboardPage() {
             <div>
               <p className="text-emerald-400 font-semibold">{t('pos.sale_complete')}</p>
               <p className="text-sm text-gray-300">
-                {saleResult.receiptNumber} — {fmt(saleResult.total)} Ft
+                {saleResult.receiptNumber} — {fmt(saleResult.total)} {t('common.currency')}
               </p>
             </div>
             <button onClick={() => setSaleResult(null)} className="text-gray-400 hover:text-white">
@@ -248,7 +248,7 @@ export default function POSDashboardPage() {
                              min-h-[100px] transition-colors touch-manipulation"
                 >
                   <span className="text-white font-medium text-center text-sm leading-tight">{p.name}</span>
-                  <span className="text-emerald-400 font-bold mt-1">{fmt(p.price)} Ft</span>
+                  <span className="text-emerald-400 font-bold mt-1">{fmt(p.price)} {t('common.currency')}</span>
                   <span className="text-xs text-gray-400 mt-0.5">
                     {t('pos.stock')}: {p.stock} {p.unit}
                   </span>
@@ -262,7 +262,7 @@ export default function POSDashboardPage() {
             {/* Daily summary bar */}
             {summary && (
               <div className="bg-gray-800 rounded-lg p-3 flex flex-wrap gap-4 text-sm text-gray-300">
-                <span>{t('pos.today_revenue')}: <strong className="text-white">{fmt(summary.netRevenue)} Ft</strong></span>
+                <span>{t('pos.today_revenue')}: <strong className="text-white">{fmt(summary.netRevenue)} {t('common.currency')}</strong></span>
                 <span>{t('pos.transactions')}: <strong className="text-white">{summary.transactionCount}</strong></span>
                 {summary.isClosed && (
                   <span className="text-amber-400 font-semibold">{t('pos.day_closed')}</span>
@@ -292,7 +292,7 @@ export default function POSDashboardPage() {
                 <div key={item.id} className="flex items-center gap-3 bg-gray-800 rounded-lg p-3">
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-sm font-medium truncate">{item.name}</p>
-                    <p className="text-gray-400 text-xs">{fmt(item.price)} Ft/{item.unit}</p>
+                    <p className="text-gray-400 text-xs">{fmt(item.price)} {t('common.currency')}/{item.unit}</p>
                   </div>
                   <div className="flex items-center gap-1">
                     <button onClick={() => updateQuantity(item.id, -1)}
@@ -305,7 +305,7 @@ export default function POSDashboardPage() {
                       <Plus className="w-4 h-4 text-white" />
                     </button>
                   </div>
-                  <span className="w-24 text-right text-white font-semibold">{fmt(item.lineTotal)} Ft</span>
+                  <span className="w-24 text-right text-white font-semibold">{fmt(item.lineTotal)} {t('common.currency')}</span>
                   <button onClick={() => removeFromCart(item.id)}
                     className="w-10 h-10 flex items-center justify-center text-red-400 hover:text-red-300 touch-manipulation">
                     <X className="w-4 h-4" />
@@ -318,15 +318,15 @@ export default function POSDashboardPage() {
             <div className="border-t border-gray-700 mt-3 pt-3 space-y-1">
               <div className="flex justify-between text-gray-300 text-sm">
                 <span>{t('pos.subtotal')}</span>
-                <span>{fmt(cartTotal)} Ft</span>
+                <span>{fmt(cartTotal)} {t('common.currency')}</span>
               </div>
               <div className="flex justify-between text-gray-300 text-sm">
                 <span>{t('pos.vat')} (27%)</span>
-                <span>{fmt(cartVat)} Ft</span>
+                <span>{fmt(cartVat)} {t('common.currency')}</span>
               </div>
               <div className="flex justify-between text-white text-xl font-bold pt-1">
                 <span>{t('pos.total')}</span>
-                <span>{fmt(cartGross)} Ft</span>
+                <span>{fmt(cartGross)} {t('common.currency')}</span>
               </div>
             </div>
 
@@ -372,11 +372,11 @@ export default function POSDashboardPage() {
                 <div className="bg-gray-800 rounded-lg p-3 space-y-1 text-sm text-gray-300">
                   <div className="flex justify-between">
                     <span>{t('pos.expected_cash')}</span>
-                    <span className="text-white font-semibold">{fmt(summary.totalCash - summary.totalRefunds)} Ft</span>
+                    <span className="text-white font-semibold">{fmt(summary.totalCash - summary.totalRefunds)} {t('common.currency')}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>{t('pos.card_total')}</span>
-                    <span>{fmt(summary.totalCard)} Ft</span>
+                    <span>{fmt(summary.totalCard)} {t('common.currency')}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>{t('pos.transactions')}</span>
@@ -450,7 +450,7 @@ export default function POSDashboardPage() {
             {transactions.map(tx => (
               <tr key={tx.id} className={`hover:bg-gray-800/50 ${tx.isRefund ? 'text-red-400' : 'text-gray-200'}`}>
                 <td className="px-4 py-3 font-mono text-sm">{tx.receiptNumber}</td>
-                <td className="px-4 py-3">{new Date(tx.date).toLocaleString('hu-HU')}</td>
+                <td className="px-4 py-3">{new Date(tx.date).toLocaleString()}</td>
                 <td className="px-4 py-3">{tx.cashierName}</td>
                 <td className="px-4 py-3">
                   <span className={`px-2 py-0.5 rounded text-xs font-medium ${
@@ -462,7 +462,7 @@ export default function POSDashboardPage() {
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right font-semibold">
-                  {tx.isRefund ? '-' : ''}{fmt(Math.abs(tx.total))} Ft
+                  {tx.isRefund ? '-' : ''}{fmt(Math.abs(tx.total))} {t('common.currency')}
                 </td>
               </tr>
             ))}

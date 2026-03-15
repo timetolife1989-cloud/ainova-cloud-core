@@ -14,7 +14,7 @@
 - ✅ Branding: "AINOVA CLOUD INTELLIGENCE"
 - ✅ Glow effekt + ripple button
 - ⬜ "Elfelejtett jelszó" flow (email alapú) — SMTP konfig szükséges
-- ⬜ "Jegyezd meg" checkbox
+- ✅ "Jegyezd meg" checkbox — 2026-03-15
 
 ## Admin panel
 - ⬜ User szerkesztő: jelszó erősség jelző
@@ -26,4 +26,4 @@
 - ✅ Error boundary (app/error.tsx kész)
 - ✅ Inaktivitás érzékelés (25p figyelmeztetés, 30p auto-kijelentkezés)
 - ✅ Dátum input dark theme CSS (color-scheme: dark)
-- ⬜ 404 oldal testreszabás (jelenleg: Next.js default)
+- ✅ 404 oldal testreszabás (app/not-found.tsx) — 2026-03-15

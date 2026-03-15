@@ -7,7 +7,7 @@ import { X, Check, AlertTriangle } from 'lucide-react';
 
 interface ReportEditorProps {
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: () => void | Promise<void>;
 }
 
 const SOURCE_MODULES = [
@@ -63,7 +63,7 @@ export function ReportEditor({ onClose, onSaved }: ReportEditorProps) {
       });
       const body = await res.json() as { ok?: boolean; error?: string };
       if (!res.ok) throw new Error(body.error ?? 'Error');
-      onSaved();
+      await onSaved();
       onClose();
     } catch (e) {
       setError(getErrorMessage(e, t));

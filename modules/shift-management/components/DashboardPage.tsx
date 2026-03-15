@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { getErrorMessage } from '@/lib/translate-error';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
-import { CalendarClock, Plus, X, Check, AlertTriangle } from 'lucide-react';
+import { CalendarClock, Plus, X, Check, AlertTriangle, LayoutGrid, List, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ShiftDef { id: number; name: string; startTime: string; endTime: string; color: string | null; }
 interface Assignment { id: number; workerName: string; teamName: string | null; shiftId: number; shiftName: string; assignmentDate: string; status: string; }
@@ -22,6 +22,8 @@ export default function ShiftManagementDashboardPage() {
   const [formTeam, setFormTeam] = useState('');
   const [formShift, setFormShift] = useState(0);
   const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0]);
+  const [viewMode, setViewMode] = useState<'list' | 'week'>('week');
+  const [weekOffset, setWeekOffset] = useState(0);
 
   const fetchData = useCallback(async () => {
     try {
@@ -62,6 +64,35 @@ export default function ShiftManagementDashboardPage() {
     return acc;
   }, {});
 
+  // Weekly grid data
+  const weekDays = useMemo(() => {
+    const mon = new Date();
+    mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7) + weekOffset * 7);
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(mon);
+      d.setDate(d.getDate() + i);
+      return d.toISOString().split('T')[0];
+    });
+  }, [weekOffset]);
+
+  const weekWorkers = useMemo(() => {
+    const names = new Set<string>();
+    assignments.forEach(a => {
+      if (weekDays.includes(a.assignmentDate)) names.add(a.workerName);
+    });
+    return Array.from(names).sort();
+  }, [assignments, weekDays]);
+
+  const getAssignment = (worker: string, day: string) =>
+    assignments.find(a => a.workerName === worker && a.assignmentDate === day);
+
+  const weekLabel = useMemo(() => {
+    if (!weekDays[0] || !weekDays[6]) return '';
+    const s = new Date(weekDays[0]);
+    const e = new Date(weekDays[6]);
+    return `${s.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${e.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`;
+  }, [weekDays]);
+
   if (loading) return (<div className="max-w-7xl mx-auto px-4 py-8"><DashboardSectionHeader title={t('shift.title')} subtitle={t('shift.subtitle_short')} /><div className="animate-pulse mt-6 h-64 bg-gray-800 rounded-xl" /></div>);
 
   return (
@@ -71,21 +102,81 @@ export default function ShiftManagementDashboardPage() {
         <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg text-sm font-medium"><Plus className="w-4 h-4" /> {t('shift.new_assignment')}</button>
       </div>
 
-      {/* Shift legend */}
-      <div className="flex gap-3 mb-4">
-        {shifts.map(s => (
-          <span key={s.id} className="px-3 py-1 rounded-lg text-xs text-white" style={{ backgroundColor: s.color ?? '#475569' }}>
-            {s.name} ({s.startTime}–{s.endTime})
-          </span>
-        ))}
-        {shifts.length === 0 && <p className="text-gray-500 text-sm">{t('shift.no_shift_types')}</p>}
+      {/* Shift legend + view toggle */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex gap-3">
+          {shifts.map(s => (
+            <span key={s.id} className="px-3 py-1 rounded-lg text-xs text-white" style={{ backgroundColor: s.color ?? '#475569' }}>
+              {s.name} ({s.startTime}–{s.endTime})
+            </span>
+          ))}
+          {shifts.length === 0 && <p className="text-gray-500 text-sm">{t('shift.no_shift_types')}</p>}
+        </div>
+        <div className="flex gap-1 bg-gray-800 rounded-lg p-0.5">
+          <button onClick={() => setViewMode('week')} className={`p-1.5 rounded ${viewMode === 'week' ? 'bg-sky-600 text-white' : 'text-gray-400 hover:text-white'}`} title={t('shift.week_view')}><LayoutGrid className="w-4 h-4" /></button>
+          <button onClick={() => setViewMode('list')} className={`p-1.5 rounded ${viewMode === 'list' ? 'bg-sky-600 text-white' : 'text-gray-400 hover:text-white'}`} title={t('shift.list_view')}><List className="w-4 h-4" /></button>
+        </div>
       </div>
 
-      {/* Calendar view */}
+      {/* Weekly grid view */}
+      {viewMode === 'week' && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <button onClick={() => setWeekOffset(o => o - 1)} className="p-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-400"><ChevronLeft className="w-4 h-4" /></button>
+            <span className="text-white font-medium text-sm">{weekLabel}</span>
+            <div className="flex gap-1">
+              <button onClick={() => setWeekOffset(0)} className="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-gray-400 text-xs">{t('shift.today')}</button>
+              <button onClick={() => setWeekOffset(o => o + 1)} className="p-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-400"><ChevronRight className="w-4 h-4" /></button>
+            </div>
+          </div>
+
+          <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-x-auto">
+            <table className="w-full text-sm min-w-[700px]">
+              <thead>
+                <tr className="bg-gray-950 text-gray-400 text-xs uppercase">
+                  <th className="px-3 py-2 text-left w-36">{t('shift.worker')}</th>
+                  {weekDays.map(d => (
+                    <th key={d} className={`px-2 py-2 text-center ${d === new Date().toISOString().split('T')[0] ? 'text-sky-400' : ''}`}>
+                      {new Date(d).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' })}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-800">
+                {weekWorkers.map(worker => (
+                  <tr key={worker} className="hover:bg-gray-800/50">
+                    <td className="px-3 py-2 text-white text-sm font-medium">{worker}</td>
+                    {weekDays.map(d => {
+                      const a = getAssignment(worker, d);
+                      return (
+                        <td key={d} className="px-1 py-1 text-center">
+                          {a ? (
+                            <span className="inline-block px-2 py-1 rounded text-[11px] text-white font-medium" style={{ backgroundColor: shifts.find(s => s.id === a.shiftId)?.color ?? '#475569' }}>
+                              {a.shiftName}
+                            </span>
+                          ) : (
+                            <span className="text-gray-700">–</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+                {weekWorkers.length === 0 && (
+                  <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-500">{t('shift.no_assignments')}</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* List view */}
+      {viewMode === 'list' && (
       <div className="space-y-4">
         {Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([date, items]) => (
           <div key={date} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <h3 className="text-white font-medium mb-3">{new Date(date).toLocaleDateString('hu-HU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h3>
+            <h3 className="text-white font-medium mb-3">{new Date(date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {items.map(a => (
                 <div key={a.id} className="flex items-center gap-2 bg-gray-950 rounded-lg p-2">
@@ -106,6 +197,7 @@ export default function ShiftManagementDashboardPage() {
           </div>
         )}
       </div>
+      )}
 
       {modalOpen && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">

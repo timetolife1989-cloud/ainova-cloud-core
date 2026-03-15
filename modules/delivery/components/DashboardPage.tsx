@@ -5,7 +5,8 @@ import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader
 import { ExportButton } from '@/components/core/ExportButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { getErrorMessage } from '@/lib/translate-error';
-import { Truck, Plus, X, Check, AlertTriangle, Package, DollarSign, Scale } from 'lucide-react';
+import { Truck, Plus, X, Check, AlertTriangle, Package, DollarSign, Scale, Pencil } from 'lucide-react';
+import CustomerBreakdownChart from './CustomerBreakdownChart';
 
 interface DeliveryShipment {
   id: number;
@@ -31,6 +32,7 @@ export default function DeliveryDashboardPage() {
   const [shipments, setShipments] = useState<DeliveryShipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -81,14 +83,71 @@ export default function DeliveryDashboardPage() {
       });
       const body = await res.json() as { ok?: boolean; error?: string };
       if (!res.ok) throw new Error(body.error ?? t('common.error'));
-      setModalOpen(false);
-      setFormCustomer(''); setFormOrder(''); setFormQuantity(0); setFormWeight(''); setFormValue('');
+      closeModal();
       await fetchData();
     } catch (e) {
       setError(getErrorMessage(e, t));
     } finally {
       setSaving(false);
     }
+  };
+
+  const openEditModal = (s: DeliveryShipment) => {
+    setEditId(s.id);
+    setFormDate(s.shipmentDate);
+    setFormCustomer(s.customerName);
+    setFormOrder(s.orderNumber ?? '');
+    setFormQuantity(s.quantity);
+    setFormWeight(s.weight ?? '');
+    setFormValue(s.value ?? '');
+    setError(null);
+    setModalOpen(true);
+  };
+
+  const handleUpdate = async () => {
+    if (!editId || !formCustomer.trim()) { setError(t('delivery.customer_required')); return; }
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/modules/delivery/data/${editId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': getCsrfToken() },
+        body: JSON.stringify({
+          shipmentDate: formDate,
+          customerName: formCustomer,
+          orderNumber: formOrder || undefined,
+          quantity: formQuantity,
+          weight: formWeight !== '' ? formWeight : undefined,
+          value: formValue !== '' ? formValue : undefined,
+        }),
+      });
+      const body = await res.json() as { ok?: boolean; error?: string };
+      if (!res.ok) throw new Error(body.error ?? t('common.error'));
+      closeModal();
+      await fetchData();
+    } catch (e) {
+      setError(getErrorMessage(e, t));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleStatusChange = async (id: number, newStatus: string) => {
+    try {
+      await fetch(`/api/modules/delivery/data/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': getCsrfToken() },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      await fetchData();
+    } catch { /* ignore */ }
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditId(null);
+    setFormCustomer(''); setFormOrder(''); setFormQuantity(0); setFormWeight(''); setFormValue('');
+    setError(null);
   };
 
   // Summary
@@ -114,7 +173,7 @@ export default function DeliveryDashboardPage() {
         <DashboardSectionHeader title={t('delivery.title')} subtitle={t('delivery.subtitle')} />
         <div className="flex items-center gap-2">
           <ExportButton moduleId="delivery" table="delivery_shipments" />
-          <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium">
+          <button onClick={() => { setEditId(null); setModalOpen(true); }} className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium">
             <Plus className="w-4 h-4" /> {t('delivery.new_shipment')}
           </button>
         </div>
@@ -148,6 +207,11 @@ export default function DeliveryDashboardPage() {
         </div>
       </div>
 
+      {/* Customer breakdown chart */}
+      <div className="mb-6">
+        <CustomerBreakdownChart />
+      </div>
+
       {/* Table */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
@@ -160,6 +224,7 @@ export default function DeliveryDashboardPage() {
               <th className="px-4 py-3 text-right">{t('delivery.weight')}</th>
               <th className="px-4 py-3 text-right">{t('delivery.value')}</th>
               <th className="px-4 py-3 text-center">{t('delivery.status')}</th>
+              <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
@@ -172,14 +237,20 @@ export default function DeliveryDashboardPage() {
                 <td className="px-4 py-3 text-right text-gray-400">{s.weight ?? '-'}</td>
                 <td className="px-4 py-3 text-right text-gray-300">{s.value?.toLocaleString() ?? '-'}</td>
                 <td className="px-4 py-3 text-center">
-                  <span className={`px-2 py-1 text-xs rounded ${STATUSES.find(st => st.value === s.status)?.color} text-white`}>
-                    {STATUSES.find(st => st.value === s.status) ? t(STATUSES.find(st => st.value === s.status)!.labelKey) : s.status}
-                  </span>
+                  <select value={s.status} onChange={e => handleStatusChange(s.id, e.target.value)}
+                    className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs text-gray-300">
+                    {STATUSES.map(st => <option key={st.value} value={st.value}>{t(st.labelKey)}</option>)}
+                  </select>
+                </td>
+                <td className="px-4 py-3">
+                  <button onClick={() => openEditModal(s)} className="p-1 text-gray-500 hover:text-orange-400" title={t('common.edit')}>
+                    <Pencil className="w-4 h-4" />
+                  </button>
                 </td>
               </tr>
             ))}
             {shipments.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500"><Truck className="w-8 h-8 mx-auto mb-2 opacity-30" />{t('delivery.no_shipments')}</td></tr>
+              <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-500"><Truck className="w-8 h-8 mx-auto mb-2 opacity-30" />{t('delivery.no_shipments')}</td></tr>
             )}
           </tbody>
         </table>
@@ -190,8 +261,8 @@ export default function DeliveryDashboardPage() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-white">{t('delivery.new_shipment')}</h3>
-              <button onClick={() => setModalOpen(false)} className="p-1 hover:bg-gray-800 rounded"><X className="w-5 h-5 text-gray-400" /></button>
+              <h3 className="text-lg font-medium text-white">{editId ? t('delivery.edit_shipment') : t('delivery.new_shipment')}</h3>
+              <button onClick={closeModal} className="p-1 hover:bg-gray-800 rounded"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -207,8 +278,8 @@ export default function DeliveryDashboardPage() {
             </div>
             {error && <div className="mt-4 p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-300 text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" /> {error}</div>}
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setModalOpen(false)} className="px-4 py-2 text-gray-400 text-sm">{t('common.cancel')}</button>
-              <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"><Check className="w-4 h-4" />{saving ? t('common.saving') : t('common.save')}</button>
+              <button onClick={closeModal} className="px-4 py-2 text-gray-400 text-sm">{t('common.cancel')}</button>
+              <button onClick={editId ? handleUpdate : handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"><Check className="w-4 h-4" />{saving ? t('common.saving') : t('common.save')}</button>
             </div>
           </div>
         </div>

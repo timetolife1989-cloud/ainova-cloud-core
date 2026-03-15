@@ -200,7 +200,7 @@ export default function MaintenanceDashboardPage() {
                     <td className="px-4 py-3 text-white">{l.taskName ?? '-'}</td>
                     <td className="px-4 py-3 text-gray-400">{l.assetName}</td>
                     <td className="px-4 py-3 text-right text-gray-300">{l.durationMin ? `${l.durationMin} min` : '-'}</td>
-                    <td className="px-4 py-3 text-right text-gray-300">{l.cost ? `${Number(l.cost).toLocaleString()} Ft` : '-'}</td>
+                    <td className="px-4 py-3 text-right text-gray-300">{l.cost ? `${Number(l.cost).toLocaleString()} ${t('common.currency')}` : '-'}</td>
                     <td className="px-4 py-3 text-gray-400">{l.performedBy ?? '-'}</td>
                   </tr>
                 ))}

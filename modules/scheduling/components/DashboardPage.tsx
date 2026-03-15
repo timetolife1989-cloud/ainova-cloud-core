@@ -159,11 +159,11 @@ export default function SchedulingDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
           <p className="text-xs text-gray-500 mb-1">{t('scheduling.planned_capacity')}</p>
-          <p className="text-2xl font-bold text-white">{totalPlanned} {t('scheduling.hours')}</p>
+          <p className="text-2xl font-bold text-white">{Number(totalPlanned.toFixed(1))} {t('scheduling.hours')}</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
           <p className="text-xs text-gray-500 mb-1">{t('scheduling.allocated')}</p>
-          <p className="text-2xl font-bold text-white">{totalAllocated} {t('scheduling.hours')}</p>
+          <p className="text-2xl font-bold text-white">{Number(totalAllocated.toFixed(1))} {t('scheduling.hours')}</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
           <p className="text-xs text-gray-500 mb-1">{t('scheduling.avg_utilization')}</p>
@@ -198,8 +198,8 @@ export default function SchedulingDashboardPage() {
                   />
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>{entry.allocatedHours} / {entry.plannedHours} {t('scheduling.hours')}</span>
-                  <span>{entry.plannedHours - entry.allocatedHours} {t('scheduling.free')}</span>
+                  <span>{Number(entry.allocatedHours.toFixed(1))} / {Number(entry.plannedHours.toFixed(1))} {t('scheduling.hours')}</span>
+                  <span>{Number((entry.plannedHours - entry.allocatedHours).toFixed(1))} {t('scheduling.free')}</span>
                 </div>
               </div>
             </div>

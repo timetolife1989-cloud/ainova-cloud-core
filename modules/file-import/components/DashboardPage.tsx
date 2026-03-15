@@ -5,6 +5,8 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { getErrorMessage } from '@/lib/translate-error';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { FileUp, Upload, Check, AlertTriangle, FileSpreadsheet, Clock, CheckCircle, XCircle } from 'lucide-react';
+import ImportPreview from './ImportPreview';
+import ErrorList from './ErrorList';
 
 interface ImportConfig {
   id: number;
@@ -50,17 +52,12 @@ export default function FileImportDashboardPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [configsRes, logsRes] = await Promise.all([
-        fetch('/api/admin/import-configs'),
-        fetch('/api/admin/import-configs'), // Would be import-logs endpoint
-      ]);
-
-      if (configsRes.ok) {
-      const json = await configsRes.json() as { configs?: ImportConfig[] };
-      setConfigs(json.configs ?? []);
+      const res = await fetch('/api/modules/file-import/data');
+      if (res.ok) {
+        const json = await res.json() as { configs?: ImportConfig[]; logs?: ImportLog[] };
+        setConfigs(json.configs ?? []);
+        setLogs(json.logs ?? []);
       }
-      // Logs would come from a separate endpoint
-      setLogs([]);
     } finally {
       setLoading(false);
     }
@@ -88,7 +85,7 @@ export default function FileImportDashboardPage() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const uploadRes = await fetch('/api/admin/import', {
+      const uploadRes = await fetch('/api/modules/file-import/data', {
         method: 'POST',
         body: formData,
       });
@@ -99,7 +96,7 @@ export default function FileImportDashboardPage() {
       setUploadedFile({ path: uploadJson.filePath!, name: file.name });
 
       // Detect file type
-      const detectRes = await fetch('/api/admin/import', {
+      const detectRes = await fetch('/api/modules/file-import/data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'detect', filePath: uploadJson.filePath }),
@@ -126,7 +123,7 @@ export default function FileImportDashboardPage() {
     setSuccess(null);
 
     try {
-      const res = await fetch('/api/admin/import', {
+      const res = await fetch('/api/modules/file-import/data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -271,6 +268,16 @@ export default function FileImportDashboardPage() {
             <CheckCircle className="w-4 h-4 flex-shrink-0" /> {success}
           </div>
         )}
+      </div>
+
+      {/* Import Preview */}
+      <div className="mt-6">
+        <ImportPreview />
+      </div>
+
+      {/* Error List */}
+      <div className="mt-6">
+        <ErrorList />
       </div>
 
       {/* Available configs */}

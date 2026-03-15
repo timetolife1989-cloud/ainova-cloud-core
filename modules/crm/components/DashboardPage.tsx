@@ -50,7 +50,7 @@ function getCsrf(): string {
 }
 
 function fmt(n: number): string {
-  return new Intl.NumberFormat('hu-HU').format(Math.round(n));
+  return new Intl.NumberFormat().format(Math.round(n));
 }
 
 export default function CRMDashboardPage() {
@@ -311,7 +311,7 @@ export default function CRMDashboardPage() {
                       'bg-gray-700 text-gray-300'
                     }`}>{t(`crm.type_${String(inter.type)}`)}</span>
                     <span className="text-xs text-gray-500">
-                      {new Date(String(inter.interaction_date)).toLocaleString('hu-HU')}
+                      {new Date(String(inter.interaction_date)).toLocaleString()}
                     </span>
                     <span className="text-xs text-gray-500 ml-auto">{String(inter.created_by_name ?? '')}</span>
                   </div>
@@ -343,7 +343,7 @@ export default function CRMDashboardPage() {
                 <div key={stage} className="space-y-2">
                   <div className={`px-3 py-2 rounded-t-lg text-white text-sm font-semibold ${STAGE_COLORS[stage]}`}>
                     {t(`crm.stage_${stage}`)} ({stageOpps.length})
-                    <span className="block text-xs font-normal opacity-80">{fmt(stageTotal)} Ft</span>
+                    <span className="block text-xs font-normal opacity-80">{fmt(stageTotal)} {t('common.currency')}</span>
                   </div>
                   <div className="space-y-2 min-h-[100px]">
                     {stageOpps.map(opp => (
@@ -403,7 +403,7 @@ export default function CRMDashboardPage() {
                   {r.customer_name && <p className="text-xs text-gray-400">{r.customer_name}</p>}
                 </div>
                 <span className={`text-sm ${isOverdue ? 'text-red-400' : 'text-gray-400'}`}>
-                  {new Date(r.due_date).toLocaleDateString('hu-HU')}
+                  {new Date(r.due_date).toLocaleDateString()}
                 </span>
               </div>
             );

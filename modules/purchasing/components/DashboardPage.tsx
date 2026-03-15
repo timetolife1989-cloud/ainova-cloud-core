@@ -252,7 +252,7 @@ export default function PurchasingDashboardPage() {
                     </td>
                     <td className="px-4 py-3 text-gray-400 text-xs">{o.orderDate}</td>
                     <td className="px-4 py-3 text-right text-gray-300">
-                      {new Intl.NumberFormat('hu-HU').format(o.totalGross)} {o.currency}
+                      {new Intl.NumberFormat().format(o.totalGross)} {o.currency}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {o.status === 'draft' && (

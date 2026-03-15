@@ -110,7 +110,8 @@ export default function InvoicingDashboardPage() {
   };
 
   // Summary stats
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const todayTotal = invoices
     .filter(i => i.issueDate === todayStr && i.status !== 'storno' && i.invoiceType !== 'storno')
     .reduce((sum, i) => sum + i.grossTotal, 0);
@@ -180,7 +181,7 @@ export default function InvoicingDashboardPage() {
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-900/30 rounded-lg"><FileText className="w-5 h-5 text-emerald-400" /></div>
-            <div><p className="text-xs text-gray-500">{t('invoicing.today_total')}</p><p className="text-2xl font-bold text-white">{todayTotal.toLocaleString('hu-HU')} Ft</p></div>
+            <div><p className="text-xs text-gray-500">{t('invoicing.today_total')}</p><p className="text-2xl font-bold text-white">{todayTotal.toLocaleString()} {t('common.currency')}</p></div>
           </div>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
@@ -192,7 +193,7 @@ export default function InvoicingDashboardPage() {
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-purple-900/30 rounded-lg"><FileText className="w-5 h-5 text-purple-400" /></div>
-            <div><p className="text-xs text-gray-500">{t('invoicing.grand_total')}</p><p className="text-2xl font-bold text-white">{totalGross.toLocaleString('hu-HU')} Ft</p></div>
+            <div><p className="text-xs text-gray-500">{t('invoicing.grand_total')}</p><p className="text-2xl font-bold text-white">{totalGross.toLocaleString()} {t('common.currency')}</p></div>
           </div>
         </div>
       </div>
@@ -257,7 +258,7 @@ export default function InvoicingDashboardPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-400">{inv.issueDate}</td>
                   <td className="px-4 py-3 text-gray-400">{inv.dueDate}</td>
-                  <td className="px-4 py-3 text-right font-mono text-gray-200">{inv.grossTotal.toLocaleString('hu-HU')} Ft</td>
+                  <td className="px-4 py-3 text-right font-mono text-gray-200">{inv.grossTotal.toLocaleString()} {t('common.currency')}</td>
                   <td className="px-4 py-3 text-gray-400">{t(PAYMENT_KEYS[inv.paymentMethod] ?? '') || inv.paymentMethod}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[inv.status] ?? 'bg-gray-700 text-gray-300'}`}>

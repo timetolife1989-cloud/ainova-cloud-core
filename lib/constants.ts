@@ -1,6 +1,15 @@
 /** Minimum password length */
 export const PASSWORD_MIN_LENGTH = 8;
 
+/** Password complexity policy */
+export const PASSWORD_POLICY = {
+  minLength: 8,
+  requireUppercase: true,
+  requireLowercase: true,
+  requireDigit: true,
+  requireSpecial: false,
+} as const;
+
 /** Minimum username length */
 export const USERNAME_MIN_LENGTH = 3;
 

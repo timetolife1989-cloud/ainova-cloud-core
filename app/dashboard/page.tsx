@@ -33,13 +33,14 @@ export default async function DashboardPage() {
   );
 
   // Pre-resolve all translations in parallel
-  const [dashboardTitle, dashboardWelcome, noModulesUser, noModules, noModulesAdmin, adminTitle] = await Promise.all([
+  const [dashboardTitle, dashboardWelcome, noModulesUser, noModules, noModulesAdmin, adminTitle, adminSubtitle] = await Promise.all([
     t('dashboard.title'),
     t('dashboard.welcome', { name: session.fullName || session.username }),
     t('dashboard.no_modules_user'),
     t('dashboard.no_modules'),
     t('dashboard.no_modules_admin'),
     t('admin.title'),
+    t('admin.subtitle'),
   ]);
 
   return (
@@ -80,6 +81,15 @@ export default async function DashboardPage() {
               color={mod.color}
             />
           ))}
+          {session.role === 'admin' && (
+            <MenuTile
+              title={adminTitle}
+              description={adminSubtitle}
+              icon="Settings"
+              href="/dashboard/admin"
+              color="bg-indigo-600"
+            />
+          )}
         </div>
       )}
     </div>

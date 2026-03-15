@@ -120,10 +120,10 @@ export default function OeeDashboardPage() {
               <tr key={r.id} className="hover:bg-gray-800/50">
                 <td className="px-4 py-3 text-gray-300">{r.recordDate}</td>
                 <td className="px-4 py-3 text-white">{r.machineName}</td>
-                <td className="px-4 py-3 text-right text-blue-400">{r.availabilityPct ?? '-'}%</td>
-                <td className="px-4 py-3 text-right text-amber-400">{r.performancePct ?? '-'}%</td>
-                <td className="px-4 py-3 text-right text-green-400">{r.qualityPct ?? '-'}%</td>
-                <td className={`px-4 py-3 text-right font-bold ${getOeeColor(r.oeePct)}`}>{r.oeePct ?? '-'}%</td>
+                <td className="px-4 py-3 text-right text-blue-400">{r.availabilityPct != null ? `${r.availabilityPct}%` : '-'}</td>
+                <td className="px-4 py-3 text-right text-amber-400">{r.performancePct != null ? `${r.performancePct}%` : '-'}</td>
+                <td className="px-4 py-3 text-right text-green-400">{r.qualityPct != null ? `${r.qualityPct}%` : '-'}</td>
+                <td className={`px-4 py-3 text-right font-bold ${getOeeColor(r.oeePct)}`}>{r.oeePct != null ? `${r.oeePct}%` : '-'}</td>
               </tr>
             ))}
             {records.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-500">{t('oee.no_data')}</td></tr>}

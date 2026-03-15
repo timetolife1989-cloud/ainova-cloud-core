@@ -56,7 +56,7 @@ function getCsrf(): string {
 }
 
 function fmt(n: number): string {
-  return new Intl.NumberFormat('hu-HU').format(Math.round(n));
+  return new Intl.NumberFormat().format(Math.round(n));
 }
 
 export default function WorksheetsDashboardPage() {
@@ -226,7 +226,32 @@ export default function WorksheetsDashboardPage() {
             </button>
           </div>
 
-          <div className="bg-gray-900 rounded-xl overflow-hidden">
+          {/* Mobile card view */}
+          <div className="sm:hidden space-y-2">
+            {orders.length === 0 && (
+              <div className="bg-gray-900 rounded-xl p-8 text-center text-gray-500">{t('worksheets.no_orders')}</div>
+            )}
+            {orders.map(o => (
+              <div key={o.id} onClick={() => setSelectedId(o.id)}
+                className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer active:bg-gray-800">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-mono text-teal-400 text-sm">{o.order_number}</span>
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium text-white ${STATUS_COLORS[o.status] ?? 'bg-gray-600'}`}>
+                    {t(`worksheets.status_${o.status}`)}
+                  </span>
+                </div>
+                <p className="text-white text-sm font-medium truncate">{o.subject}</p>
+                <p className="text-gray-400 text-xs mt-1">{o.customer_name}</p>
+                <div className="flex items-center justify-between mt-2">
+                  <span className={`text-xs ${PRIORITY_COLORS[o.priority] ?? ''}`}>{t(`worksheets.priority_${o.priority}`)}</span>
+                  <span className="text-white text-sm font-semibold">{fmt(o.total_cost)} {t('common.currency')}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop table view */}
+          <div className="hidden sm:block bg-gray-900 rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-gray-800 text-gray-400">
                 <tr>
@@ -257,7 +282,7 @@ export default function WorksheetsDashboardPage() {
                     <td className={`px-4 py-3 text-sm ${PRIORITY_COLORS[o.priority] ?? ''}`}>
                       {t(`worksheets.priority_${o.priority}`)}
                     </td>
-                    <td className="px-4 py-3 text-right font-semibold">{fmt(o.total_cost)} Ft</td>
+                    <td className="px-4 py-3 text-right font-semibold">{fmt(o.total_cost)} {t('common.currency')}</td>
                     <td className="px-4 py-3"><ChevronRight className="w-4 h-4 text-gray-500" /></td>
                   </tr>
                 ))}
@@ -336,17 +361,17 @@ export default function WorksheetsDashboardPage() {
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-gray-900 rounded-xl p-4 text-center">
               <Clock className="w-5 h-5 text-blue-400 mx-auto mb-1" />
-              <p className="text-xl text-white font-bold">{fmt(Number(detail.order.total_labor))} Ft</p>
+              <p className="text-xl text-white font-bold">{fmt(Number(detail.order.total_labor))} {t('common.currency')}</p>
               <p className="text-xs text-gray-400">{t('worksheets.labor_cost')}</p>
             </div>
             <div className="bg-gray-900 rounded-xl p-4 text-center">
               <Package className="w-5 h-5 text-amber-400 mx-auto mb-1" />
-              <p className="text-xl text-white font-bold">{fmt(Number(detail.order.total_materials))} Ft</p>
+              <p className="text-xl text-white font-bold">{fmt(Number(detail.order.total_materials))} {t('common.currency')}</p>
               <p className="text-xs text-gray-400">{t('worksheets.material_cost')}</p>
             </div>
             <div className="bg-gray-900 rounded-xl p-4 text-center">
               <Wrench className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
-              <p className="text-xl text-white font-bold">{fmt(Number(detail.order.total_cost))} Ft</p>
+              <p className="text-xl text-white font-bold">{fmt(Number(detail.order.total_cost))} {t('common.currency')}</p>
               <p className="text-xs text-gray-400">{t('worksheets.total_cost')}</p>
             </div>
           </div>
@@ -372,8 +397,8 @@ export default function WorksheetsDashboardPage() {
                     <span className="text-white">{l.description ?? t('worksheets.labor_default')}</span>
                     <span className="text-gray-500 ml-2">({l.worker_name ?? ''})</span>
                   </div>
-                  <span className="text-gray-400">{l.hours}h × {fmt(l.rate)} Ft</span>
-                  <span className="text-blue-400 font-semibold">{fmt(l.total)} Ft</span>
+                  <span className="text-gray-400">{l.hours}h × {fmt(l.rate)} {t('common.currency')}</span>
+                  <span className="text-blue-400 font-semibold">{fmt(l.total)} {t('common.currency')}</span>
                 </div>
               ))}
             </div>
@@ -399,8 +424,8 @@ export default function WorksheetsDashboardPage() {
                   <div className="flex-1">
                     <span className="text-white">{m.product_name}</span>
                   </div>
-                  <span className="text-gray-400">{m.quantity} {m.unit} × {fmt(m.unit_price)} Ft</span>
-                  <span className="text-amber-400 font-semibold">{fmt(m.total)} Ft</span>
+                  <span className="text-gray-400">{m.quantity} {m.unit} × {fmt(m.unit_price)} {t('common.currency')}</span>
+                  <span className="text-amber-400 font-semibold">{fmt(m.total)} {t('common.currency')}</span>
                 </div>
               ))}
             </div>

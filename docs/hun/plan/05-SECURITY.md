@@ -21,6 +21,6 @@
 - ✅ SQL injection fix az export API-kban (parameterized queries)
 
 ## Tennivaló
-- ⬜ Superadmin backdoor kikapcsolás production-ben (`DISABLE_SUPERADMIN=true`)
-- ⬜ Password policy konfigurálhatóság (min. hossz, komplexitás)
+- ✅ Superadmin backdoor kikapcsolás production-ben (production default OFF, `ENABLE_SUPERADMIN=true` szükséges) — 2026-03-15
+- ✅ Password policy konfigurálhatóság (`PASSWORD_POLICY` + `validatePassword()` utility) — 2026-03-15
 - ⬜ Dependency audit (`npm audit`) — rendszeres futtatás

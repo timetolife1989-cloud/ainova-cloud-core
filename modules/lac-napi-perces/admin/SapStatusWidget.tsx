@@ -187,7 +187,7 @@ function StatCard({ label, value, color, bold }: { label: string; value: number;
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '-';
   try {
-    return new Date(dateStr).toLocaleDateString('hu-HU', {
+    return new Date(dateStr).toLocaleDateString(undefined, {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',

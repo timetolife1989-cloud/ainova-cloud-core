@@ -5,7 +5,9 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { getErrorMessage } from '@/lib/translate-error';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { ExportButton } from '@/components/core/ExportButton';
-import { ShieldCheck, Plus, X, Check, AlertTriangle, CheckCircle, XCircle, FileText, Eye, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShieldCheck, Plus, X, Check, AlertTriangle, CheckCircle, XCircle, FileText, Eye, Trash2, ChevronLeft, ChevronRight, ListChecks } from 'lucide-react';
+import DefectCodeManager from './DefectCodeManager';
+import RejectTrendChart from './RejectTrendChart';
 
 interface Inspection {
   id: number; inspectionDate: string; productCode: string | null; productName: string | null;
@@ -25,7 +27,7 @@ const D_STEPS = ['d1Team', 'd2Problem', 'd3Containment', 'd4RootCause', 'd5Corre
 
 export default function QualityDashboardPage() {
   const { t } = useTranslation();
-  const [tab, setTab] = useState<'inspections' | '8d'>('inspections');
+  const [tab, setTab] = useState<'inspections' | '8d' | 'defect-codes' | 'trends'>('inspections');
   const [inspections, setInspections] = useState<Inspection[]>([]);
   const [reports8d, setReports8d] = useState<Report8D[]>([]);
   const [loading, setLoading] = useState(true);
@@ -185,6 +187,12 @@ export default function QualityDashboardPage() {
         <button onClick={() => setTab('8d')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === '8d' ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>
           <FileText className="w-4 h-4 inline mr-2" />{t('quality.8d_title')}
         </button>
+        <button onClick={() => setTab('defect-codes')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'defect-codes' ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>
+          <ListChecks className="w-4 h-4 inline mr-2" />{t('quality.dc_tab')}
+        </button>
+        <button onClick={() => setTab('trends')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'trends' ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>
+          <ShieldCheck className="w-4 h-4 inline mr-2" />{t('quality.trends_tab')}
+        </button>
       </div>
 
       {/* Inspections tab */}
@@ -263,6 +271,12 @@ export default function QualityDashboardPage() {
           )}
         </>
       )}
+
+      {/* Defect Codes tab */}
+      {tab === 'defect-codes' && <DefectCodeManager />}
+
+      {/* Trends tab */}
+      {tab === 'trends' && <RejectTrendChart />}
 
       {/* Inspection modal */}
       {modalOpen && (

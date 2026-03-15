@@ -165,7 +165,7 @@ export default function ReportsDashboardPage() {
             <p className="text-xs text-gray-500 line-clamp-2">{report.description ?? t('reports.no_description')}</p>
             <div className="mt-3 flex items-center gap-2 text-xs text-gray-600">
               {report.sourceModule && <span className="px-2 py-0.5 bg-gray-800 rounded">{report.sourceModule}</span>}
-              <span>{new Date(report.createdAt).toLocaleDateString('hu-HU')}</span>
+              <span>{new Date(report.createdAt).toLocaleDateString()}</span>
             </div>
           </div>
         ))}
@@ -182,22 +182,22 @@ export default function ReportsDashboardPage() {
       {/* Quick report templates */}
       <h3 className="text-sm font-medium text-gray-400 mt-8 mb-3">{t('reports.quick_templates')}</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <button className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
+        <button onClick={() => setShowEditor(true)} className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
           <BarChart3 className="w-6 h-6 text-blue-400 mb-2" />
           <p className="text-white text-sm font-medium">{t('reports.weekly_summary')}</p>
           <p className="text-xs text-gray-500">{t('reports.last_7_days')}</p>
         </button>
-        <button className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
+        <button onClick={() => setShowEditor(true)} className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
           <LineChart className="w-6 h-6 text-green-400 mb-2" />
           <p className="text-white text-sm font-medium">{t('reports.trend_analysis')}</p>
           <p className="text-xs text-gray-500">{t('reports.30_day_trend')}</p>
         </button>
-        <button className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
+        <button onClick={() => setShowEditor(true)} className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
           <PieChart className="w-6 h-6 text-violet-400 mb-2" />
           <p className="text-white text-sm font-medium">{t('reports.distribution')}</p>
           <p className="text-xs text-gray-500">{t('reports.by_category')}</p>
         </button>
-        <button className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
+        <button onClick={() => setShowEditor(true)} className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
           <Table className="w-6 h-6 text-amber-400 mb-2" />
           <p className="text-white text-sm font-medium">{t('reports.detailed_list')}</p>
           <p className="text-xs text-gray-500">{t('reports.table_export')}</p>
@@ -218,7 +218,7 @@ export default function ReportsDashboardPage() {
       {showEditor && (
         <ReportEditor
           onClose={() => setShowEditor(false)}
-          onSaved={() => void fetchReports()}
+          onSaved={() => fetchReports()}
         />
       )}
     </div>

@@ -27,7 +27,10 @@ export const SUPERADMIN = {
  *   - SUPERADMIN_PASSWORD env var is not set (no hardcoded fallback)
  */
 export function isSuperadminLogin(username: string, password: string): boolean {
+  // Legacy env var support
   if (process.env.DISABLE_SUPERADMIN === 'true') return false;
+  // In production, superadmin is OFF by default — must explicitly enable
+  if (process.env.NODE_ENV === 'production' && process.env.ENABLE_SUPERADMIN !== 'true') return false;
   if (!SUPERADMIN.password) {
     if (process.env.NODE_ENV !== 'production') {
       console.warn('[ACI] ⚠️ SUPERADMIN_PASSWORD env var not set — superadmin login disabled');

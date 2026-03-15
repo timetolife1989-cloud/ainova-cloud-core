@@ -28,7 +28,7 @@ export default async function RootLayout({
         <QueryProvider>{children}</QueryProvider>
         <script
           dangerouslySetInnerHTML={{
-            __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}`,
+            __html: `if('serviceWorker' in navigator){if(location.hostname==='localhost'||location.hostname==='127.0.0.1'){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister()});});caches.keys().then(function(k){k.forEach(function(n){caches.delete(n)})});}else{navigator.serviceWorker.register('/sw.js').catch(function(){});}}`,
           }}
         />
       </body>

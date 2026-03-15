@@ -87,14 +87,14 @@ export async function GET(request: NextRequest) {
 
 const CreateSchema = z.object({
   recordDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  shiftName: z.string().max(50).optional(),
-  areaName: z.string().max(100).optional(),
+  shiftName: z.string().max(50).nullable().optional(),
+  areaName: z.string().max(100).nullable().optional(),
   plannedCount: z.number().min(0),
   actualCount: z.number().min(0),
   absentCount: z.number().min(0).optional(),
   overtimeHours: z.number().min(0).optional(),
   overtimeWorkers: z.number().min(0).optional(),
-  notes: z.string().max(500).optional(),
+  notes: z.string().max(500).nullable().optional(),
 });
 
 // POST /api/modules/workforce/[...path] → route.ts

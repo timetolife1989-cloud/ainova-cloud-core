@@ -15,6 +15,8 @@ import {
 } from './index';
 import NapiLehivottChart from './NapiLehivottChart';
 import NapiEuroChart from './NapiEuroChart';
+import NormaManager from './NormaManager';
+import TargetManager from './TargetManager';
 import { Download } from 'lucide-react';
 
 const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 perc
@@ -165,6 +167,14 @@ export default function NapiPercesPage() {
       {!loading && data.length > 0 && (
         <NapiPercesTable data={data} activeKimutat={activeKimutat} />
       )}
+
+      <div className="mt-6">
+        <NormaManager />
+      </div>
+
+      <div className="mt-6">
+        <TargetManager />
+      </div>
     </div>
   );
 }

@@ -33,6 +33,7 @@ export function LoginContainer() {
   const [loading, setLoading] = useState(false);
   const [glowState, setGlowState] = useState<GlowState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
 
   const showError = (msg: string) => {
     setErrorMessage(msg);
@@ -71,7 +72,7 @@ export function LoginContainer() {
           'X-CSRF-Token': csrfToken,
         },
         credentials: 'include',
-        body: JSON.stringify({ username: username.trim(), password }),
+        body: JSON.stringify({ username: username.trim(), password, rememberMe }),
       });
 
       const data = (await res.json()) as {
@@ -212,6 +213,19 @@ export function LoginContainer() {
               autoComplete="current-password"
             />
 
+            <label className="flex items-center gap-2 mt-4 cursor-pointer select-none group">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={e => setRememberMe(e.target.checked)}
+                disabled={loading || isSuccess}
+                className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-cyan-500 focus:ring-cyan-500/30 focus:ring-offset-0"
+              />
+              <span className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">
+                {t('auth.remember_me')}
+              </span>
+            </label>
+
             <div className="mt-6">
               <RippleButton
                 type="submit"
@@ -298,7 +312,7 @@ export function LoginContainer() {
                   textShadow: '0 0 10px rgba(16,185,129,0.5)',
                 }}
               >
-                Login successful!
+                {t('auth.login_success')}
               </p>
             </div>
           </motion.div>

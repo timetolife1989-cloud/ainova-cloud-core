@@ -296,7 +296,7 @@ export default function InvoiceEditor({ onSuccess, onCancel }: InvoiceEditorProp
                   <div className="col-span-12 sm:col-span-2 flex items-end justify-between">
                     <div className="text-right flex-1">
                       <p className="text-[10px] text-gray-500">{t('invoicing.line_gross')}</p>
-                      <p className="text-sm font-mono text-white">{calc.lineGross.toLocaleString('hu-HU')} Ft</p>
+                      <p className="text-sm font-mono text-white">{calc.lineGross.toLocaleString()} {t('common.currency')}</p>
                     </div>
                     <button onClick={() => removeLineItem(li.key)} className="ml-2 p-1.5 text-gray-600 hover:text-red-400" title={t('common.delete')}>
                       <Trash2 className="w-3.5 h-3.5" />
@@ -314,17 +314,17 @@ export default function InvoiceEditor({ onSuccess, onCancel }: InvoiceEditorProp
         <div className="flex flex-col items-end gap-1">
           <div className="flex items-center gap-8 text-sm">
             <span className="text-gray-400">{t('invoicing.net_total')}:</span>
-            <span className="font-mono text-gray-300 w-32 text-right">{totals.netTotal.toLocaleString('hu-HU')} Ft</span>
+            <span className="font-mono text-gray-300 w-32 text-right">{totals.netTotal.toLocaleString()} {t('common.currency')}</span>
           </div>
           {totals.vatSummary.map(vs => (
             <div key={vs.vatRateCode} className="flex items-center gap-8 text-sm">
               <span className="text-gray-400">{t('invoicing.vat')} {vs.vatRateCode}:</span>
-              <span className="font-mono text-gray-300 w-32 text-right">{vs.vatAmount.toLocaleString('hu-HU')} Ft</span>
+              <span className="font-mono text-gray-300 w-32 text-right">{vs.vatAmount.toLocaleString()} {t('common.currency')}</span>
             </div>
           ))}
           <div className="flex items-center gap-8 text-base font-bold border-t border-gray-700 pt-2 mt-1">
             <span className="text-gray-200">{t('invoicing.gross_total')}:</span>
-            <span className="font-mono text-white w-32 text-right">{totals.grossTotal.toLocaleString('hu-HU')} Ft</span>
+            <span className="font-mono text-white w-32 text-right">{totals.grossTotal.toLocaleString()} {t('common.currency')}</span>
           </div>
         </div>
       </div>

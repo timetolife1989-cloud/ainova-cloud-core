@@ -267,7 +267,7 @@ export default function PerformanceDashboardPage() {
             </div>
             <div>
               <p className="text-xs text-gray-500">{t('performance.norm_time')}</p>
-              <p className="text-2xl font-bold text-white">{totalNormTime} perc</p>
+              <p className="text-2xl font-bold text-white">{totalNormTime} {t('common.minutes')}</p>
             </div>
           </div>
         </div>
@@ -278,7 +278,7 @@ export default function PerformanceDashboardPage() {
             </div>
             <div>
               <p className="text-xs text-gray-500">{t('performance.actual_time')}</p>
-              <p className="text-2xl font-bold text-white">{totalActualTime} perc</p>
+              <p className="text-2xl font-bold text-white">{totalActualTime} {t('common.minutes')}</p>
             </div>
           </div>
         </div>
@@ -505,7 +505,7 @@ export default function PerformanceDashboardPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-400 mb-1">{t('performance.target_unit')}</label>
-                  <input type="text" value={tgtUnit} onChange={e => setTgtUnit(e.target.value)} placeholder="%, db, perc" className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" />
+                  <input type="text" value={tgtUnit} onChange={e => setTgtUnit(e.target.value)} placeholder="%, db, min" className="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">

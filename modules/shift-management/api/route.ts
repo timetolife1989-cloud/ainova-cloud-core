@@ -63,8 +63,10 @@ export async function POST(request: NextRequest) {
   const { workerName, teamName, shiftId, assignmentDate } = parsed.data;
 
   try {
+    const db = getDb();
+
     // Check for conflict
-    const existing = await getDb().query<{ id: number }>(
+    const existing = await db.query<{ id: number }>(
       'SELECT id FROM shift_assignments WHERE worker_name = @p0 AND assignment_date = @p1',
       [{ name: 'p0', type: 'nvarchar', value: workerName }, { name: 'p1', type: 'nvarchar', value: assignmentDate }]
     );
@@ -72,7 +74,59 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'api.error.worker_already_assigned' }, { status: 409 });
     }
 
-    const result = await getDb().query<{ id: number }>(
+    // sm-07: Rest period validation (min 11 hours between shifts)
+    const MIN_REST_HOURS = 11;
+    const newShift = await db.query<{ start_time: string; end_time: string }>(
+      'SELECT start_time, end_time FROM shift_definitions WHERE id = @p0',
+      [{ name: 'p0', type: 'int', value: shiftId }]
+    );
+    if (newShift[0]) {
+      const prevDate = new Date(assignmentDate);
+      prevDate.setDate(prevDate.getDate() - 1);
+      const nextDate = new Date(assignmentDate);
+      nextDate.setDate(nextDate.getDate() + 1);
+
+      const adjacent = await db.query<{ assignment_date: string; start_time: string; end_time: string }>(
+        `SELECT CONVERT(VARCHAR(10), a.assignment_date, 120) AS assignment_date, s.start_time, s.end_time
+         FROM shift_assignments a JOIN shift_definitions s ON a.shift_id = s.id
+         WHERE a.worker_name = @p0 AND a.assignment_date IN (@p1, @p2)`,
+        [
+          { name: 'p0', type: 'nvarchar', value: workerName },
+          { name: 'p1', type: 'nvarchar', value: prevDate.toISOString().split('T')[0] },
+          { name: 'p2', type: 'nvarchar', value: nextDate.toISOString().split('T')[0] },
+        ]
+      );
+
+      const parseTime = (dateStr: string, timeStr: string) => {
+        const [h, m] = timeStr.split(':').map(Number);
+        const d = new Date(dateStr);
+        d.setHours(h ?? 0, m ?? 0, 0, 0);
+        return d.getTime();
+      };
+
+      for (const adj of adjacent) {
+        const adjDate = adj.assignment_date;
+        if (adjDate === prevDate.toISOString().split('T')[0]) {
+          // Previous day shift end → new shift start
+          const prevEnd = parseTime(adjDate, adj.end_time);
+          const newStart = parseTime(assignmentDate, newShift[0].start_time);
+          const restHours = (newStart - prevEnd) / (1000 * 60 * 60);
+          if (restHours < MIN_REST_HOURS) {
+            return Response.json({ error: 'shift.rest_violation' }, { status: 422 });
+          }
+        } else {
+          // New shift end → next day shift start
+          const newEnd = parseTime(assignmentDate, newShift[0].end_time);
+          const nextStart = parseTime(adjDate, adj.start_time);
+          const restHours = (nextStart - newEnd) / (1000 * 60 * 60);
+          if (restHours < MIN_REST_HOURS) {
+            return Response.json({ error: 'shift.rest_violation' }, { status: 422 });
+          }
+        }
+      }
+    }
+
+    const result = await db.query<{ id: number }>(
       `INSERT INTO shift_assignments (worker_name, team_name, shift_id, assignment_date, created_by)
        OUTPUT INSERTED.id VALUES (@p0, @p1, @p2, @p3, @p4)`,
       [

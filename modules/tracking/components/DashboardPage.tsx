@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DashboardSectionHeader } from '@/components/core/DashboardSectionHeader';
 import { ExportButton } from '@/components/core/ExportButton';
-import { ClipboardCheck, Plus, X, Check, AlertTriangle, Clock, CheckCircle, Circle, AlertCircle } from 'lucide-react';
+import { ClipboardCheck, Plus, X, Check, AlertTriangle, Clock, CheckCircle, Circle, AlertCircle, History } from 'lucide-react';
+import TimelinePanel from './TimelinePanel';
 import { useTranslation } from '@/hooks/useTranslation';
 import { getErrorMessage } from '@/lib/translate-error';
 
@@ -54,6 +55,7 @@ export default function TrackingDashboardPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('');
+  const [timelineItem, setTimelineItem] = useState<TrackingItem | null>(null);
 
   // Form state
   const [formRef, setFormRef] = useState('');
@@ -234,10 +236,12 @@ export default function TrackingDashboardPage() {
 
       {/* Items list */}
       <div className="space-y-2">
-        {items.map(item => (
-          <div key={item.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center justify-between">
+        {items.map(item => {
+          const isOverdue = !!(item.dueDate && new Date(item.dueDate) < new Date() && item.status !== 'Kész' && item.status !== 'Lezárt');
+          return (
+          <div key={item.id} className={`bg-gray-900 border rounded-xl p-4 flex items-center justify-between ${isOverdue ? 'border-red-700/60' : 'border-gray-800'}`}>
             <div className="flex items-center gap-4">
-              {getStatusIcon(item.status)}
+              {isOverdue ? <AlertCircle className="w-4 h-4 text-red-400" /> : getStatusIcon(item.status)}
               <div>
                 <div className="flex items-center gap-2">
                   {item.referenceCode && <span className="text-xs text-gray-500 font-mono">{item.referenceCode}</span>}
@@ -245,22 +249,29 @@ export default function TrackingDashboardPage() {
                   <span className={`text-xs ${PRIORITIES.find(p => p.value === item.priority)?.color ?? 'text-gray-400'}`}>
                     {t(PRIORITIES.find(p => p.value === item.priority)?.labelKey ?? item.priority)}
                   </span>
+                  {isOverdue && <span className="px-1.5 py-0.5 bg-red-900/40 text-red-400 text-[10px] rounded font-semibold">{t('tracking.overdue')}</span>}
                 </div>
                 <p className="text-xs text-gray-500">
                   {item.assignedTo && <span>{t('tracking.assigned_label')}: {item.assignedTo} • </span>}
-                  {item.dueDate && <span>{t('tracking.due_label')}: {item.dueDate}</span>}
+                  {item.dueDate && <span className={isOverdue ? 'text-red-400' : ''}>{t('tracking.due_label')}: {item.dueDate}</span>}
                 </p>
               </div>
             </div>
-            <select
-              value={item.status}
-              onChange={e => handleStatusChange(item, e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded-lg px-2 py-1 text-sm text-gray-300"
-            >
-              {DEFAULT_STATUSES.map(s => <option key={s} value={s}>{t(STATUS_KEYS[s] ?? s)}</option>)}
-            </select>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setTimelineItem(item)} className="p-1.5 hover:bg-gray-800 rounded-lg" title={t('tracking.timeline')}>
+                <History className="w-4 h-4 text-gray-400" />
+              </button>
+              <select
+                value={item.status}
+                onChange={e => handleStatusChange(item, e.target.value)}
+                className="bg-gray-800 border border-gray-700 rounded-lg px-2 py-1 text-sm text-gray-300"
+              >
+                {DEFAULT_STATUSES.map(s => <option key={s} value={s}>{t(STATUS_KEYS[s] ?? s)}</option>)}
+              </select>
+            </div>
           </div>
-        ))}
+          );
+        })}
         {items.length === 0 && (
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
             <ClipboardCheck className="w-12 h-12 mx-auto mb-3 text-gray-600" />
@@ -268,6 +279,11 @@ export default function TrackingDashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Timeline Panel */}
+      {timelineItem && (
+        <TimelinePanel itemId={timelineItem.id} itemTitle={timelineItem.title} onClose={() => setTimelineItem(null)} />
+      )}
 
       {/* Modal */}
       {modalOpen && (

@@ -63,11 +63,41 @@ export async function POST(request: NextRequest) {
   const conn = conns[0];
   const adapter = await getAdapter(conn);
 
-  const syncResult: { stockUpdated: number; ordersImported: number; errors: string[] } = {
+  const syncResult: { stockUpdated: number; priceUpdated: number; ordersImported: number; errors: string[] } = {
     stockUpdated: 0,
+    priceUpdated: 0,
     ordersImported: 0,
     errors: [],
   };
+
+  // ec-01: Sync price: push local price → remote
+  if (conn.sync_price) {
+    const priceMappings = await db.query<MapRow>(
+      'SELECT * FROM ecommerce_product_map WHERE connection_id = @p0 AND sync_price = 1',
+      [{ name: 'p0', type: 'int', value: conn.id }]
+    );
+
+    for (const m of priceMappings) {
+      try {
+        const priceRows = await db.query<{ unit_price: number; currency: string }>(
+          'SELECT unit_price, ISNULL(currency, \'HUF\') AS currency FROM inventory_items WHERE id = @p0',
+          [{ name: 'p0', type: 'int', value: m.local_product_id }]
+        );
+        if (priceRows[0]) {
+          const ok = await adapter.updatePrice(m.remote_product_id, priceRows[0].unit_price);
+          if (ok) {
+            syncResult.priceUpdated++;
+            await db.query(
+              'UPDATE ecommerce_product_map SET last_synced = GETUTCDATE() WHERE id = @p0',
+              [{ name: 'p0', type: 'int', value: m.id }]
+            );
+          }
+        }
+      } catch (err) {
+        syncResult.errors.push(`Price sync failed for product ${m.remote_product_id}: ${err instanceof Error ? err.message : 'unknown'}`);
+      }
+    }
+  }
 
   // Sync stock: push local stock → remote
   if (conn.sync_stock) {

@@ -607,7 +607,7 @@ export default function SapImportDashboardPage() {
                     <div className="flex items-center gap-3 text-xs text-gray-500">
                       <span>{log.connectionName}</span>
                       <span>{log.syncType}</span>
-                      <span>{new Date(log.startedAt).toLocaleString('hu-HU')}</span>
+                      <span>{new Date(log.startedAt).toLocaleString()}</span>
                       {log.durationMs > 0 && <span>{(log.durationMs / 1000).toFixed(1)}s</span>}
                     </div>
                   </div>

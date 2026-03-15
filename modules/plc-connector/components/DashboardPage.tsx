@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import RegisterManager from './RegisterManager';
+import LiveRegisterValues from './LiveRegisterValues';
 
 interface PlcDevice {
   id: number;
@@ -23,6 +25,7 @@ export default function PlcConnectorDashboardPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: '', protocol: 's7', ipAddress: '', port: 102, rack: 0, slot: 1 });
   const [error, setError] = useState('');
+  const [selectedDevice, setSelectedDevice] = useState<PlcDevice | null>(null);
 
   const fetchDevices = useCallback(async () => {
     try {
@@ -98,7 +101,7 @@ export default function PlcConnectorDashboardPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {devices.map(d => (
-            <div key={d.id} className="bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-green-500/50 transition-colors">
+            <div key={d.id} onClick={() => setSelectedDevice(d)} className={`bg-gray-900 border rounded-xl p-5 cursor-pointer transition-colors ${selectedDevice?.id === d.id ? 'border-green-500' : 'border-gray-800 hover:border-green-500/50'}`}>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-white font-semibold">{d.name}</h3>
                 <span className={`w-3 h-3 rounded-full ${d.isActive ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`} />
@@ -107,10 +110,18 @@ export default function PlcConnectorDashboardPage() {
                 <p>{t('plc.protocol')}: <span className="text-gray-300">{d.protocol.toUpperCase()}</span></p>
                 <p>{t('plc.ip')}: <span className="text-gray-300">{d.ipAddress}:{d.port}</span></p>
                 {d.rack !== null && <p>{t('plc.rack_slot')}: <span className="text-gray-300">{d.rack}/{d.slot}</span></p>}
-                {d.lastSeenAt && <p>{t('plc.last_activity')}: <span className="text-gray-300">{new Date(d.lastSeenAt).toLocaleString('hu-HU')}</span></p>}
+                {d.lastSeenAt && <p>{t('plc.last_activity')}: <span className="text-gray-300">{new Date(d.lastSeenAt).toLocaleString()}</span></p>}
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Selected device — Register config + Live values */}
+      {selectedDevice && (
+        <div className="mt-6 space-y-6">
+          <RegisterManager deviceId={selectedDevice.id} deviceName={selectedDevice.name} />
+          <LiveRegisterValues deviceId={selectedDevice.id} deviceName={selectedDevice.name} />
         </div>
       )}
 
