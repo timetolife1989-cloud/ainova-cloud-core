@@ -8,6 +8,9 @@ import { X, Check, AlertTriangle } from 'lucide-react';
 interface ReportEditorProps {
   onClose: () => void;
   onSaved: () => void | Promise<void>;
+  presetName?: string;
+  presetChartType?: string;
+  presetDateRange?: string;
 }
 
 const SOURCE_MODULES = [
@@ -24,16 +27,16 @@ const SOURCE_MODULES = [
 const CHART_TYPES = ['bar', 'line', 'pie', 'area', 'table'] as const;
 const DATE_RANGES = ['last_7_days', 'last_30_days', 'last_90_days', 'last_365_days'] as const;
 
-export function ReportEditor({ onClose, onSaved }: ReportEditorProps) {
+export function ReportEditor({ onClose, onSaved, presetName, presetChartType, presetDateRange }: ReportEditorProps) {
   const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [name, setName] = useState('');
+  const [name, setName] = useState(presetName ?? '');
   const [description, setDescription] = useState('');
   const [sourceIdx, setSourceIdx] = useState(0);
-  const [chartType, setChartType] = useState<string>('bar');
-  const [dateRange, setDateRange] = useState<string>('last_30_days');
+  const [chartType, setChartType] = useState<string>(presetChartType ?? 'bar');
+  const [dateRange, setDateRange] = useState<string>(presetDateRange ?? 'last_30_days');
   const [isPublic, setIsPublic] = useState(true);
 
   const getCsrfToken = () =>
@@ -63,8 +66,8 @@ export function ReportEditor({ onClose, onSaved }: ReportEditorProps) {
       });
       const body = await res.json() as { ok?: boolean; error?: string };
       if (!res.ok) throw new Error(body.error ?? 'Error');
-      await onSaved();
       onClose();
+      await onSaved();
     } catch (e) {
       setError(getErrorMessage(e, t));
     } finally {

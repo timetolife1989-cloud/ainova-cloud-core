@@ -279,7 +279,15 @@ export default function InvoicingDashboardPage() {
                       )}
                       {(inv.status === 'issued' || inv.status === 'paid') && !isDemo && (
                         <button
-                          onClick={() => window.open(`/api/modules/invoicing/data/${inv.id}/pdf`, '_blank')}
+                          onClick={() => {
+                            const w = window.open('', '_blank');
+                            if (w) {
+                              fetch(`/api/modules/invoicing/data/${inv.id}/pdf`)
+                                .then(r => r.text())
+                                .then(html => { w.document.open(); w.document.write(html); w.document.close(); })
+                                .catch(() => { w.document.write('PDF generation failed'); w.document.close(); });
+                            }
+                          }}
                           className="p-1.5 bg-emerald-900/30 hover:bg-emerald-900/50 rounded text-emerald-400"
                           title={t('invoicing.action_print')}
                         >

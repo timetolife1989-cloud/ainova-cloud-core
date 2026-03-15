@@ -208,6 +208,7 @@
   "workforce.save_success_edit": "Sikeresen módosítva!",
   "workforce.delete_success": "Sikeresen törölve!",
   "workforce.csv_exported": "CSV exportálva!",
+  "workforce.error_date_required": "A dátum megadása kötelező!",
   "workforce.error_future_date": "Nem lehet jövőbeli dátumra rögzíteni!",
   "workforce.error_zero_headcount": "Adj meg legalább 1 főt (tervezett, tényleges vagy hiányzó)!",
   "workforce.report_required_title": "Riport köteles módosítás",

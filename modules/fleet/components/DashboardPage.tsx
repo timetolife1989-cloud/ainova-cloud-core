@@ -344,10 +344,10 @@ export default function FleetDashboardPage() {
                 <table className="w-full text-sm">
                   <thead className="text-gray-500 text-xs">
                     <tr>
-                      <th className="text-left px-3 py-2">{t('fleet.date')}</th>
-                      <th className="text-left px-3 py-2">{t('fleet.driver')}</th>
-                      <th className="text-right px-3 py-2">{t('fleet.km')}</th>
-                      <th className="text-left px-3 py-2">{t('fleet.destination')}</th>
+                      <th className="text-left px-3 py-2 whitespace-nowrap">{t('fleet.date')}</th>
+                      <th className="text-left px-3 py-2 whitespace-nowrap">{t('fleet.driver')}</th>
+                      <th className="text-right px-3 py-2 whitespace-nowrap">{t('fleet.km')}</th>
+                      <th className="text-left px-3 py-2 whitespace-nowrap">{t('fleet.destination')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-800">
@@ -375,11 +375,11 @@ export default function FleetDashboardPage() {
                 <table className="w-full text-sm">
                   <thead className="text-gray-500 text-xs">
                     <tr>
-                      <th className="text-left px-3 py-2">{t('fleet.date')}</th>
-                      <th className="text-right px-3 py-2">{t('fleet.amount_l')}</th>
-                      <th className="text-right px-3 py-2">{t('fleet.cost')}</th>
-                      <th className="text-right px-3 py-2">{t('fleet.km')}</th>
-                      <th className="text-left px-3 py-2">{t('fleet.fuel_type')}</th>
+                      <th className="text-left px-3 py-2 whitespace-nowrap">{t('fleet.date')}</th>
+                      <th className="text-right px-3 py-2 whitespace-nowrap">{t('fleet.amount_l')}</th>
+                      <th className="text-right px-3 py-2 whitespace-nowrap">{t('fleet.cost')}</th>
+                      <th className="text-right px-3 py-2 whitespace-nowrap">{t('fleet.km')}</th>
+                      <th className="text-left px-3 py-2 whitespace-nowrap">{t('fleet.fuel_type')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-800">

@@ -32,6 +32,7 @@ export default function ReportsDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [viewReport, setViewReport] = useState<SavedReport | null>(null);
   const [showEditor, setShowEditor] = useState(false);
+  const [editorPreset, setEditorPreset] = useState<{ name?: string; chartType?: string; dateRange?: string }>({});
   const [deleting, setDeleting] = useState<number | null>(null);
 
   const fetchReports = useCallback(async () => {
@@ -182,22 +183,22 @@ export default function ReportsDashboardPage() {
       {/* Quick report templates */}
       <h3 className="text-sm font-medium text-gray-400 mt-8 mb-3">{t('reports.quick_templates')}</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <button onClick={() => setShowEditor(true)} className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
+        <button onClick={() => { setEditorPreset({ chartType: 'bar', dateRange: 'last_7_days' }); setShowEditor(true); }} className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
           <BarChart3 className="w-6 h-6 text-blue-400 mb-2" />
           <p className="text-white text-sm font-medium">{t('reports.weekly_summary')}</p>
           <p className="text-xs text-gray-500">{t('reports.last_7_days')}</p>
         </button>
-        <button onClick={() => setShowEditor(true)} className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
+        <button onClick={() => { setEditorPreset({ chartType: 'line', dateRange: 'last_30_days' }); setShowEditor(true); }} className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
           <LineChart className="w-6 h-6 text-green-400 mb-2" />
           <p className="text-white text-sm font-medium">{t('reports.trend_analysis')}</p>
           <p className="text-xs text-gray-500">{t('reports.30_day_trend')}</p>
         </button>
-        <button onClick={() => setShowEditor(true)} className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
+        <button onClick={() => { setEditorPreset({ chartType: 'pie', dateRange: 'last_30_days' }); setShowEditor(true); }} className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
           <PieChart className="w-6 h-6 text-violet-400 mb-2" />
           <p className="text-white text-sm font-medium">{t('reports.distribution')}</p>
           <p className="text-xs text-gray-500">{t('reports.by_category')}</p>
         </button>
-        <button onClick={() => setShowEditor(true)} className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
+        <button onClick={() => { setEditorPreset({ chartType: 'table', dateRange: 'last_30_days' }); setShowEditor(true); }} className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-left hover:border-violet-500/50 transition-colors">
           <Table className="w-6 h-6 text-amber-400 mb-2" />
           <p className="text-white text-sm font-medium">{t('reports.detailed_list')}</p>
           <p className="text-xs text-gray-500">{t('reports.table_export')}</p>
@@ -217,8 +218,11 @@ export default function ReportsDashboardPage() {
       {/* Report editor modal */}
       {showEditor && (
         <ReportEditor
-          onClose={() => setShowEditor(false)}
+          onClose={() => { setShowEditor(false); setEditorPreset({}); }}
           onSaved={() => fetchReports()}
+          presetName={editorPreset.name}
+          presetChartType={editorPreset.chartType}
+          presetDateRange={editorPreset.dateRange}
         />
       )}
     </div>

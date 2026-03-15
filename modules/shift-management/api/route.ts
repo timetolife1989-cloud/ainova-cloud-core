@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       nextDate.setDate(nextDate.getDate() + 1);
 
       const adjacent = await db.query<{ assignment_date: string; start_time: string; end_time: string }>(
-        `SELECT CONVERT(VARCHAR(10), a.assignment_date, 120) AS assignment_date, s.start_time, s.end_time
+        `SELECT CAST(a.assignment_date AS VARCHAR) AS assignment_date, s.start_time, s.end_time
          FROM shift_assignments a JOIN shift_definitions s ON a.shift_id = s.id
          WHERE a.worker_name = @p0 AND a.assignment_date IN (@p1, @p2)`,
         [

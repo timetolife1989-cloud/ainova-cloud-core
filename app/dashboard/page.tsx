@@ -74,22 +74,13 @@ export default async function DashboardPage() {
           {modules.map((mod) => (
             <MenuTile
               key={mod.id}
-              title={moduleTitles[mod.id]}
-              description={moduleSubtitles[mod.id]}
+              title={mod.id === 'admin' ? adminTitle : moduleTitles[mod.id]}
+              description={mod.id === 'admin' ? adminSubtitle : moduleSubtitles[mod.id]}
               icon={mod.icon}
               href={mod.href}
               color={mod.color}
             />
           ))}
-          {session.role === 'admin' && (
-            <MenuTile
-              title={adminTitle}
-              description={adminSubtitle}
-              icon="Settings"
-              href="/dashboard/admin"
-              color="bg-indigo-600"
-            />
-          )}
         </div>
       )}
     </div>

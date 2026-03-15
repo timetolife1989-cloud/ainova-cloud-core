@@ -69,13 +69,13 @@ export default function OeeDashboardPage() {
     finally { setSaving(false); }
   };
 
-  const avgOee = useMemo(() => records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.oeePct ?? 0), 0) / records.filter(r => r.oeePct !== null).length) : 0, [records]);
-  const avgAvailability = useMemo(() => records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.availabilityPct ?? 0), 0) / records.length) : 0, [records]);
-  const avgPerformance = useMemo(() => records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.performancePct ?? 0), 0) / records.filter(r => r.performancePct !== null).length || 0) : 0, [records]);
-  const avgQuality = useMemo(() => records.length > 0 ? Math.round(records.reduce((s, r) => s + (r.qualityPct ?? 0), 0) / records.length) : 0, [records]);
+  const avgOee = useMemo(() => { const valid = records.filter(r => r.oeePct != null); return valid.length > 0 ? Math.round(valid.reduce((s, r) => s + (r.oeePct ?? 0), 0) / valid.length) : null; }, [records]);
+  const avgAvailability = useMemo(() => { const valid = records.filter(r => r.availabilityPct != null); return valid.length > 0 ? Math.round(valid.reduce((s, r) => s + (r.availabilityPct ?? 0), 0) / valid.length) : null; }, [records]);
+  const avgPerformance = useMemo(() => { const valid = records.filter(r => r.performancePct != null); return valid.length > 0 ? Math.round(valid.reduce((s, r) => s + (r.performancePct ?? 0), 0) / valid.length) : null; }, [records]);
+  const avgQuality = useMemo(() => { const valid = records.filter(r => r.qualityPct != null); return valid.length > 0 ? Math.round(valid.reduce((s, r) => s + (r.qualityPct ?? 0), 0) / valid.length) : null; }, [records]);
 
   if (loading) {
-    return (<div className="max-w-7xl mx-auto px-4 py-8"><DashboardSectionHeader title={t('oee.title')} subtitle={t('oee.subtitle')} /><div className="animate-pulse mt-6 h-64 bg-gray-800 rounded-xl" /></div>);
+    return (<div className="max-w-7xl mx-auto px-4 py-8"><DashboardSectionHeader title={t('oee.title')} subtitle={t('oee.subtitle')} /><div className="mt-6 flex items-center justify-center h-64"><div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-red-500" /></div></div>);
   }
 
   return (
@@ -93,19 +93,19 @@ export default function OeeDashboardPage() {
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
           <Gauge className="w-8 h-8 mx-auto mb-2 text-red-400" />
           <p className="text-xs text-gray-500">{t('oee.avg_oee')}</p>
-          <p className={`text-3xl font-bold ${getOeeColor(avgOee)}`}>{avgOee}%</p>
+          <p className={`text-3xl font-bold ${getOeeColor(avgOee)}`}>{avgOee != null ? `${avgOee}%` : '-'}</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
           <p className="text-xs text-gray-500">{t('oee.availability')}</p>
-          <p className="text-2xl font-bold text-blue-400">{avgAvailability}%</p>
+          <p className="text-2xl font-bold text-blue-400">{avgAvailability != null ? `${avgAvailability}%` : '-'}</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
           <p className="text-xs text-gray-500">{t('oee.performance')}</p>
-          <p className="text-2xl font-bold text-amber-400">{avgPerformance}%</p>
+          <p className="text-2xl font-bold text-amber-400">{avgPerformance != null ? `${avgPerformance}%` : '-'}</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
           <p className="text-xs text-gray-500">{t('oee.quality')}</p>
-          <p className="text-2xl font-bold text-green-400">{avgQuality}%</p>
+          <p className="text-2xl font-bold text-green-400">{avgQuality != null ? `${avgQuality}%` : '-'}</p>
         </div>
       </div>
 

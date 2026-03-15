@@ -86,6 +86,37 @@ async function handleModuleRequest(
       }
     }
 
+    // Strategy 3b: 'data' prefix + numeric ID (e.g. path=['data','123'] → [id]/route)
+    if (!handler && path.length >= 2 && path[0] === 'data' && /^\d+$/.test(path[1])) {
+      try {
+        handler = await import(`@/modules/${moduleId}/api/[id]/route`);
+        routeParams = { id: path[1] };
+      } catch {
+        // continue to fallback
+      }
+    }
+
+    // Strategy 3c: 'data' prefix + numeric ID + sub-path (e.g. path=['data','3','pdf'] → [id]/pdf/route)
+    if (!handler && path.length >= 3 && path[0] === 'data' && /^\d+$/.test(path[1])) {
+      const restPath = path.slice(2).join('/');
+      try {
+        handler = await import(`@/modules/${moduleId}/api/[id]/${restPath}/route`);
+        routeParams = { id: path[1] };
+      } catch {
+        // continue to fallback
+      }
+    }
+
+    // Strategy 3d: 'data' prefix + named sub-path (e.g. path=['data','customers'] → customers/route)
+    if (!handler && path.length >= 2 && path[0] === 'data' && !/^\d+$/.test(path[1])) {
+      const namedPath = path.slice(1).join('/');
+      try {
+        handler = await import(`@/modules/${moduleId}/api/${namedPath}/route`);
+      } catch {
+        // continue to fallback
+      }
+    }
+
     // Strategy 4: fallback to root module route (e.g. modules/workforce/api/route)
     if (!handler) {
       try {

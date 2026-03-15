@@ -236,6 +236,12 @@ export default function WorkforceDashboardPage() {
 
   /** Save with validations: future date, zero headcount, overwrite check, report-required */
   const handleSave = async () => {
+    // Validation 0: Date required
+    if (!form.date || !/^\d{4}-\d{2}-\d{2}$/.test(form.date)) {
+      addToast('warning', t('workforce.error_date_required'));
+      return;
+    }
+
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
     const selectedDate = new Date(form.date + 'T00:00:00');
