@@ -28,22 +28,28 @@ export async function GET(request: NextRequest) {
   }
 
   const db = getDb();
-  const rows = await db.query<SectorPreset>(
-    'SELECT * FROM core_sector_presets ORDER BY sector_id'
-  );
 
-  const sectors = rows.map(r => ({
-    id: r.id,
-    sectorId: r.sector_id,
-    nameHu: r.name_hu,
-    nameEn: r.name_en,
-    nameDe: r.name_de,
-    icon: r.icon,
-    modules: JSON.parse(r.modules),
-    optionalModules: r.optional_modules ? JSON.parse(r.optional_modules) : [],
-    settings: JSON.parse(r.settings),
-    recommendedTier: r.recommended_tier,
-  }));
+  let sectors: Array<Record<string, unknown>> = [];
+  try {
+    const rows = await db.query<SectorPreset>(
+      'SELECT * FROM core_sector_presets ORDER BY sector_id'
+    );
+
+    sectors = rows.map(r => ({
+      id: r.id,
+      sectorId: r.sector_id,
+      nameHu: r.name_hu,
+      nameEn: r.name_en,
+      nameDe: r.name_de,
+      icon: r.icon,
+      modules: JSON.parse(r.modules),
+      optionalModules: r.optional_modules ? JSON.parse(r.optional_modules) : [],
+      settings: JSON.parse(r.settings),
+      recommendedTier: r.recommended_tier,
+    }));
+  } catch {
+    // Table may not exist yet — return empty list for setup wizard
+  }
 
   return Response.json({ sectors });
 }

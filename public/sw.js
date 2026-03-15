@@ -1,8 +1,7 @@
 // Ainova Cloud Intelligence — Service Worker (PWA)
-const CACHE_NAME = 'ainova-v3';
+const CACHE_NAME = 'ainova-v4';
 const STATIC_ASSETS = [
   '/manifest.json',
-  '/login',
   '/offline.html',
 ];
 
@@ -30,8 +29,11 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   if (url.pathname.startsWith('/api/')) return;
 
-  // Cache-first for static assets (immutable hashed files)
-  if (url.pathname.startsWith('/_next/static/') || url.pathname.match(/\.(js|css|woff2?|ttf|svg|png|ico|webp)$/)) {
+  // Never cache in development (localhost)
+  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') return;
+
+  // Cache-first for static assets (immutable hashed files from production builds only)
+  if (url.pathname.startsWith('/_next/static/') || url.pathname.match(/\.(css|woff2?|ttf|svg|png|ico|webp)$/)) {
     event.respondWith(
       caches.open(CACHE_NAME).then(async (cache) => {
         const cached = await cache.match(request);

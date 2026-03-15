@@ -257,8 +257,8 @@ export default function LandingPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {TIERS.map((tier) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+          {TIERS.map((tier, idx) => {
             const tierKey = tier.nameKey.replace('landing.tier_', '');
             const isRecommended = activeSectorPreset?.recommendedTier === tierKey;
             const isPopular = activeSector ? isRecommended : tier.popular;
@@ -274,15 +274,18 @@ export default function LandingPage() {
             return (
             <motion.div
               key={tier.nameKey}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: TIERS.indexOf(tier) * 0.1 }}
-              className={`relative rounded-2xl p-6 border ${
-                isPopular ? 'border-blue-500 shadow-xl shadow-blue-600/20 lg:scale-105' : 'border-gray-800'
-              } bg-gradient-to-b ${tier.color}`}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              className={`relative rounded-2xl p-6 border flex flex-col ${
+                isPopular
+                  ? 'border-blue-500 shadow-xl shadow-blue-600/20 lg:scale-105'
+                  : 'border-gray-700/50 hover:border-gray-600'
+              } bg-gradient-to-b ${tier.color} backdrop-blur-sm hover:shadow-lg hover:shadow-blue-900/10 transition-all duration-300 group`}
             >
               {isPopular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-500 text-white text-xs font-bold rounded-full uppercase tracking-wide">
                   {isRecommended ? t('landing.tier_recommended') : t('landing.tier_popular')}
                 </div>
               )}
@@ -291,7 +294,7 @@ export default function LandingPage() {
                 <span className="text-3xl font-extrabold">€{tier.price}</span>
                 <span className="text-gray-400 text-sm"> /{t('landing.tier_per_month')}</span>
               </div>
-              <ul className="space-y-2 mb-6">
+              <ul className="space-y-2 mb-6 flex-1">
                 {displayFeatures.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-sm text-gray-300">
                     <span className="text-green-400">✓</span> {t(f)}
@@ -303,10 +306,10 @@ export default function LandingPage() {
               </ul>
               <a
                 href="/login"
-                className={`block w-full text-center py-3 rounded-xl font-semibold transition-colors ${
+                className={`block w-full text-center py-3 rounded-xl font-semibold transition-all duration-200 mt-auto ${
                   isPopular
-                    ? 'bg-blue-500 hover:bg-blue-400 text-white'
-                    : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
+                    ? 'bg-blue-500 hover:bg-blue-400 hover:shadow-lg hover:shadow-blue-500/30 text-white'
+                    : 'bg-white/10 hover:bg-white/20 text-gray-200 border border-white/10'
                 }`}
               >
                 {t(tier.ctaKey)}
@@ -383,7 +386,6 @@ export default function LandingPage() {
             © {new Date().getFullYear()} Ainova Cloud Intelligence. {t('landing.footer_rights')}
           </div>
           <div className="flex items-center gap-6 text-sm text-gray-500">
-            <a href="/login" className="hover:text-gray-300 transition-colors">{t('landing.footer_signin')}</a>
             <a href="/login" className="hover:text-gray-300 transition-colors">{t('landing.footer_signin')}</a>
           </div>
         </div>

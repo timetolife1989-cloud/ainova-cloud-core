@@ -94,7 +94,8 @@ function convertSqlSyntax(sqlStr: string): string {
   // No change needed — PostgreSQL supports CAST
 
   // DATEADD(MINUTE, -15, ...) → (... - INTERVAL '15 minutes')
-  s = s.replace(/DATEADD\(\s*(\w+)\s*,\s*(-?\d+)\s*,\s*([^)]+)\s*\)/gi, (_match, unit, amount, field) => {
+  // Use balanced-paren group to handle nested calls like NOW()
+  s = s.replace(/DATEADD\(\s*(\w+)\s*,\s*(-?\d+)\s*,\s*((?:[^()]|\([^)]*\))+)\s*\)/gi, (_match, unit, amount, field) => {
     const absAmount = Math.abs(parseInt(amount));
     const sign = parseInt(amount) < 0 ? '-' : '+';
     const pgUnit = unit.toLowerCase() === 'minute' ? 'minutes' : `${unit.toLowerCase()}s`;
